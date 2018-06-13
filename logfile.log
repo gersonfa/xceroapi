@@ -1,0 +1,34 @@
+
+{"message":"holi","level":"info"}
+{"errors":{"full_name":{"message":"Path `full_name` is required.","name":"ValidatorError","properties":{"type":"required","message":"Path `{PATH}` is required.","path":"full_name"},"kind":"required","path":"full_name","$isValidatorError":true}},"_message":"User validation failed","message":"User validation failed: full_name: Path `full_name` is required.","name":"ValidationError","level":"error"}
+{"level":"error","message":"LngLat [lat] must be within -90 to 90 degrees"}
+{"level":"error","message":"LngLat [lat] must be within -90 to 90 degrees"}
+{"level":"error","message":"LngLat [lat] must be within -90 to 90 degrees"}
+{"level":"error","message":"Can't set headers after they are sent."}
+{"level":"error","message":"Can't set headers after they are sent."}
+{"message":"holi","level":"info"}
+{"message":"holi","level":"info"}
+{"message":"holi","level":"info"}
+{"message":"holi","level":"info"}
+{"message":"holi","level":"info"}
+{"message":"holi","level":"info"}
+{"message":"holi","level":"info"}
+{"message":"holi","level":"info"}
+{"message":"holi","level":"info"}
+{"message":"holi","level":"info"}
+{"message":"holi","level":"info"}
+{"message":"holi","level":"info"}
+{"message":"holi","level":"info"}
+{"message":"holi","level":"info"}
+{"message":"holi","level":"info"}
+{"message":"holi","level":"info"}
+{"message":"holi","level":"info"}
+{"message":"holi","level":"info"}
+{"message":"holi","level":"info"}
+{"message":"holi","level":"info"}
+{"message":"holi","level":"info"}
+{"message":"holi","level":"info"}
+{"message":"holi","level":"info"}
+{"message":"holi","level":"info"}
+{"message":"holi","level":"info"}
+{"message":"holi","level":"info"}
