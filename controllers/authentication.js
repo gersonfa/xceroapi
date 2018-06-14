@@ -20,12 +20,14 @@ function login(req, res, next) {
 async function register(req, res, next) {
   try {
     let userExist = await User.findOne({
-      email: req.body.email
+      account: req.body.account
     })
 
     if (userExist) {
       return next(new Error('User alredy exist'))
     }
+
+    if (!req.body.password) throw boom.badRequest('password is required')
 
     let user = new User(req.body)
 

@@ -46,7 +46,7 @@
       }
     },
     "version": "0.0.0",
-    "filename": "app/router/index.js",
+    "filename": "routes/auth.js",
     "groupTitle": "Authentication"
   },
   {
@@ -117,7 +117,7 @@
       }
     },
     "version": "0.0.0",
-    "filename": "app/router/index.js",
+    "filename": "routes/auth.js",
     "groupTitle": "Authentication"
   },
   {
@@ -159,57 +159,8 @@
       }
     },
     "version": "0.0.0",
-    "filename": "app/router/index.js",
+    "filename": "routes/index.js",
     "groupTitle": "Colony"
-  },
-  {
-    "type": "get",
-    "url": "/api/group/place",
-    "title": "GroupPlace list",
-    "name": "GroupPlace_list",
-    "group": "GroupPlace",
-    "permission": [
-      {
-        "name": "Token"
-      }
-    ],
-    "success": {
-      "fields": {
-        "200 Success": [
-          {
-            "group": "200 Success",
-            "type": "Object[]",
-            "optional": false,
-            "field": "groupplaces",
-            "description": "<p>Array de groupplaces</p>"
-          },
-          {
-            "group": "200 Success",
-            "type": "String",
-            "optional": false,
-            "field": "groupplaces._id",
-            "description": ""
-          },
-          {
-            "group": "200 Success",
-            "type": "String",
-            "optional": false,
-            "field": "groupplaces.type",
-            "description": "<p>Puede ser group o place</p>"
-          },
-          {
-            "group": "200 Success",
-            "type": "String",
-            "optional": false,
-            "field": "groupplaces.name",
-            "description": ""
-          }
-        ]
-      }
-    },
-    "version": "0.0.0",
-    "filename": "app/router/index.js",
-    "groupTitle": "GroupPlace"
   },
   {
     "type": "get",
@@ -243,11 +194,142 @@
       }
     },
     "version": "0.0.0",
-    "filename": "app/router/index.js",
+    "filename": "routes/index.js",
     "groupTitle": "Place"
   },
   {
     "type": "post",
+    "url": "/api/service",
+    "title": "Service create",
+    "name": "Service_create",
+    "group": "Service",
+    "permission": [
+      {
+        "name": "Token"
+      }
+    ],
+    "parameter": {
+      "fields": {
+        "body": [
+          {
+            "group": "body",
+            "type": "Number",
+            "optional": false,
+            "field": "origin_lat",
+            "description": "<p>Latitud de origen</p>"
+          },
+          {
+            "group": "body",
+            "type": "Number",
+            "optional": false,
+            "field": "origin_lng",
+            "description": "<p>Longitud de origen</p>"
+          },
+          {
+            "group": "body",
+            "type": "String",
+            "optional": false,
+            "field": "origin_place",
+            "description": "<p>id de origen de un objeto place (Opcional)</p>"
+          },
+          {
+            "group": "body",
+            "type": "String",
+            "optional": false,
+            "field": "destiny_place",
+            "description": "<p>id de destino de un objeto place (Opcional)</p>"
+          },
+          {
+            "group": "body",
+            "type": "String",
+            "optional": false,
+            "field": "origin_colony",
+            "description": "<p>id de origen de un objeto colony (Opcional)</p>"
+          },
+          {
+            "group": "body",
+            "type": "String",
+            "optional": false,
+            "field": "destiny_colony",
+            "description": "<p>id de origen de un objeto colony (Opcional)</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "200 Success": [
+          {
+            "group": "200 Success",
+            "type": "Object[]",
+            "optional": false,
+            "field": "services",
+            "description": "<p>Array de colonias</p>"
+          },
+          {
+            "group": "200 Success",
+            "type": "String",
+            "optional": false,
+            "field": "services._id",
+            "description": ""
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "routes/index.js",
+    "groupTitle": "Service"
+  },
+  {
+    "type": "get",
+    "url": "/api/service",
+    "title": "Service list",
+    "name": "Service_list",
+    "group": "Service",
+    "permission": [
+      {
+        "name": "Token"
+      }
+    ],
+    "parameter": {
+      "fields": {
+        "query": [
+          {
+            "group": "query",
+            "type": "String",
+            "optional": false,
+            "field": "state",
+            "description": "<p>Por defecto es 'complete'</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "200 Success": [
+          {
+            "group": "200 Success",
+            "type": "Object[]",
+            "optional": false,
+            "field": "services",
+            "description": "<p>Array de colonias</p>"
+          },
+          {
+            "group": "200 Success",
+            "type": "String",
+            "optional": false,
+            "field": "services._id",
+            "description": ""
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "routes/index.js",
+    "groupTitle": "Service"
+  },
+  {
+    "type": "get",
     "url": "/api/tariff/check",
     "title": "Check Tariff",
     "name": "Check_Tariff",
@@ -307,7 +389,7 @@
       }
     },
     "version": "0.0.0",
-    "filename": "app/router/index.js",
+    "filename": "routes/tariff.js",
     "groupTitle": "Tariff"
   }
 ]

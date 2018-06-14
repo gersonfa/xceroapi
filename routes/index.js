@@ -66,7 +66,21 @@ module.exports = (app, io) => {
   api_routes.get('/colony', require_auth, colony_controller.colony_list)
 
   api_routes.get('/user/drivers', require_auth, user_controller.user_drivers_list)
+  /**
+   * @api {post} /api/service Service create
+   * @apiName Service create
+   * @apiGroup Service
+   * @apiPermission Token
+   * @apiParam (body) {Number} origin_lat Latitud de origen
+   * @apiParam (body) {Number} origin_lng Longitud de origen
+   * @apiParam (body) {String} origin_place id de origen de un objeto place (Opcional)
+   * @apiParam (body) {String} destiny_place id de destino de un objeto place (Opcional)
+   * @apiParam (body) {String} origin_colony id de origen de un objeto colony (Opcional)
+   * @apiParam (body) {String} destiny_colony id de origen de un objeto colony (Opcional)
 
+   * @apiSuccess (200 Success) {Object[]} services Array de colonias
+   * @apiSuccess (200 Success) {String} services._id
+   */
   api_routes.post('/service', require_auth, service_controller.service_create)
   /**
    * @api {get} /api/service Service list
