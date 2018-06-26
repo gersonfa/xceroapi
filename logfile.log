@@ -33,3 +33,12 @@
 {"message":"holi","level":"info"}
 {"message":"holi","level":"info"}
 {"message":"holi","level":"info"}
+{"message":"holi","level":"info"}
+{"message":"holi","level":"info"}
+{"message":"holi","level":"info"}
+{"data":null,"isBoom":true,"isServer":false,"output":{"statusCode":400,"payload":{"statusCode":400,"error":"Bad Request","message":"name, address, lng, lat is required"},"headers":{}},"level":"error","message":"name, address, lng, lat is required"}
+{"message":"holi","level":"info"}
+{"message":"holi","level":"info"}
+{"message":"holi","level":"info"}
+{"data":null,"isBoom":true,"isServer":false,"output":{"statusCode":400,"payload":{"statusCode":400,"error":"Bad Request","message":"name, address, lng, lat is required"},"headers":{}},"level":"error","message":"name, address, lng, lat is required"}
+{"data":null,"isBoom":true,"isServer":false,"output":{"statusCode":400,"payload":{"statusCode":400,"error":"Bad Request","message":"name, address, lng, lat is required"},"headers":{}},"level":"error","message":"name, address, lng, lat is required"}

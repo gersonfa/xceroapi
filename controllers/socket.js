@@ -5,13 +5,13 @@ const theEarth = require('../shared/common').theEarth
 
 module.exports = (io, users_online) => {
   io.on('connect', (socket) => {
-    console.log('connection')
+    const socket_id = socket.id
     let user_id = socket.handshake.query.user_id
     users_online.set(user_id, socket.id)
     console.log(users_online.entries())
 
     socket.on('update location', async (socket) => {
-      console.log(socket.user_id)
+      //console.log(socket.user_id, socket.coords)
       //console.log(io.sockets.clients())
 
       const coords = socket.coords
@@ -34,15 +34,14 @@ module.exports = (io, users_online) => {
       let bases = await Base.geoNear(point, geoOptions)
 
       if (bases.length > 0) {
-        let base = base[0].obj
+        let base = bases[0].obj
+        let is_within = base.stack.indexOf(user_id)
 
-        let is_within = base.stack.find(user_id)
-
-        if (!is_within) {
+        if (is_within === -1) {
           base.stack.push(user_id)
-          base.save()
+          await base.save()
 
-          socket.to(socket.id).emit('added', { base: base.name, position: base.stack.indexOf(user_id) + 1 })
+          io.to(socket_id).emit('added', { base: base.name, position: base.stack.indexOf(user_id) + 1 })
         }
       }
     })

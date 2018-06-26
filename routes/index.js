@@ -93,6 +93,17 @@ module.exports = (app, io) => {
    * @apiSuccess (200 Success) {String} services._id
    */
   api_routes.get('/service', require_auth, service_controller.service_list)
+  /**
+   * @api {get} /api/service Service list
+   * @apiName Service list
+   * @apiGroup Service
+   * @apiPermission Token
+   * @apiParam (query) {String} origin_lng Longitud
+  * @apiParam (query) {String} origin_lat Latitud
+
+   * @apiSuccess (200 Success) {Object} colony colonia
+   */
+  api_routes.get('/get_location', require_auth, service_controller.get_location)
 
   app.use('/api', api_routes)
 }

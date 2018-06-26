@@ -1,7 +1,6 @@
 const tariff_controller = require('../controllers/tariff')
 const express = require('express')
 const require_auth = require('../middlewares/auth').require_auth
-const require_login = require('../middlewares/auth').require_login
 
 const tariff_routes = express.Router()
 

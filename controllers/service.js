@@ -14,6 +14,7 @@ async function service_create (req, res, next) {
 
     const origin_lat = req.body.origin_lat
     const origin_lng = req.body.origin_lng
+
     let origin_colony = req.body.origin_colony
     let origin_place = req.body.origin_place
 
@@ -24,7 +25,8 @@ async function service_create (req, res, next) {
 
     let service = new Service({
       origin_coords: [parseFloat(origin_lng), parseFloat(origin_lat)],
-      user: user._id
+      user: user._id,
+      address: req.body.address
     })
 
     if (!origin_colony && !origin_place) {
@@ -93,7 +95,51 @@ async function service_list(req, res, next) {
   }
 }
 
+async function get_location(req, res, next) {
+  try {
+    const origin_lng = req.query.origin_lng
+    const origin_lat = req.query.origin_lat
+
+    const point = {
+      type: 'Point',
+      coordinates: [parseFloat(origin_lng), parseFloat(origin_lat)]
+    }
+
+    const geoOptions = {
+      spherical: true,
+      maxDistance: theEarth.getMetersFromKilometers(0.5)
+    }
+
+    let place = await Place.geoNear(point, geoOptions)
+
+    if (place.length > 0) {
+      let place_location = place[0].obj
+
+      sendJSONresponse(res, 200, {place: place_location})
+    } else {
+      const geojson = await geocoder.googleReverse([parseFloat(origin_lng), parseFloat(origin_lat)])
+
+      if (geojson && geojson.features) {
+
+        let place_ids = geojson.features.map(f => f.properties.place_id)
+        let colony = await Colony.findOne({place_id: { "$in": place_ids }})
+
+        if (colony) {
+          sendJSONresponse(res, 200, {colony: colony})
+        } else {
+          sendJSONresponse(res, 200, 'colony or place not found')
+        }
+      } else {
+        sendJSONresponse(res, 200, 'colony or place not found')
+      }
+    }
+  } catch(e) {
+    return next(e)
+  }
+}
+
 module.exports = {
   service_create,
-  service_list
+  service_list,
+  get_location
 }
