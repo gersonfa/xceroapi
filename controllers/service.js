@@ -59,12 +59,6 @@ module.exports = (io, users_online) => {
           service.destiny_place = destiny_place,
           service.destiny_colony = destiny_colony
 
-          let base = await Base.findById(origin_place.base)
-          if (base.stack.length > 0) {
-            let driver_id = base.stack[0]
-            let driver_socket = users_online.get(driver_id)
-          }
-
         } else {
           // Buscar colonia
           const geojson = await geocoder.googleReverse([parseFloat(origin_lng), parseFloat(origin_lat)])
@@ -85,6 +79,15 @@ module.exports = (io, users_online) => {
         service.destiny_colony = destiny_colony
         service.origin_place = origin_place
         service.destiny_place = destiny_place
+      }
+
+      let base = await Base.findById(origin_place.base)
+      if (base.stack.length > 0) {
+        let driver_id = base.stack[0]
+        let driver_socket = users_online.get(driver_id)
+        if (driver_socket) {
+          io.to(driver_socket).emit('new service', )
+        }
       }
 
       service = await service.save()
@@ -162,7 +165,7 @@ module.exports = (io, users_online) => {
     }
   }
 
-  return = {
+  return {
     service_create,
     service_list,
     get_location,

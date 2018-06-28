@@ -42,3 +42,5 @@
 {"message":"holi","level":"info"}
 {"data":null,"isBoom":true,"isServer":false,"output":{"statusCode":400,"payload":{"statusCode":400,"error":"Bad Request","message":"name, address, lng, lat is required"},"headers":{}},"level":"error","message":"name, address, lng, lat is required"}
 {"data":null,"isBoom":true,"isServer":false,"output":{"statusCode":400,"payload":{"statusCode":400,"error":"Bad Request","message":"name, address, lng, lat is required"},"headers":{}},"level":"error","message":"name, address, lng, lat is required"}
+{"message":"holi","level":"info"}
+{"errors":{"place_id":{"message":"Path `place_id` is required.","name":"ValidatorError","properties":{"type":"required","message":"Path `{PATH}` is required.","path":"place_id"},"kind":"required","path":"place_id","$isValidatorError":true}},"_message":"Place validation failed","message":"Place validation failed: place_id: Path `place_id` is required.","name":"ValidationError","level":"error"}

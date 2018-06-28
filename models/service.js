@@ -12,6 +12,8 @@ const serviceSchema = new Schema({
   address: { type: String },
   state: { type: String, enum: ['pending', 'waiting', 'on road', 'completed'], default: 'pending'},
 
+  base: { type: Schema.Types.ObjectId, ref: 'Base' },
+
   origin_colony: { type: Schema.Types.ObjectId, ref: 'Colony' },
   destiny_colony: { type: Schema.Types.ObjectId, ref: 'Colony'},
 

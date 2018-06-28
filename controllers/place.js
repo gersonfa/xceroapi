@@ -33,7 +33,7 @@ async function place_create(req, res, next) {
 		const address = req.body.address
 		const lat = req.body.lat
 		const lng = req.body.lng
-    const google_id = req.body.google_id
+    const place_id = req.body.place_id
 
     if (!base_id || !address || !name) throw Boom.badRequest('base_id address name are required')
 
@@ -42,7 +42,7 @@ async function place_create(req, res, next) {
       name: name,
 			address: address,
 			coords: [parseFloat(lng), parseFloat(lat)],
-      google_id: google_id
+      place_id: place_id
     })
 
     place = await place.save()

@@ -12,7 +12,7 @@ module.exports = (app, io) => {
   const group_controller = require('../controllers/group')
   const colony_controller = require('../controllers/colony')
   const place_controller = require('../controllers/place')
-  const service_controller = require('../controllers/service')
+  const service_controller = require('../controllers/service')(io, users_online)
 
   require('../controllers/socket')(io, users_online)
 
@@ -39,6 +39,7 @@ module.exports = (app, io) => {
 
   api_routes.post('/base', require_auth, base_controller.base_create)
   api_routes.get('/base', require_auth, base_controller.base_list)
+  api_routes.get('/base/:base_id', require_auth, base_controller.base_details)
   api_routes.delete('/base/:base_id', require_auth, base_controller.base_delete)
 
   api_routes.post('/base/:base_id/place', require_auth, place_controller.place_create)

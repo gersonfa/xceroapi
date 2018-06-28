@@ -49,8 +49,21 @@ async function base_delete(req, res, next) {
 	}
 }
 
+async function base_details(req, res, next) {
+	try {
+		const base_id = req.params.base_id
+
+		let base = await Base.findById(base_id)
+
+		sendJSONresponse(res, 200, base)
+	} catch (e) {
+		return next(e)
+	}
+}
+
 module.exports = {
 	base_create,
 	base_list,
-	base_delete
+	base_delete,
+	base_details
 }
