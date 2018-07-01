@@ -41,6 +41,7 @@ module.exports = (app, io) => {
   api_routes.get('/base', require_auth, base_controller.base_list)
   api_routes.get('/base/:base_id', require_auth, base_controller.base_details)
   api_routes.delete('/base/:base_id', require_auth, base_controller.base_delete)
+  api_routes.put('/base/empty_stack/:base_id', require_auth, base_controller.base_empty_stack)
 
   api_routes.post('/base/:base_id/place', require_auth, place_controller.place_create)
   api_routes.get('/base/:base_id/place', require_auth, place_controller.place_by_base)
@@ -79,8 +80,7 @@ module.exports = (app, io) => {
    * @apiParam (body) {String} origin_colony id de origen de un objeto colony (Opcional)
    * @apiParam (body) {String} destiny_colony id de origen de un objeto colony (Opcional)
 
-   * @apiSuccess (200 Success) {Object[]} services Array de colonias
-   * @apiSuccess (200 Success) {String} services._id
+   * @apiSuccess (200 Success) Object service
    */
   api_routes.post('/service', require_auth, service_controller.service_create)
   /**
@@ -90,21 +90,58 @@ module.exports = (app, io) => {
    * @apiPermission Token
    * @apiParam (query) {String} state Por defecto es 'complete'
 
-   * @apiSuccess (200 Success) {Object[]} services Array de colonias
-   * @apiSuccess (200 Success) {String} services._id
+   * @apiSuccess (200 Success) {Object[]} services
    */
   api_routes.get('/service', require_auth, service_controller.service_list)
   /**
-   * @api {get} /api/service Service list
+   * @api {get} /api/service/:service_id/accept Service accept
+   * @apiName Service accept
+   * @apiGroup Service
+   * @apiPermission Token
+
+   * @apiSuccess (200 Success) Object service updated
+   */
+  api_routes.put('/service/:service_id/accept', require_auth, service_controller.service_set_driver)
+  /**
+   * @api {get} /api/get_location Service list
    * @apiName Service list
    * @apiGroup Service
    * @apiPermission Token
    * @apiParam (query) {String} origin_lng Longitud
-  * @apiParam (query) {String} origin_lat Latitud
+   * @apiParam (query) {String} origin_lat Latitud
 
-   * @apiSuccess (200 Success) {Object} colony colonia
+   * @apiSuccess (200 Success) object {place: object} devuelve un lugar si se encontro
+   * @apiSuccess (200 Success) object {colony:object} devuelve la colonia si se encontro
    */
   api_routes.get('/get_location', require_auth, service_controller.get_location)
+
+  /**
+   * @api {post} /update_location update location
+   * @apiName Update location
+   * @apiGroup DriverSockets
+   * @apiParam (body) Object {user_id: user_id, coords: [lng, lat]}
+  */
+
+  /**
+   * @api {get} /added added to base
+   * @apiName Added to base
+   * @apiGroup DriverSockets
+   * @apiSuccess (200 Success) Object {base: String, position: Number}
+  */
+
+  /**
+   * @api {get} /api/new_service new service
+   * @apiName New service
+   * @apiGroup DriverSockets
+   * @apiSuccess (200 Success) Object service
+  */
+
+  /**
+   * @api {get} /service_on_the_way service on the way
+   * @apiName Service on the way
+   * @apiGroup UserSockets
+   * @apiSuccess (200 Success) Object service
+  */
 
   app.use('/api', api_routes)
 }

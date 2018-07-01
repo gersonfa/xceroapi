@@ -16,15 +16,15 @@ const localOptions = {
 const localLogin = new LocalStrategy(
   localOptions, async (account, password, done) => {
     try {
-      let user = await User.findOne({
-        account: account
-      });
+      let user = await User.findOne({ account })
       if (user) {
         user.comparePassword(password, (err, isMatch) => {
-          if (err) boom.internal(err.message);
-          if (!isMatch) boom.unauthorized("Nombre de usuario o contraseña incorrectos.");
+          if (err) throw boom.internal(err.message);
+          if (!isMatch) throw boom.unauthorized("Nombre de usuario o contraseña incorrectos.")
           return done(null, user);
         });
+      } else {
+        throw boom.unauthorized("Nombre de usuario o contraseña incorrectos.");
       }
     } catch (e) {
       return done(e);

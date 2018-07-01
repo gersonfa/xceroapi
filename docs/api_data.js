@@ -12,7 +12,7 @@ define({ "api": [
             "group": "body",
             "type": "String",
             "optional": false,
-            "field": "email",
+            "field": "account",
             "description": ""
           },
           {
@@ -164,6 +164,72 @@ define({ "api": [
   },
   {
     "type": "get",
+    "url": "/added",
+    "title": "added to base",
+    "name": "Added_to_base",
+    "group": "DriverSockets",
+    "success": {
+      "fields": {
+        "200 Success": [
+          {
+            "group": "200 Success",
+            "optional": false,
+            "field": "Object",
+            "description": "<p>{base: String, position: Number}</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "routes/index.js",
+    "groupTitle": "DriverSockets"
+  },
+  {
+    "type": "get",
+    "url": "/api/new_service",
+    "title": "new service",
+    "name": "New_service",
+    "group": "DriverSockets",
+    "success": {
+      "fields": {
+        "200 Success": [
+          {
+            "group": "200 Success",
+            "optional": false,
+            "field": "Object",
+            "description": "<p>service</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "routes/index.js",
+    "groupTitle": "DriverSockets"
+  },
+  {
+    "type": "post",
+    "url": "/update_location",
+    "title": "update location",
+    "name": "Update_location",
+    "group": "DriverSockets",
+    "parameter": {
+      "fields": {
+        "body": [
+          {
+            "group": "body",
+            "optional": false,
+            "field": "Object",
+            "description": "<p>{user_id: user_id, coords: [lng, lat]}</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "routes/index.js",
+    "groupTitle": "DriverSockets"
+  },
+  {
+    "type": "get",
     "url": "/place",
     "title": "Place list",
     "name": "Place_list",
@@ -196,6 +262,33 @@ define({ "api": [
     "version": "0.0.0",
     "filename": "routes/index.js",
     "groupTitle": "Place"
+  },
+  {
+    "type": "get",
+    "url": "/api/service/:service_id/accept",
+    "title": "Service accept",
+    "name": "Service_accept",
+    "group": "Service",
+    "permission": [
+      {
+        "name": "Token"
+      }
+    ],
+    "success": {
+      "fields": {
+        "200 Success": [
+          {
+            "group": "200 Success",
+            "optional": false,
+            "field": "Object",
+            "description": "<p>service updated</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "routes/index.js",
+    "groupTitle": "Service"
   },
   {
     "type": "post",
@@ -261,17 +354,56 @@ define({ "api": [
         "200 Success": [
           {
             "group": "200 Success",
-            "type": "Object[]",
             "optional": false,
-            "field": "services",
-            "description": "<p>Array de colonias</p>"
-          },
+            "field": "Object",
+            "description": "<p>service</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "routes/index.js",
+    "groupTitle": "Service"
+  },
+  {
+    "type": "get",
+    "url": "/api/get_location",
+    "title": "Service list",
+    "name": "Service_list",
+    "group": "Service",
+    "permission": [
+      {
+        "name": "Token"
+      }
+    ],
+    "parameter": {
+      "fields": {
+        "query": [
           {
-            "group": "200 Success",
+            "group": "query",
             "type": "String",
             "optional": false,
-            "field": "services._id",
-            "description": ""
+            "field": "origin_lng",
+            "description": "<p>Longitud</p>"
+          },
+          {
+            "group": "query",
+            "type": "String",
+            "optional": false,
+            "field": "origin_lat",
+            "description": "<p>Latitud</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "200 Success": [
+          {
+            "group": "200 Success",
+            "optional": false,
+            "field": "object",
+            "description": "<p>{place: object} devuelve un lugar si se encontro</p>"
           }
         ]
       }
@@ -312,13 +444,6 @@ define({ "api": [
             "type": "Object[]",
             "optional": false,
             "field": "services",
-            "description": "<p>Array de colonias</p>"
-          },
-          {
-            "group": "200 Success",
-            "type": "String",
-            "optional": false,
-            "field": "services._id",
             "description": ""
           }
         ]
@@ -391,5 +516,27 @@ define({ "api": [
     "version": "0.0.0",
     "filename": "routes/tariff.js",
     "groupTitle": "Tariff"
+  },
+  {
+    "type": "get",
+    "url": "/service_on_the_way",
+    "title": "service on the way",
+    "name": "Service_on_the_way",
+    "group": "UserSockets",
+    "success": {
+      "fields": {
+        "200 Success": [
+          {
+            "group": "200 Success",
+            "optional": false,
+            "field": "Object",
+            "description": "<p>service</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "routes/index.js",
+    "groupTitle": "UserSockets"
   }
 ] });

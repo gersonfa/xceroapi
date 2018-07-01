@@ -26,7 +26,7 @@ auth_routes.post('/register', authenticathion_controller.register)
  * @api {post} /api/auth/login Login
  * @apiName Login
  * @apiGroup Authentication
- * @apiParam (body) {String} email
+ * @apiParam (body) {String} account
  * @apiParam (body) {String} password
  * @apiSuccess (200 Success) {String} token
  * @apiSuccess (200 Success) {Object} user

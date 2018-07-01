@@ -61,9 +61,25 @@ async function base_details(req, res, next) {
 	}
 }
 
+async function base_empty_stack (req, res, next) {
+	try {
+		const base_id = req.params.base_id
+
+		let base = await Base.findById(base_id)
+
+		base.stack = []
+		base = await base.save()
+
+		sendJSONresponse(res, 200, base)
+	} catch (e) {
+		return next(e)
+	}
+}
+
 module.exports = {
 	base_create,
 	base_list,
 	base_delete,
-	base_details
+	base_details,
+	base_empty_stack
 }

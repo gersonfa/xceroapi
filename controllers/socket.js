@@ -10,7 +10,7 @@ module.exports = (io, users_online) => {
     users_online.set(user_id, socket.id)
     console.log(users_online.entries())
 
-    socket.on('update location', async (socket) => {
+    socket.on('update_location', async (socket) => {
       //console.log(socket.user_id, socket.coords)
       //console.log(io.sockets.clients())
 
