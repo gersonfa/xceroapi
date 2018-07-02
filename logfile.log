@@ -25,3 +25,8 @@
 {"level":"error","message":"passenger_socket is not defined"}
 {"message":"holi","level":"info"}
 {"message":"holi","level":"info"}
+{"message":"holi","level":"info"}
+{"message":"Schema hasn't been registered for model \"base\".\nUse mongoose.model(name, schema)","name":"MissingSchemaError","level":"error"}
+{"message":"Schema hasn't been registered for model \"base\".\nUse mongoose.model(name, schema)","name":"MissingSchemaError","level":"error"}
+{"message":"Schema hasn't been registered for model \"base\".\nUse mongoose.model(name, schema)","name":"MissingSchemaError","level":"error"}
+{"level":"error","message":"Cannot read property 'name' of undefined"}

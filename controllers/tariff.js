@@ -70,8 +70,21 @@ async function tariff_check (req, res, next) {
 	}
 }
 
+async function tariff_delete (req, res, next) {
+	try {
+		const tariff_id = req.params.tariff_id
+
+		let tariff = await Tariff.findByIdAndRemove(tariff_id)
+
+		sendJSONresponse(res, 200, tariff)
+	} catch (e) {
+		return next(e)
+	}
+}
+
 module.exports = {
 	tariff_create,
 	tariff_list,
-	tariff_check
+	tariff_check,
+	tariff_delete
 }

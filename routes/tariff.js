@@ -20,5 +20,6 @@ tariff_routes.get('/', require_auth, tariff_controller.tariff_list)
  *
  */
 tariff_routes.get('/check', require_auth, tariff_controller.tariff_check)
+tariff_routes.delete('/:tariff_id', require_auth, tariff_controller.tariff_delete)
 
 module.exports = tariff_routes

@@ -45,8 +45,8 @@ async function group_by_base(req, res, next) {
 
 async function group_place_list(req, res, next) {
 	try {
-		let groups = await Group.find()
-		let places = await Place.find()
+		let groups = await Group.find().populate('base')
+		let places = await Place.find().populate('base')
 
 		let group_places = []
 
@@ -54,6 +54,7 @@ async function group_place_list(req, res, next) {
 			let group = {
 				_id: g._id,
 				name: g.name,
+				base: g.base.name,
 				type: 'group'
 			}
 
@@ -64,6 +65,7 @@ async function group_place_list(req, res, next) {
 			let place = {
 				_id: p._id,
 				name: p.name,
+				base: p.base.name,
 				type: 'place'
 			}
 
