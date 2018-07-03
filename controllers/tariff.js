@@ -24,7 +24,13 @@ async function tariff_create(req, res, next) {
 
 async function tariff_list(req, res, next) {
 	try {
-		let tariffs = await Tariff.find().populate('origin_group destiny_group origin_place destiny_place')
+		//let tariffs = await Tariff.find().populate('origin_group destiny_group origin_place destiny_place')
+		let tariffs = await Tariff.find().populate([
+			{path: 'origin_group', populate: {path: 'base', select: 'name'}},
+			{path: 'destiny_group', populate: {path: 'base', select: 'name'}},
+			{path: 'origin_place', populate: {path: 'base', select: 'name'}},
+			{path: 'destiny_place', populate: {path: 'base', select: 'name'}}
+		])
 
 		sendJSONresponse(res, 200, tariffs)
 	} catch(e) {

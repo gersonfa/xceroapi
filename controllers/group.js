@@ -43,7 +43,7 @@ async function group_by_base(req, res, next) {
 	}
 }
 
-async function group_place_list(req, res, next) {
+async function gp_list() {
 	try {
 		let groups = await Group.find().populate('base')
 		let places = await Place.find().populate('base')
@@ -72,6 +72,17 @@ async function group_place_list(req, res, next) {
 			group_places.push(place)
 		})
 
+		return group_places
+	} catch (e) {
+		return next(e)
+	}
+}
+
+async function group_place_list(req, res, next) {
+	try {
+
+		let group_places = await gp_list()
+
 		sendJSONresponse(res, 200, group_places)
 	} catch(e) {
 		return next(e)
@@ -82,24 +93,33 @@ async function group_place_available(req, res, next) {
 	try {
 		const group_id = req.query.group_id
 		const place_id = req.query.place_id
-
-		let groups = await Group.find()
-		let places = await Place.find()
+		
+		let groups_places = await gp_list()
 		let tariffs = await Tariff.find()
 
-		groups = groups.filter(g => {
-			let tariff = tariffs.find(t => (t.origin_group == group_id && t.destiny_group == g._id) || (t.origin_group == g._id && t.destiny_group == group_id))
+		if (group_id) {
+			groups_places = groups_places.filter(gp => {
+				let tariff = tariffs.find(t => {
+					if (t.origin_group.toString() == group_id && (t.destiny_group.toString() == gp._id.toString() || t.destiny_place.toString() == gp._id.toString())) {
+						return t
+					} else if (t.destiny_group.toString() == group_id && (t.origin_group.toString() == gp._id.toString() || t.origin_place.toString() == gp._id.toString())) {
+						return t
+					}
+				})
+				if (!tariff) {
+					return gp
+				}
+			})
+		} else if (place_id) {
+			groups_places = groups_places.filter(gp => {
+				let tariff = tariffs.find(t => (t.origin_place.toString() == place_id && (t.destiny_group.toString() == gp._id.toString() || t.destiny_place.toString() == gp._id.toString())) || (t.destiny_place.toString() == place_id && (t.origin_group.toString() == gp._id.toString() || t.origin_place == gp._id)))
+				if (!tariff) {
+					return gp
+				}
+			})
+		}
 
-			if (!tariff) {
-				return g
-			}
-		})
-
-		/*places = places.filter(p => {
-			let tariff = tariffs.find(t => t.origin_place == p._id && )
-		})*/
-
-		sendJSONresponse(res, 200, groups)
+		sendJSONresponse(res, 200, groups_places)
 	} catch(e) {
 		return next(e)
 	}

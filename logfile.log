@@ -30,3 +30,7 @@
 {"message":"Schema hasn't been registered for model \"base\".\nUse mongoose.model(name, schema)","name":"MissingSchemaError","level":"error"}
 {"message":"Schema hasn't been registered for model \"base\".\nUse mongoose.model(name, schema)","name":"MissingSchemaError","level":"error"}
 {"level":"error","message":"Cannot read property 'name' of undefined"}
+{"level":"error","message":"group_places is not defined"}
+{"level":"error","message":"group_places is not defined"}
+{"level":"error","message":"t.origin_group.toStrig is not a function"}
+{"level":"error","message":"t.origin_group.toStrig is not a function"}
