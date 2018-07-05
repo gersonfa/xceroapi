@@ -368,7 +368,7 @@
   {
     "type": "get",
     "url": "/api/get_location",
-    "title": "Service list",
+    "title": "Get location",
     "name": "Service_list",
     "group": "Service",
     "permission": [
