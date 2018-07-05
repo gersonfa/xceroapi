@@ -68,6 +68,7 @@ module.exports = (app, io) => {
   api_routes.get('/colony', require_auth, colony_controller.colony_list)
 
   api_routes.get('/user/drivers', require_auth, user_controller.user_drivers_list)
+  api_routes.get('/user/location', require_auth, user_controller.drivers_location)
   /**
    * @api {post} /api/service Service create
    * @apiName Service create
@@ -103,7 +104,7 @@ module.exports = (app, io) => {
    */
   api_routes.put('/service/:service_id/accept', require_auth, service_controller.service_set_driver)
   /**
-   * @api {get} /api/get_location Service list
+   * @api {get} /api/get_location Get location
    * @apiName Service list
    * @apiGroup Service
    * @apiPermission Token

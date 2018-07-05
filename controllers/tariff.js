@@ -13,8 +13,14 @@ async function tariff_create(req, res, next) {
 
 		tariff = await tariff.save()
 
-		tariff = await Group.populate(tariff, 'origin_group destiny_group')
-		tariff = await Place.populate(tariff, 'origin_place destiny_place')
+		tariff = await Group.populate(tariff, [
+			{path: 'origin_group', populate: {path: 'base', select: 'name'}},
+			{path: 'destiny_group', populate: {path: 'base', select: 'name'}}
+		])
+		tariff = await Place.populate(tariff, [
+			{path: 'origin_place', populate: {path: 'base', select: 'name'}},
+			{path: 'destiny_place', populate: {path: 'base', select: 'name'}}
+		])
 
 		sendJSONresponse(res, 200, tariff)
 	} catch(e) {
@@ -88,9 +94,65 @@ async function tariff_delete (req, res, next) {
 	}
 }
 
+async function tariff_update (req, res, next) {
+	try {
+		const tariff_id = req.params.tariff_id
+
+		let tariff = await Tariff.findByIdAndUpdate(tariff_id, req.body, { new: true })
+
+		tariff = await Group.populate(tariff, [
+			{path: 'origin_group', populate: {path: 'base', select: 'name'}},
+			{path: 'destiny_group', populate: {path: 'base', select: 'name'}}
+		])
+		tariff = await Place.populate(tariff, [
+			{path: 'origin_place', populate: {path: 'base', select: 'name'}},
+			{path: 'destiny_place', populate: {path: 'base', select: 'name'}}
+		])
+
+		sendJSONresponse(res, 200, tariff)
+	} catch (e) {
+		return next(e)
+	}
+}
+
+async function tariff_update_all (req, res, next) {
+	try {
+		const percentage = req.body.percentage
+		const quantity = req.body.quantity
+
+		let tariffs = await Tariff.find()
+
+		if (quantity) {
+			await Promise.all(tariffs.map(async (t) => {
+				t.cost += quantity
+				t = await t.save()
+			}))
+		} else if (percentage) {
+			await Promise.all(tariffs.map(async (t) => {
+				let quantity_calculated = Math.round((t.cost * percentage) / 100)
+				t.cost += quantity_calculated
+				t = await t.save()
+			}))
+		}
+
+		tariffs = await Tariff.find().populate([
+			{path: 'origin_group', populate: {path: 'base', select: 'name'}},
+			{path: 'destiny_group', populate: {path: 'base', select: 'name'}},
+			{path: 'origin_place', populate: {path: 'base', select: 'name'}},
+			{path: 'destiny_place', populate: {path: 'base', select: 'name'}}
+		])
+
+		sendJSONresponse(res, 200, tariffs)
+	} catch (e) {
+		return next(e)
+	}
+}
+
 module.exports = {
 	tariff_create,
 	tariff_list,
 	tariff_check,
-	tariff_delete
+	tariff_delete,
+	tariff_update,
+	tariff_update_all
 }

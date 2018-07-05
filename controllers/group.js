@@ -93,16 +93,31 @@ async function group_place_available(req, res, next) {
 	try {
 		const group_id = req.query.group_id
 		const place_id = req.query.place_id
-		
+
 		let groups_places = await gp_list()
 		let tariffs = await Tariff.find()
 
 		if (group_id) {
+			let tariff_same_place = tariffs.find(t => (t.origin_group && t.origin_group.toString() == group_id) && (t.destiny_group && t.destiny_group.toString() == group_id))
+			if (tariff_same_place) {
+				groups_places = groups_places.filter( gp => gp._id.toString() != group_id)
+			}
+
 			groups_places = groups_places.filter(gp => {
 				let tariff = tariffs.find(t => {
-					if (t.origin_group.toString() == group_id && (t.destiny_group.toString() == gp._id.toString() || t.destiny_place.toString() == gp._id.toString())) {
+					if ((t.origin_group && t.origin_group.toString() == group_id) &&
+					(
+						(t.destiny_group && t.destiny_group.toString() == gp._id.toString()) ||
+						(t.destiny_place && t.destiny_place.toString() == gp._id.toString())
+					)
+					) {
 						return t
-					} else if (t.destiny_group.toString() == group_id && (t.origin_group.toString() == gp._id.toString() || t.origin_place.toString() == gp._id.toString())) {
+					} else if ((t.destiny_group && t.destiny_group.toString() == group_id) &&
+					(
+						(t.origin_group && t.origin_group.toString() == gp._id.toString()) ||
+						(t.origin_place && t.origin_place.toString() == gp._id.toString())
+					)
+					) {
 						return t
 					}
 				})
@@ -111,8 +126,12 @@ async function group_place_available(req, res, next) {
 				}
 			})
 		} else if (place_id) {
+			groups_places = groups_places.filter( gp => gp._id.toString() != place_id)
 			groups_places = groups_places.filter(gp => {
-				let tariff = tariffs.find(t => (t.origin_place.toString() == place_id && (t.destiny_group.toString() == gp._id.toString() || t.destiny_place.toString() == gp._id.toString())) || (t.destiny_place.toString() == place_id && (t.origin_group.toString() == gp._id.toString() || t.origin_place == gp._id)))
+				let tariff = tariffs.find(t => (
+					((t.origin_place && t.origin_place.toString() == place_id) && ((t.destiny_group && t.destiny_group.toString() == gp._id.toString()) || (t.destiny_place && t.destiny_place.toString() == gp._id.toString()))) ||
+					((t.destiny_place && t.destiny_place.toString() == place_id) && ((t.origin_group && t.origin_group.toString() == gp._id.toString()) || (t.origin_place && t.origin_place.toString() == gp._id.toString()))))
+				)
 				if (!tariff) {
 					return gp
 				}

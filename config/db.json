@@ -1,3 +1,3 @@
 {
-    "database": "mongodb://127.0.0.1/xcero"
+    "database": "mongodb://xcero:xcero123@ds125881.mlab.com:25881/xcero"
 }
