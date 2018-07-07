@@ -11,7 +11,7 @@ module.exports = (io, users_online) => {
     console.log(users_online.entries())
 
     socket.on('update_location', async (socket) => {
-      //console.log(socket.user_id, socket.coords)
+      console.log(socket.user_id, socket.coords)
       //console.log(io.sockets.clients())
 
       const coords = socket.coords

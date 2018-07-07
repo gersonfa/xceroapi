@@ -10,7 +10,8 @@ const userSchema = new Schema({
   role: { type: String, enum: ['Admin', 'Driver', 'User'], default: 'User'},
   facebook_id: { type: String },
   image: { type: String },
-  rating: { type: Number, max: 5, default: 3}
+  rating: { type: Number, max: 5, default: 3},
+  unit_number: { type: Number }
 })
 
 userSchema.pre('save', function (next) {
