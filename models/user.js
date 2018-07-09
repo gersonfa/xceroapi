@@ -8,6 +8,7 @@ const userSchema = new Schema({
   email: { type: String },
   full_name: { type: String, required: true },
   role: { type: String, enum: ['Admin', 'Driver', 'User'], default: 'User'},
+  coords: { type: [Number], index: "2dsphere" },
   facebook_id: { type: String },
   image: { type: String },
   rating: { type: Number, max: 5, default: 3},
