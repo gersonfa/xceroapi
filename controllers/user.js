@@ -16,7 +16,7 @@ async function user_drivers_list(req, res, next) {
 
 async function drivers_location (req, res, next) {
   try {
-    let drivers = await User.find({role: 'Driver'}, 'coords full_name')
+    let drivers = await User.find({role: 'Driver'}, 'coords full_name unit_number')
 
     sendJSONresponse(res, 200, drivers)
   } catch (e) {
