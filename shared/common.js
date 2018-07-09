@@ -16,7 +16,7 @@ function setUserInfo(user) {
     _id: user._id,
     email: user.email,
     account: user.account,
-    name: user.name,
+    name: user.full_name,
     role: user.role,
     unit_number: user.unit_number
   }
