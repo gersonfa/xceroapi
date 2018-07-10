@@ -19,7 +19,7 @@ module.exports = (io, users_online) => {
 
       let user = await User.findById(user_id)
       user.coords = coords
-      await user.save()
+      //await user.save()
 
       if (!user.inService) {
         const point = {
