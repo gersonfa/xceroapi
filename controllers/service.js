@@ -250,7 +250,7 @@ module.exports = (io, users_online) => {
           }
       }
 
-      let driver = user.findById(user._id)
+      let driver = User.findById(user._id)
       driver.inService = false
       await driver.save()
 

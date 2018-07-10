@@ -104,7 +104,7 @@ module.exports = (app, io) => {
    */
   api_routes.put('/service/:service_id/accept', require_auth, service_controller.service_set_driver)
   /**
-   * @api {put} /api/service Service end
+   * @api {put} /api/service/:service_id/end Service end
    * @apiName Service end
    * @apiGroup Service
    * @apiPermission Token
