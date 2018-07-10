@@ -265,6 +265,53 @@
   },
   {
     "type": "get",
+    "url": "/api/get_location",
+    "title": "Get location",
+    "name": "Get_location",
+    "group": "Service",
+    "permission": [
+      {
+        "name": "Token"
+      }
+    ],
+    "parameter": {
+      "fields": {
+        "query": [
+          {
+            "group": "query",
+            "type": "String",
+            "optional": false,
+            "field": "origin_lng",
+            "description": "<p>Longitud</p>"
+          },
+          {
+            "group": "query",
+            "type": "String",
+            "optional": false,
+            "field": "origin_lat",
+            "description": "<p>Latitud</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "200 Success": [
+          {
+            "group": "200 Success",
+            "optional": false,
+            "field": "object",
+            "description": "<p>{place: object} devuelve un lugar si se encontro</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "routes/index.js",
+    "groupTitle": "Service"
+  },
+  {
+    "type": "put",
     "url": "/api/service/:service_id/accept",
     "title": "Service accept",
     "name": "Service_accept",
@@ -366,10 +413,10 @@
     "groupTitle": "Service"
   },
   {
-    "type": "get",
-    "url": "/api/get_location",
-    "title": "Get location",
-    "name": "Service_list",
+    "type": "put",
+    "url": "/api/service",
+    "title": "Service end",
+    "name": "Service_end",
     "group": "Service",
     "permission": [
       {
@@ -378,20 +425,20 @@
     ],
     "parameter": {
       "fields": {
-        "query": [
+        "body": [
           {
-            "group": "query",
-            "type": "String",
+            "group": "body",
+            "type": "Number",
             "optional": false,
-            "field": "origin_lng",
-            "description": "<p>Longitud</p>"
+            "field": "destiny_lat",
+            "description": "<p>Latitud de origen</p>"
           },
           {
-            "group": "query",
-            "type": "String",
+            "group": "body",
+            "type": "Number",
             "optional": false,
-            "field": "origin_lat",
-            "description": "<p>Latitud</p>"
+            "field": "destiny_lng",
+            "description": "<p>Longitud de origen</p>"
           }
         ]
       }
@@ -402,8 +449,8 @@
           {
             "group": "200 Success",
             "optional": false,
-            "field": "object",
-            "description": "<p>{place: object} devuelve un lugar si se encontro</p>"
+            "field": "Object",
+            "description": "<p>service</p>"
           }
         ]
       }

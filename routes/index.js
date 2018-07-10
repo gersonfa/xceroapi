@@ -95,7 +95,7 @@ module.exports = (app, io) => {
    */
   api_routes.get('/service', require_auth, service_controller.service_list)
   /**
-   * @api {get} /api/service/:service_id/accept Service accept
+   * @api {put} /api/service/:service_id/accept Service accept
    * @apiName Service accept
    * @apiGroup Service
    * @apiPermission Token
@@ -104,8 +104,19 @@ module.exports = (app, io) => {
    */
   api_routes.put('/service/:service_id/accept', require_auth, service_controller.service_set_driver)
   /**
+   * @api {put} /api/service Service end
+   * @apiName Service end
+   * @apiGroup Service
+   * @apiPermission Token
+   * @apiParam (body) {Number} destiny_lat Latitud de origen
+   * @apiParam (body) {Number} destiny_lng Longitud de origen
+
+   * @apiSuccess (200 Success) Object service
+   */
+  api_routes.put('/service/:service_id/end', require_auth, service_controller.service_end)
+  /**
    * @api {get} /api/get_location Get location
-   * @apiName Service list
+   * @apiName Get location
    * @apiGroup Service
    * @apiPermission Token
    * @apiParam (query) {String} origin_lng Longitud

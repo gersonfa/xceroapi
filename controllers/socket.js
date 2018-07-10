@@ -21,27 +21,29 @@ module.exports = (io, users_online) => {
       user.coords = coords
       user.save()
 
-      const point = {
-        type: 'Point',
-        coordinates: coords
-      }
+      if (!user.inService) {
+        const point = {
+          type: 'Point',
+          coordinates: coords
+        }
 
-      const geoOptions = {
-        spherical: true,
-        maxDistance: theEarth.getMetersFromKilometers(0.3)
-      }
+        const geoOptions = {
+          spherical: true,
+          maxDistance: theEarth.getMetersFromKilometers(0.3)
+        }
 
-      let bases = await Base.geoNear(point, geoOptions)
+        let bases = await Base.geoNear(point, geoOptions)
 
-      if (bases.length > 0) {
-        let base = bases[0].obj
-        let is_within = base.stack.indexOf(user_id)
+        if (bases.length > 0) {
+          let base = bases[0].obj
+          let is_within = base.stack.indexOf(user_id)
 
-        if (is_within === -1) {
-          base.stack.push(user_id)
-          await base.save()
+          if (is_within === -1) {
+            base.stack.push(user_id)
+            await base.save()
 
-          io.to(socket_id).emit('added', { base: base.name, position: base.stack.indexOf(user_id) + 1 })
+            io.to(socket_id).emit('added', { base: base.name, position: base.stack.indexOf(user_id) + 1 })
+          }
         }
       }
     })
