@@ -104,6 +104,15 @@ module.exports = (app, io) => {
    */
   api_routes.put('/service/:service_id/accept', require_auth, service_controller.service_set_driver)
   /**
+   * @api {put} /api/service/:service_id/start Service start
+   * @apiName Service start
+   * @apiGroup Service
+   * @apiPermission Token
+
+   * @apiSuccess (200 Success) Object service updated
+   */
+  api_routes.put('/service/:service_id/start', require_auth, service_controller.service_start)
+  /**
    * @api {put} /api/service/:service_id/end Service end
    * @apiName Service end
    * @apiGroup Service
@@ -151,6 +160,13 @@ module.exports = (app, io) => {
   /**
    * @api {get} /service_on_the_way service on the way
    * @apiName Service on the way
+   * @apiGroup UserSockets
+   * @apiSuccess (200 Success) Object service
+  */
+
+  /**
+   * @api {get} /service_started service started
+   * @apiName Service started
    * @apiGroup UserSockets
    * @apiSuccess (200 Success) Object service
   */

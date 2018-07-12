@@ -4,3 +4,13 @@
 {"level":"error","message":"Must pass either a legacy coordinate array or GeoJSON Point to geoNear"}
 {"data":null,"isBoom":true,"isServer":false,"output":{"statusCode":400,"payload":{"statusCode":400,"error":"Bad Request","message":"destiny_lat & destiny_lng are requireds"},"headers":{}},"level":"error","message":"destiny_lat & destiny_lng are requireds"}
 {"level":"error","message":"next is not defined"}
+{"message":"holi","level":"info"}
+{"message":"holi","level":"info"}
+{"message":"holi","level":"info"}
+{"data":null,"isBoom":true,"isServer":false,"output":{"statusCode":404,"payload":{"statusCode":404,"error":"Not Found","message":"user unauthorized"},"headers":{}},"level":"error","message":"user unauthorized"}
+{"level":"error","message":"service_utils.get_places is not a function"}
+{"level":"error","message":"service_utils.get_places is not a function"}
+{"level":"error","message":"service_utils.get_places is not a function"}
+{"level":"error","message":"destiny_lat is not defined"}
+{"name":"MongoError","message":"Topology was destroyed","level":"error"}
+{"level":"error","message":"Cannot read property '_id' of undefined"}
