@@ -338,6 +338,33 @@ define({ "api": [
     "groupTitle": "Service"
   },
   {
+    "type": "put",
+    "url": "/api/service/:service_id/cancel",
+    "title": "Service cancel",
+    "name": "Service_cancel",
+    "group": "Service",
+    "permission": [
+      {
+        "name": "Token"
+      }
+    ],
+    "success": {
+      "fields": {
+        "200 Success": [
+          {
+            "group": "200 Success",
+            "optional": false,
+            "field": "Object",
+            "description": "<p>service</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "routes/index.js",
+    "groupTitle": "Service"
+  },
+  {
     "type": "post",
     "url": "/api/service",
     "title": "Service create",
@@ -414,7 +441,7 @@ define({ "api": [
   },
   {
     "type": "put",
-    "url": "/api/service",
+    "url": "/api/service/:service_id/end",
     "title": "Service end",
     "name": "Service_end",
     "group": "Service",
@@ -501,6 +528,33 @@ define({ "api": [
     "groupTitle": "Service"
   },
   {
+    "type": "put",
+    "url": "/api/service/:service_id/start",
+    "title": "Service start",
+    "name": "Service_start",
+    "group": "Service",
+    "permission": [
+      {
+        "name": "Token"
+      }
+    ],
+    "success": {
+      "fields": {
+        "200 Success": [
+          {
+            "group": "200 Success",
+            "optional": false,
+            "field": "Object",
+            "description": "<p>service updated</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "routes/index.js",
+    "groupTitle": "Service"
+  },
+  {
     "type": "get",
     "url": "/api/tariff/check",
     "title": "Check Tariff",
@@ -569,6 +623,28 @@ define({ "api": [
     "url": "/service_on_the_way",
     "title": "service on the way",
     "name": "Service_on_the_way",
+    "group": "UserSockets",
+    "success": {
+      "fields": {
+        "200 Success": [
+          {
+            "group": "200 Success",
+            "optional": false,
+            "field": "Object",
+            "description": "<p>service</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "routes/index.js",
+    "groupTitle": "UserSockets"
+  },
+  {
+    "type": "get",
+    "url": "/service_started",
+    "title": "service started",
+    "name": "Service_started",
     "group": "UserSockets",
     "success": {
       "fields": {

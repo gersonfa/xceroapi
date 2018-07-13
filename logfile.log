@@ -19,3 +19,6 @@
 {"message":"holi","level":"info"}
 {"level":"error","message":"drivers is not defined"}
 {"level":"error","message":"drivers is not defined"}
+{"level":"error","message":"drivers.filter is not a function"}
+{"level":"error","message":"Cannot read property 'filter' of undefined"}
+{"level":"error","message":"Cannot read property 'forEach' of undefined"}

@@ -82,25 +82,20 @@ async function get_places(lat, lng) {
 }
 
 async function get_close_drivers(service) {
-  try {
-    const drivers = await User.find({
-      coords: {
-        $nearSphere: {
-          $geometry: {
-            type: 'Point',
-            coordinates: service.origin_coords
-          },
-          $maxDistance: 40000
-        }
-      },
-      role: 'Driver'
-    })
+  const drivers = await User.find({
+    coords: {
+      $nearSphere: {
+        $geometry: {
+          type: 'Point',
+          coordinates: service.origin_coords
+        },
+        $maxDistance: 40000
+      }
+    },
+    role: 'Driver'
+  })
 
-    return drivers
-  } catch(e) {
-    console.log(e)
-    return e
-  }
+  return drivers
 }
 
 module.exports = {
