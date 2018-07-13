@@ -1,6 +1,7 @@
 const Tariff = require('../models/tariff')
 const Place = require('../models/place')
-const theEarth = require('./common').theEarth
+const User = require('../models/user')
+const fetch = require('node-fetch')
 
 function withinRadius(point, interest, kms) {
   let R = 6371;
@@ -34,7 +35,11 @@ async function set_tariff (service) {
         return service
       }
     } else if (service.origin_place) {
-
+      if (service.destiny_colony) {
+        let tariff = await Tariff.findOne({origin_place: service.origin_place._id, destiny_place: service.destiny_place._id})
+        service.tariff = tariff
+        return service
+      }
     } else return service
   } catch(e) {
     return e
@@ -76,9 +81,32 @@ async function get_places(lat, lng) {
   }
 }
 
+async function get_close_drivers(service) {
+  try {
+    const drivers = await User.find({
+      coords: {
+        $nearSphere: {
+          $geometry: {
+            type: 'Point',
+            coordinates: service.origin_coords
+          },
+          $maxDistance: 40000
+        }
+      },
+      role: 'Driver'
+    })
+
+    return drivers
+  } catch(e) {
+    console.log(e)
+    return e
+  }
+}
+
 module.exports = {
   withinRadius,
   set_tariff,
   get_colonies,
-  get_places
+  get_places,
+  get_close_drivers
 }

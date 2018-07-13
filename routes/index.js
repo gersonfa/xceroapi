@@ -124,6 +124,15 @@ module.exports = (app, io) => {
    */
   api_routes.put('/service/:service_id/end', require_auth, service_controller.service_end)
   /**
+   * @api {put} /api/service/:service_id/cancel Service cancel
+   * @apiName Service cancel
+   * @apiGroup Service
+   * @apiPermission Token
+
+   * @apiSuccess (200 Success) Object service
+   */
+  api_routes.put('/service/:service_id/cancel', require_auth, service_controller.service_cancel)
+  /**
    * @api {get} /api/get_location Get location
    * @apiName Get location
    * @apiGroup Service

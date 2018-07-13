@@ -14,3 +14,8 @@
 {"level":"error","message":"destiny_lat is not defined"}
 {"name":"MongoError","message":"Topology was destroyed","level":"error"}
 {"level":"error","message":"Cannot read property '_id' of undefined"}
+{"level":"error","message":"origin_lat is not defined"}
+{"errors":{"unit_number":{"message":"Path `unit_number` is required.","name":"ValidatorError","properties":{"type":"required","message":"Path `{PATH}` is required.","path":"unit_number"},"kind":"required","path":"unit_number","$isValidatorError":true}},"_message":"User validation failed","message":"User validation failed: unit_number: Path `unit_number` is required.","name":"ValidationError","level":"error"}
+{"message":"holi","level":"info"}
+{"level":"error","message":"drivers is not defined"}
+{"level":"error","message":"drivers is not defined"}

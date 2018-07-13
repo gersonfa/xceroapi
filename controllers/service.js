@@ -7,10 +7,7 @@ const Group = require('../models/group')
 const Place = require('../models/place')
 const Colony = require('../models/colony')
 const sendJSONresponse = require('../shared/common').sendJSONresponse
-const theEarth = require('../shared/common').theEarth
 const boom = require('boom')
-const geocoder = require('geocoder-geojson')
-const fetch = require('node-fetch')
 const service_utils = require('../shared/service-utils')
 
 module.exports = (io, users_online) => {
@@ -197,7 +194,7 @@ module.exports = (io, users_online) => {
       service.state = 'completed'
       service.destiny_coords = [parseFloat(destiny_lng), parseFloat(destiny_lat)]
 
-      let place = await service_utils.get_places(origin_lat, origin_lng)
+      let place = await service_utils.get_places(destiny_lat, destiny_lng)
 
       if (place.length > 0) {
         let place_location = place[0]
@@ -205,9 +202,7 @@ module.exports = (io, users_online) => {
         service.destiny_place = place_location._id
       } else {
           const place_ids = await service_utils.get_colonies(destiny_lat, destiny_lng)
-
           let colony = await Colony.findOne({place_id: { "$in": place_ids }})
-
           if (colony) {
             service.destiny_colony = colony._id
           } else {
@@ -222,14 +217,52 @@ module.exports = (io, users_online) => {
       // Buscar tarifa
       service = await Colony.populate(service, 'origin_colony destiny_colony')
       service = await Place.populate(service, 'origin_place destiny_place')
-
       service = await service_utils.set_tariff(service)
-
+      service = await service.save()
       sendJSONresponse(res, 200, service)
 
 
     } catch(e) {
       next(e)
+    }
+  }
+
+  async function service_cancel (req, res, next) {
+    try {
+      const user = req.user
+      const service_id = req.params.service_id
+
+      let service = await Service.findById(service_id)
+
+      if (user.role == 'Driver') {
+        let drivers = await service_utils.get_close_drivers(service)
+        drivers = drivers.filter(d => d._id.toString() != user.id)
+        if (drivers.length > 0) {
+          let driver_socket = users_online.get(drivers[0]._id)
+          service.state = 'Pending'
+          await service.save()
+          service = await User.populate(service, {path: 'user', select: 'full_name image'})
+          if (driver_socket) {
+            io.to(driver_socket).emit('new_service', service)
+          }
+          sendJSONresponse(res, 200, service)
+        } else {
+          sendJSONresponse(res, 200, {error: 'no es posible cancelar el servicio'})
+        }
+      } else {
+        service.state = 'canceled'
+        service = await service.save()
+
+        let driver_socket = users_online.get(service.driver)
+        if (driver_socket) {
+          io.to(driver_socket).emit('service_canceled', service)
+        }
+        sendJSONresponse(res, 200, service)
+      }
+
+      
+    } catch(e) {
+      return next(e)
     }
   }
 
@@ -255,6 +288,7 @@ module.exports = (io, users_online) => {
     get_location,
     service_set_driver,
     service_start,
-    service_end
+    service_end,
+    service_cancel
   }
 }
