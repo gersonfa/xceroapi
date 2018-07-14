@@ -16,6 +16,8 @@ module.exports = (io, users_online) => {
     try {
       const user = req.user
 
+      if (user.inService) throw boom.badRequest('no puedes crear un servicio si estas activo en uno.')
+
       const origin_lat = req.body.origin_lat
       const origin_lng = req.body.origin_lng
 
@@ -75,6 +77,8 @@ module.exports = (io, users_online) => {
       }
 
       service = await service.save()
+      user.inService = true
+      await user.save()
 
       sendJSONresponse(res, 200, service)
     } catch(e) {
@@ -210,9 +214,12 @@ module.exports = (io, users_online) => {
           }
       }
 
-      let driver = await User.findById(user._id)
-      driver.inService = false
-      await driver.save()
+      user.inService = false
+      await user.save()
+
+      let client = await User.findById(service.user)
+      client.inService = false
+      await client.save()
 
       // Buscar tarifa
       service = await Colony.populate(service, 'origin_colony destiny_colony')
@@ -233,25 +240,40 @@ module.exports = (io, users_online) => {
       const service_id = req.params.service_id
 
       let service = await Service.findById(service_id)
+      user.inService = false
+      await user.save()
 
       if (user.role == 'Driver') {
         let drivers = await service_utils.get_close_drivers(service)
         drivers = drivers.filter(d => d._id.toString() != user.id)
+        
         if (drivers.length > 0) {
-          let driver_socket = users_online.get(drivers[0]._id)
+          const driver_socket = users_online.get(drivers[0]._id)
           service.state = 'Pending'
           await service.save()
+
           service = await User.populate(service, {path: 'user', select: 'full_name image'})
+          
           if (driver_socket) {
             io.to(driver_socket).emit('new_service', service)
           }
           sendJSONresponse(res, 200, service)
         } else {
-          sendJSONresponse(res, 200, {error: 'no es posible cancelar el servicio'})
+          //Avisar que el servicio no puede ser completado en estos momentos.
+          service.state = 'canceled'
+          await service.save()
+
+          const client_socket = users_online.get(service.user)
+          if (client_socket) {
+            io.to(client_socket).emit('cant_do_service', service)
+          }
         }
       } else {
         service.state = 'canceled'
         service = await service.save()
+        let driver = await User.findById(service.driver)
+        driver.inService = false
+        await driver.save()
 
         let driver_socket = users_online.get(service.driver)
         if (driver_socket) {
@@ -282,6 +304,71 @@ module.exports = (io, users_online) => {
     }
   }
 
+  async function service_reject (req, res, next) {
+    try {
+      const user = req.user
+      const service_id = req.params.service_id
+
+      let service = await Service.findById(service_id).populate('origin_colony origin_place destiny_colony destiny_place')
+      
+      if (service.origin_colony) {
+        let group = await Group.findById(service.origin_colony.group)
+        let base = await Base.findById(group.base)
+
+        if (base.stack.map(d => d.toString()).includes(user.id)) {
+          const position = base.stack.indexOf(user.id)
+
+          if (position) {
+            const socket_driver = users_online.get(base.stack[position + 1])
+            if (socket_driver) {
+              service = await User.populate(service, {path: 'user', select: 'full_name image'})
+              io.to(socket_driver).emit('new_service', service)
+            }
+          } else {
+            await assign_to_close_driver(service, user)
+          }
+        }
+      } else if (service.origin_place) {
+        let base = await Base.findById(service.origin_place.base)
+
+        if (base.stack.map(d => d.toString()).includes(user.id)) {
+          const position = base.stack.indexOf(user.id)
+
+          if (position) {
+            const socket_driver = users_online.get(base.stack[position + 1])
+            if (socket_driver) {
+              service = await User.populate(service, {path: 'user', select: 'full_name image'})
+              io.to(socket_driver).emit('new_service', service)
+            }
+          } else {
+            await assign_to_close_driver(service, user)
+          }
+        }
+      } else {
+        await assign_to_close_driver(service, user)
+      }
+
+      sendJSONresponse(res, 200, {message: 'Se asigno el servicio a otro conductor'})
+    } catch(e) {
+      return next(e)
+    }
+  }
+
+  async function assign_to_close_driver (service, user) {
+    let drivers = await service_utils.get_close_drivers(service)
+
+    if (drivers.length > 0) {
+      drivers.filter(d => d._id != user._id)
+      const driver_socket = users_online.get(drivers[0]._id)
+
+      service = await User.populate(service, {path: 'user', select: 'full_name image'})
+          
+      if (driver_socket) {
+        io.to(driver_socket).emit('new_service', service)
+      }
+    }
+  }
+
   return {
     service_create,
     service_list,
@@ -289,6 +376,7 @@ module.exports = (io, users_online) => {
     service_set_driver,
     service_start,
     service_end,
-    service_cancel
+    service_cancel,
+    service_reject
   }
 }

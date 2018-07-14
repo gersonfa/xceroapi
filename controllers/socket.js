@@ -2,12 +2,18 @@
 const User = require('../models/user')
 const Base = require('../models/base')
 const theEarth = require('../shared/common').theEarth
+const mongoose = require('mongoose')
 
 module.exports = (io, users_online) => {
-  io.on('connect', (socket) => {
+  io.on('connect',  async (socket) => {
     const socket_id = socket.id
     let user_id = socket.handshake.query.user_id
     users_online.set(user_id, socket.id)
+    
+    let user = await User.findById(user_id)
+    user.online = true
+    await user.save()
+
     console.log(users_online.entries())
 
     socket.on('update_location', async (socket) => {
@@ -36,13 +42,12 @@ module.exports = (io, users_online) => {
 
         if (bases.length > 0) {
           let base = bases[0].obj
-          let is_within = base.stack.indexOf(user_id)
 
-          if (is_within === -1) {
-            base.stack.push(user_id)
+          if (!(base.stack.map(u => u.toString()).includes(user.id))) {
+            base.stack.push(user._id)
             await base.save()
 
-            io.to(socket_id).emit('added', { base: base.name, position: base.stack.indexOf(user_id) + 1 })
+            io.to(socket_id).emit('added', { base: base.name, position: base.stack.indexOf(user.id) + 1 })
           }
         }
       }

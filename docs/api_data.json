@@ -229,6 +229,60 @@
     "groupTitle": "DriverSockets"
   },
   {
+    "type": "put",
+    "url": "/api/user/driver_in",
+    "title": "Enter to app",
+    "name": "Enter_to_app",
+    "group": "Drivers",
+    "permission": [
+      {
+        "name": "Token"
+      }
+    ],
+    "success": {
+      "fields": {
+        "200 Success": [
+          {
+            "group": "200 Success",
+            "optional": false,
+            "field": "message",
+            "description": ""
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "routes/index.js",
+    "groupTitle": "Drivers"
+  },
+  {
+    "type": "put",
+    "url": "/api/user/driver_exit",
+    "title": "Exit from app",
+    "name": "Exit_from_app",
+    "group": "Drivers",
+    "permission": [
+      {
+        "name": "Token"
+      }
+    ],
+    "success": {
+      "fields": {
+        "200 Success": [
+          {
+            "group": "200 Success",
+            "optional": false,
+            "field": "message",
+            "description": ""
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "routes/index.js",
+    "groupTitle": "Drivers"
+  },
+  {
     "type": "get",
     "url": "/place",
     "title": "Place list",
@@ -529,6 +583,33 @@
   },
   {
     "type": "put",
+    "url": "/api/service/:service_id/service_reject",
+    "title": "Service reject",
+    "name": "Service_reject",
+    "group": "Service",
+    "permission": [
+      {
+        "name": "Token"
+      }
+    ],
+    "success": {
+      "fields": {
+        "200 Success": [
+          {
+            "group": "200 Success",
+            "optional": false,
+            "field": "messge",
+            "description": "<p>servicio asignado a otro conductor</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "routes/index.js",
+    "groupTitle": "Service"
+  },
+  {
+    "type": "put",
     "url": "/api/service/:service_id/start",
     "title": "Service start",
     "name": "Service_start",
@@ -661,5 +742,38 @@
     "version": "0.0.0",
     "filename": "routes/index.js",
     "groupTitle": "UserSockets"
+  },
+  {
+    "type": "put",
+    "url": "/api/user/user_status",
+    "title": "Check user status",
+    "name": "User_status",
+    "group": "Users",
+    "permission": [
+      {
+        "name": "Token"
+      }
+    ],
+    "success": {
+      "fields": {
+        "200 Success": [
+          {
+            "group": "200 Success",
+            "optional": false,
+            "field": "inService",
+            "description": "<p>boolean</p>"
+          },
+          {
+            "group": "200 Success",
+            "optional": false,
+            "field": "service",
+            "description": "<p>service object if exist</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "routes/index.js",
+    "groupTitle": "Users"
   }
 ]

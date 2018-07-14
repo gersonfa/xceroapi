@@ -70,6 +70,34 @@ module.exports = (app, io) => {
   api_routes.get('/user/drivers', require_auth, user_controller.user_drivers_list)
   api_routes.get('/user/location', require_auth, user_controller.drivers_location)
   /**
+   * @api {put} /api/user/driver_exit Exit from app
+   * @apiName Exit from app
+   * @apiGroup Drivers
+   * @apiPermission Token
+
+   * @apiSuccess (200 Success) message
+   */
+  api_routes.put('/user/driver_exit', require_auth, user_controller.driver_exit)
+  /**
+   * @api {put} /api/user/driver_in Enter to app
+   * @apiName Enter to app
+   * @apiGroup Drivers
+   * @apiPermission Token
+
+   * @apiSuccess (200 Success) message
+   */
+  api_routes.put('/user/driver_in', require_auth, user_controller.driver_in)
+  /**
+   * @api {put} /api/user/user_status Check user status
+   * @apiName User status
+   * @apiGroup Users
+   * @apiPermission Token
+
+   * @apiSuccess (200 Success) inService boolean
+   * * @apiSuccess (200 Success) service service object if exist
+   */
+  api_routes.get('/user/user_status', require_auth, user_controller.user_status)
+  /**
    * @api {post} /api/service Service create
    * @apiName Service create
    * @apiGroup Service
@@ -132,6 +160,15 @@ module.exports = (app, io) => {
    * @apiSuccess (200 Success) Object service
    */
   api_routes.put('/service/:service_id/cancel', require_auth, service_controller.service_cancel)
+  /**
+   * @api {put} /api/service/:service_id/service_reject Service reject
+   * @apiName Service reject
+   * @apiGroup Service
+   * @apiPermission Token
+
+   * @apiSuccess (200 Success) messge servicio asignado a otro conductor
+   */
+  api_routes.put('/service/:service_id/service_reject', require_auth, service_controller.service_reject)
   /**
    * @api {get} /api/get_location Get location
    * @apiName Get location
