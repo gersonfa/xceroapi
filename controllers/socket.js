@@ -11,8 +11,6 @@ module.exports = (io, users_online) => {
     users_online.set(user_id, socket.id)
     
     let user = await User.findById(user_id)
-    user.online = true
-    await user.save()
 
     console.log(users_online.entries())
 

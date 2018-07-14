@@ -92,7 +92,8 @@ async function get_close_drivers(service) {
         $maxDistance: 40000
       }
     },
-    role: 'Driver'
+    role: 'Driver',
+    inService: false
   })
 
   return drivers

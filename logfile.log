@@ -26,3 +26,9 @@
 {"message":"holi","level":"info"}
 {"level":"error","message":"Cannot read property 'stack' of null"}
 {"level":"error","message":"Can't use $or with String."}
+{"data":null,"isBoom":true,"isServer":false,"output":{"statusCode":401,"payload":{"statusCode":401,"error":"Unauthorized","message":"Nombre de usuario o contraseña incorrectos."},"headers":{}},"level":"error","message":"Nombre de usuario o contraseña incorrectos."}
+{"data":null,"isBoom":true,"isServer":false,"output":{"statusCode":401,"payload":{"statusCode":401,"error":"Unauthorized","message":"Nombre de usuario o contraseña incorrectos."},"headers":{}},"level":"error","message":"Nombre de usuario o contraseña incorrectos."}
+{"message":"holi","level":"info"}
+{"message":"holi","level":"info"}
+{"message":"holi","level":"info"}
+{"message":"holi","level":"info"}
