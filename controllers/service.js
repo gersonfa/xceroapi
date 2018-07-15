@@ -226,9 +226,9 @@ module.exports = (io, users_online) => {
       service = await Colony.populate(service, 'origin_colony destiny_colony')
       service = await Place.populate(service, 'origin_place destiny_place')
       service = await service_utils.set_tariff(service)
+
       service = await service.save()
       sendJSONresponse(res, 200, service)
-
 
     } catch(e) {
       next(e)

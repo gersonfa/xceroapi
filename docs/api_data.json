@@ -229,6 +229,28 @@
     "groupTitle": "DriverSockets"
   },
   {
+    "type": "get",
+    "url": "/api/service_canceled",
+    "title": "service canceled",
+    "name": "service_canceled",
+    "group": "DriverSockets",
+    "success": {
+      "fields": {
+        "200 Success": [
+          {
+            "group": "200 Success",
+            "optional": false,
+            "field": "Object",
+            "description": "<p>service</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "routes/index.js",
+    "groupTitle": "DriverSockets"
+  },
+  {
     "type": "put",
     "url": "/api/user/driver_in",
     "title": "Enter to app",
@@ -704,6 +726,28 @@
     "url": "/service_on_the_way",
     "title": "service on the way",
     "name": "Service_on_the_way",
+    "group": "UserSockets",
+    "success": {
+      "fields": {
+        "200 Success": [
+          {
+            "group": "200 Success",
+            "optional": false,
+            "field": "Object",
+            "description": "<p>service</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "routes/index.js",
+    "groupTitle": "UserSockets"
+  },
+  {
+    "type": "get",
+    "url": "/service_rejected",
+    "title": "service rejected",
+    "name": "Service_rejected",
     "group": "UserSockets",
     "success": {
       "fields": {
