@@ -171,7 +171,7 @@ module.exports = (io, users_online) => {
         sendJSONresponse(res, 200, {place: place_location})
       } else {
 
-          const place_ids = await service_utils.get_colonies(destiny_lat, destiny_lng)
+          const place_ids = await service_utils.get_colonies(origin_lat, origin_lng)
 
           let colony = await Colony.findOne({place_id: { "$in": place_ids }})
 
