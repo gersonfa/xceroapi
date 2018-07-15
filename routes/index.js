@@ -203,6 +203,13 @@ module.exports = (app, io) => {
    * @apiSuccess (200 Success) Object service
   */
 
+ /**
+   * @api {get} /api/service_canceled service canceled
+   * @apiName service canceled
+   * @apiGroup DriverSockets
+   * @apiSuccess (200 Success) Object service
+  */
+
   /**
    * @api {get} /service_on_the_way service on the way
    * @apiName Service on the way

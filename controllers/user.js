@@ -64,7 +64,7 @@ async function user_status (req, res, next) {
 
     let service = await Service.findOne({
       $or: [{driver: user._id}, {user: user._id}], 
-      state: {$in: ['on_the_way', 'in_process']}})
+      state: {$in: ['on_the_way', 'in_process', 'pending']}})
       .populate('origin_colony destiny_colony origin_place destiny_place')
       .populate({path: 'user', select: 'full_name image'})
       .populate({path: 'driver', select: 'full_name image rating unit_number'})

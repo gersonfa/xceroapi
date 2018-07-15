@@ -12,9 +12,8 @@ const userSchema = new Schema({
   facebook_id: { type: String },
   image: { type: String },
   rating: { type: Number, max: 5, default: 3},
-  unit_number: { type: Number, unique: true, required: true },
-  inService: { type: Boolean, default: false },
-  online: { type: Boolean, default: false}
+  unit_number: { type: Number, unique: true },
+  inService: { type: Boolean, default: false }
 })
 
 userSchema.pre('save', function (next) {

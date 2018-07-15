@@ -1,6 +1,8 @@
 const Tariff = require('../models/tariff')
 const Place = require('../models/place')
 const User = require('../models/user')
+const Group = require('../models/group')
+const Base = require('../models/base')
 const fetch = require('node-fetch')
 
 function withinRadius(point, interest, kms) {
@@ -99,10 +101,24 @@ async function get_close_drivers(service) {
   return drivers
 }
 
+async function get_base(service) {
+  let base
+
+  if (service.origin_colony) {
+    const group = await Group.findById(service.origin_colony.group)
+    base = await Base.findById(group.base)
+  } else if (service.origin_place) {
+    base = await Base.findById(service.origin_place.base)
+  }
+
+  return base
+}
+
 module.exports = {
   withinRadius,
   set_tariff,
   get_colonies,
   get_places,
-  get_close_drivers
+  get_close_drivers,
+  get_base
 }
