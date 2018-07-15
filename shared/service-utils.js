@@ -20,7 +20,6 @@ function withinRadius(point, interest, kms) {
 }
 
 async function set_tariff (service) {
-  try {
     if (service.origin_colony) {
       if (service.destiny_colony) {
         let tariff = await Tariff.findOne({
@@ -38,14 +37,16 @@ async function set_tariff (service) {
       }
     } else if (service.origin_place) {
       if (service.destiny_colony) {
-        let tariff = await Tariff.findOne({origin_place: service.origin_place._id, destiny_place: service.destiny_place._id})
+        let tariff = await Tariff.findOne({origin_place: service.origin_place._id, destiny_colony: service.destiny_colony._id})
+        service.tariff = tariff
+        return service
+      } else {
+        let tariff = await Tariff.findOne({origin_group: service.origin_colony.group, destiny_place: service.destiny_place._id})
         service.tariff = tariff
         return service
       }
     } else return service
-  } catch(e) {
-    return e
-  }
+  
 }
 
 async function get_colonies(lat, lng) {

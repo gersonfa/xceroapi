@@ -224,5 +224,12 @@ module.exports = (app, io) => {
    * @apiSuccess (200 Success) Object service
   */
 
+  /**
+   * @api {get} /service_rejected service rejected
+   * @apiName Service rejected
+   * @apiGroup UserSockets
+   * @apiSuccess (200 Success) Object service
+  */
+
   app.use('/api', api_routes)
 }

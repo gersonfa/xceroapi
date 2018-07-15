@@ -138,7 +138,7 @@ module.exports = (io, users_online) => {
 
       let service = await Service.findById(service_id)
 
-      if (service_utils.withinRadius(service.origin_coords, driver.coords, 0.2)) {
+      if (service_utils.withinRadius({longitude: service.origin_coords[0], latitude: service.origin_coords[1]}, {longitude: driver.coords[0], latitude: driver.coords[1]}, 0.2)) {
         service.state = 'in_process'
         await service.save()
 
