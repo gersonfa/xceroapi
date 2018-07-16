@@ -275,6 +275,7 @@ module.exports = (io, users_online) => {
 
       
     } catch(e) {
+      e.controller = 'service:cancel'
       return next(e)
     }
   }

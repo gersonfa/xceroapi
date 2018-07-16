@@ -10,7 +10,6 @@ const winston = require('winston')
 
 function login(req, res, next) {
   let userInfo = setUserInfo(req.user)
-  winston.info('holi')
   sendJSONresponse(res, 200, {
     token: generateToken(userInfo),
     user: userInfo
