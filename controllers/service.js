@@ -248,8 +248,11 @@ module.exports = (io, users_online) => {
       const service_id = req.params.service_id
 
       let service = await Service.findById(service_id)
+      console.log(service)
+
       user.inService = false
       await user.save()
+      console.log(user)
 
       if (user.role == 'Driver') {
         await emit_new_service(service)
@@ -266,8 +269,9 @@ module.exports = (io, users_online) => {
           await driver.save()
         }
 
-        let driver_socket = users_online.get(service.driver)
+        let driver_socket = users_online.get(service.driver.toString())
         if (driver_socket) {
+          console.log('se emitio')
           io.to(driver_socket).emit('service_canceled', service)
         }
         sendJSONresponse(res, 200, service)
