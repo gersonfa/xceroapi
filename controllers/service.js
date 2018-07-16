@@ -228,6 +228,13 @@ module.exports = (io, users_online) => {
       service = await service_utils.set_tariff(service)
 
       service = await service.save()
+
+      let user_socket = users_online.get(service.user.toString())
+
+      if (user_socket) {
+        io.to(user_socket).emit('service_end', service)
+      }
+      
       sendJSONresponse(res, 200, service)
 
     } catch(e) {

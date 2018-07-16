@@ -90,7 +90,7 @@ module.exports = (app, io) => {
    */
   api_routes.put('/user/driver_in', require_auth, user_controller.driver_in)
   /**
-   * @api {put} /api/user/user_status Check user status
+   * @api {get} /api/user/user_status Check user status
    * @apiName User status
    * @apiGroup Users
    * @apiPermission Token
@@ -229,6 +229,13 @@ module.exports = (app, io) => {
   /**
    * @api {get} /service_rejected service rejected
    * @apiName Service rejected
+   * @apiGroup UserSockets
+   * @apiSuccess (200 Success) Object service
+  */
+ 
+ /**
+   * @api {get} /service_end service end
+   * @apiName Service end
    * @apiGroup UserSockets
    * @apiSuccess (200 Success) Object service
   */
