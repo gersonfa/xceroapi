@@ -45,6 +45,7 @@ module.exports = (app, io) => {
 
   api_routes.post('/base/:base_id/place', require_auth, place_controller.place_create)
   api_routes.get('/base/:base_id/place', require_auth, place_controller.place_by_base)
+  api_routes.delete('/base/:base_id/place/:place_id', require_auth, place_controller.place_delete)
 
   api_routes.post('/base/:base_id/group', require_auth, group_controller.group_create)
   api_routes.get('/base/:base_id/group', require_auth, group_controller.group_by_base)
@@ -54,6 +55,7 @@ module.exports = (app, io) => {
 
   api_routes.post('/group/:group_id/colony', require_auth, colony_controller.colony_create)
   api_routes.get('/group/:group_id/colony', require_auth, colony_controller.colony_by_group)
+  api_routes.delete('/colony/:colony_id', require_auth, colony_controller.colony_delete)
 
   /**
    * @api {get} /api/group/place Colony list

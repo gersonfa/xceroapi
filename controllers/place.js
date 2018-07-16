@@ -2,6 +2,7 @@
 
 const Place = require('../models/place')
 const sendJSONresponse = require('../shared/common').sendJSONresponse
+const Tariff = require('../models/tariff')
 const Boom = require('boom')
 
 async function place_list(req, res, next) {
@@ -53,8 +54,24 @@ async function place_create(req, res, next) {
   }
 }
 
+async function place_delete (req, res, next) {
+  try {
+    const place_id = req.params.place_id
+
+    let place = await Place.findByIdAndRemove(place_id)
+
+    let tariffs = await Tariff.deleteMany({$or: [{origin_place: place._id}, {destiny_place: place._id}]})
+
+    console.log(tariffs)
+    sendJSONresponse(res, 200, place)
+  } catch (e) {
+    return next(e)
+  }
+}
+
 module.exports = {
   place_list,
   place_by_base,
-  place_create
+  place_create,
+  place_delete
 }

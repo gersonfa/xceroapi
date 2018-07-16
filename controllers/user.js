@@ -8,7 +8,7 @@ const Service = require('../models/service')
 async function user_drivers_list(req, res, next) {
   try {
 
-    let drivers = await User.find({role: 'Driver'}, 'email full_name rating image unit_number')
+    let drivers = await User.find({role: 'Driver'}, 'email full_name rating image unit_number inService')
 
     sendJSONresponse(res, 200, drivers)
   } catch (e) {

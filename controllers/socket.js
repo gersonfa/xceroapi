@@ -22,6 +22,7 @@ module.exports = (io, users_online) => {
       const user_id = socket.user_id
 
       let user = await User.findById(user_id)
+      console.log(user)
       if (user) {
         user.coords = coords
         await user.save()
