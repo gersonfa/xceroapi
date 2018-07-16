@@ -723,6 +723,28 @@
   },
   {
     "type": "get",
+    "url": "/service_end",
+    "title": "service end",
+    "name": "Service_end",
+    "group": "UserSockets",
+    "success": {
+      "fields": {
+        "200 Success": [
+          {
+            "group": "200 Success",
+            "optional": false,
+            "field": "Object",
+            "description": "<p>service</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "routes/index.js",
+    "groupTitle": "UserSockets"
+  },
+  {
+    "type": "get",
     "url": "/service_on_the_way",
     "title": "service on the way",
     "name": "Service_on_the_way",
@@ -788,7 +810,7 @@
     "groupTitle": "UserSockets"
   },
   {
-    "type": "put",
+    "type": "get",
     "url": "/api/user/user_status",
     "title": "Check user status",
     "name": "User_status",
