@@ -2,6 +2,12 @@ const mongoose = require('mongoose')
 const bcrypt = require('bcrypt-nodejs')
 const Schema = mongoose.Schema
 
+const reviewSchema = new Schema({
+  author: {type: Schema.Types.ObjectId, ref: 'User' },
+  rating: { type: Number, min: 0},
+  comment: { type: String }
+})
+
 const userSchema = new Schema({
   account: { type: String, required: true, unique: true},
   password: { type: String },
@@ -13,7 +19,8 @@ const userSchema = new Schema({
   image: { type: String },
   rating: { type: Number, max: 5, default: 3},
   unit_number: { type: Number, unique: true },
-  inService: { type: Boolean, default: false }
+  inService: { type: Boolean, default: false },
+  reviews: [reviewSchema]
 }, {
   versionKey: false
 })

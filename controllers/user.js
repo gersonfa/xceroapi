@@ -4,6 +4,7 @@ const User = require('../models/user')
 const sendJSONresponse = require('../shared/common').sendJSONresponse
 const Base = require('../models/base')
 const Service = require('../models/service')
+const boom = require('boom')
 
 async function user_drivers_list(req, res, next) {
   try {
@@ -87,11 +88,41 @@ async function driver_details (req, res, next) {
   }
 }
 
+async function driver_add_review (req, res, next) {
+  try {
+    const user = req.user
+    const driver_id = req.params.driver_id
+
+    if (!req.body.rating) throw boom.badRequest('rating is required')
+
+    let driver = await User.findById(driver_id)
+
+    let review = {
+      user: user._id,
+      rating: req.body.rating,
+      comment: req.body.comment
+    }
+
+    driver.reviews.push(review)
+
+    let total = 0
+    driver.reviews.map(r => total += r.rating)
+    driver.rating = total / driver.reviews.length
+
+    await driver.save()
+
+    sendJSONresponse(res, 201, review)
+  } catch(e) {
+    return next(e)
+  }
+}
+
 module.exports = {
   user_drivers_list,
   drivers_location,
   driver_exit,
   driver_in,
   user_status,
-  driver_details
+  driver_details,
+  driver_add_review
 }

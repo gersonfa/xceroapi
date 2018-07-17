@@ -107,7 +107,7 @@ module.exports = (app, io) => {
   /**
    * @api {get} /api/user/user_status Check user status
    * @apiName User status
-   * @apiGroup Users
+   * @apiGroup User
    * @apiPermission Token
 
    * @apiSuccess (200 Success) inService boolean
@@ -115,6 +115,17 @@ module.exports = (app, io) => {
    */
   api_routes.get('/user/user_status', require_auth, user_controller.user_status)
   api_routes.get('/user/:driver_id/driver_details', require_auth, user_controller.driver_details)
+  /**
+   * @api {post} /api/driver/:driver_id/add_review Review create
+   * @apiName Review create
+   * @apiGroup User
+   * @apiPermission Token
+   * @apiParam (body) {Number} rating Calificación del 1 al 5
+   * @apiParam (body) {String} comment comentario (Opcional)
+
+   * @apiSuccess (200 Success) Object service
+   */
+  api_routes.post('/driver/:driver_id/add_review', require_auth, user_controller.driver_add_review)
   /**
    * @api {post} /api/service Service create
    * @apiName Service create

@@ -771,6 +771,53 @@
     "groupTitle": "Tariff"
   },
   {
+    "type": "post",
+    "url": "/api/driver/:driver_id/add_review",
+    "title": "Review create",
+    "name": "Review_create",
+    "group": "User",
+    "permission": [
+      {
+        "name": "Token"
+      }
+    ],
+    "parameter": {
+      "fields": {
+        "body": [
+          {
+            "group": "body",
+            "type": "Number",
+            "optional": false,
+            "field": "rating",
+            "description": "<p>Calificación del 1 al 5</p>"
+          },
+          {
+            "group": "body",
+            "type": "String",
+            "optional": false,
+            "field": "comment",
+            "description": "<p>comentario (Opcional)</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "200 Success": [
+          {
+            "group": "200 Success",
+            "optional": false,
+            "field": "Object",
+            "description": "<p>service</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "routes/index.js",
+    "groupTitle": "User"
+  },
+  {
     "type": "get",
     "url": "/service_end",
     "title": "service end",
@@ -863,7 +910,7 @@
     "url": "/api/user/user_status",
     "title": "Check user status",
     "name": "User_status",
-    "group": "Users",
+    "group": "User",
     "permission": [
       {
         "name": "Token"
@@ -889,6 +936,6 @@
     },
     "version": "0.0.0",
     "filename": "routes/index.js",
-    "groupTitle": "Users"
+    "groupTitle": "User"
   }
 ]
