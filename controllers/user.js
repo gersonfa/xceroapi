@@ -75,10 +75,23 @@ async function user_status (req, res, next) {
   }
 }
 
+async function driver_details (req, res, next) {
+  try {
+    const driver_id = req.params.driver_id
+
+    let driver = await User.findById(driver_id, 'full_name image rating email image')
+
+    sendJSONresponse(res, 200, driver)
+  } catch(e) {
+    return next(e)
+  }
+}
+
 module.exports = {
   user_drivers_list,
   drivers_location,
   driver_exit,
   driver_in,
-  user_status
+  user_status,
+  driver_details
 }

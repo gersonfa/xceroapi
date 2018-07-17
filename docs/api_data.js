@@ -306,6 +306,55 @@ define({ "api": [
   },
   {
     "type": "get",
+    "url": "/api/diver/:driver_id/inbox",
+    "title": "Inbox list",
+    "name": "Inbox_list",
+    "group": "Inbox",
+    "permission": [
+      {
+        "name": "Token"
+      }
+    ],
+    "success": {
+      "fields": {
+        "200 Success": [
+          {
+            "group": "200 Success",
+            "type": "Object[]",
+            "optional": false,
+            "field": "inbox",
+            "description": "<p>Array de inbox</p>"
+          },
+          {
+            "group": "200 Success",
+            "type": "String",
+            "optional": false,
+            "field": "inbox._id",
+            "description": ""
+          },
+          {
+            "group": "200 Success",
+            "type": "String",
+            "optional": false,
+            "field": "body.name",
+            "description": ""
+          },
+          {
+            "group": "200 Success",
+            "type": "Number",
+            "optional": false,
+            "field": "body.date",
+            "description": ""
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "routes/index.js",
+    "groupTitle": "Inbox"
+  },
+  {
+    "type": "get",
     "url": "/place",
     "title": "Place list",
     "name": "Place_list",

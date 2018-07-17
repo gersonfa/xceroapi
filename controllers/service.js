@@ -247,12 +247,10 @@ module.exports = (io, users_online) => {
       const user = req.user
       const service_id = req.params.service_id
 
-      let service = await Service.findById(service_id)
-      console.log(service)
+      let service = await Service.findById(service_id).populate('origin_colony')
 
       user.inService = false
       await user.save()
-      console.log(user)
 
       if (user.role == 'Driver') {
         await emit_new_service(service)
@@ -271,7 +269,6 @@ module.exports = (io, users_online) => {
 
         let driver_socket = users_online.get(service.driver.toString())
         if (driver_socket) {
-          console.log('se emitio')
           io.to(driver_socket).emit('service_canceled', service)
         }
         sendJSONresponse(res, 200, service)
@@ -313,7 +310,7 @@ module.exports = (io, users_online) => {
       } else if (driver_reject) {
         //  Verificar si el rechazo vino de base
         if (base.stack.map(d => d.toString).includes(driver_reject.toString)) {
-          console.log('estoy en base')
+        
           const reject_position = base.stack.indexOf(driver_reject) + 1
 
           if (base.stack.length != 0 && base.stack.length > reject_position) {
@@ -385,6 +382,21 @@ module.exports = (io, users_online) => {
     }
   }
 
+  async function service_by_driver (req, res, next) {
+    try {
+      const driver_id = req.params.driver_id
+
+      let services = await Service.find({driver: driver_id})
+      .populate('origin_colony origin_place destiny_colony destiny_place')
+      .populate({path: 'user', select: 'full_name'})
+
+      sendJSONresponse(res, 200, services)
+    } catch (e) {
+      return next(e)
+    }
+  }
+
+
   return {
     service_create,
     service_list,
@@ -393,6 +405,7 @@ module.exports = (io, users_online) => {
     service_start,
     service_end,
     service_cancel,
-    service_reject
+    service_reject,
+    service_by_driver
   }
 }

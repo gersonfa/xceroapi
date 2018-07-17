@@ -12,6 +12,7 @@ module.exports = (app, io) => {
   const group_controller = require('../controllers/group')
   const colony_controller = require('../controllers/colony')
   const place_controller = require('../controllers/place')
+  const inbox_controller = require('../controllers/inbox')
   const service_controller = require('../controllers/service')(io, users_online)
 
   require('../controllers/socket')(io, users_online)
@@ -57,6 +58,20 @@ module.exports = (app, io) => {
   api_routes.get('/group/:group_id/colony', require_auth, colony_controller.colony_by_group)
   api_routes.delete('/colony/:colony_id', require_auth, colony_controller.colony_delete)
 
+  api_routes.post('/driver/:driver_id/inbox', require_auth, inbox_controller.inbox_create)
+  /**
+   * @api {get} /api/diver/:driver_id/inbox Inbox list
+   * @apiName Inbox list
+   * @apiGroup Inbox
+   * @apiPermission Token
+
+   * @apiSuccess (200 Success) {Object[]} inbox Array de inbox
+   * @apiSuccess (200 Success) {String} inbox._id
+   * @apiSuccess (200 Success) {String} body.name
+   * @apiSuccess (200 Success) {Number} body.date
+   */
+  api_routes.get('/driver/:driver_id/inbox', require_auth, inbox_controller.inbox_list)
+
   /**
    * @api {get} /api/group/place Colony list
    * @apiName Colony list
@@ -99,6 +114,7 @@ module.exports = (app, io) => {
    * * @apiSuccess (200 Success) service service object if exist
    */
   api_routes.get('/user/user_status', require_auth, user_controller.user_status)
+  api_routes.get('/user/:driver_id/driver_details', require_auth, user_controller.driver_details)
   /**
    * @api {post} /api/service Service create
    * @apiName Service create
@@ -183,6 +199,7 @@ module.exports = (app, io) => {
    * @apiSuccess (200 Success) object {colony:object} devuelve la colonia si se encontro
    */
   api_routes.get('/get_location', require_auth, service_controller.get_location)
+  api_routes.get('/service/driver/:driver_id', require_auth, service_controller.service_by_driver)
 
   /**
    * @api {post} /update_location update location
