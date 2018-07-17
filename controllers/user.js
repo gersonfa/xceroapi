@@ -117,6 +117,32 @@ async function driver_add_review (req, res, next) {
   }
 }
 
+async function driver_update_image (req, res, next) {
+  try {
+    const user = req.user
+
+    if (req.body.image) {
+      let fileName = Date.now()
+      let filepath = base64Img.imgSync(
+        req.body.image,
+        path.join("/home/xcero/public", "drivers"),
+        //path.join("./uploads", "laboratory"),
+        fileName
+      )
+      user.image = "http://xcero.com/images/drivers/" + fileName + path.extname(filepath)
+
+      await user.save()
+    } else {
+      throw boom.badRequest('image is required')
+    }
+
+    sendJSONresponse(res, 200, {image: user.image})
+
+  } catch(e) {
+    return next(e)
+  }
+}
+
 module.exports = {
   user_drivers_list,
   drivers_location,
@@ -124,5 +150,6 @@ module.exports = {
   driver_in,
   user_status,
   driver_details,
-  driver_add_review
+  driver_add_review,
+  driver_update_image
 }

@@ -30,6 +30,17 @@ async function register(req, res, next) {
 
     let user = new User(req.body)
 
+    if (user.image != 'http://via.placeholder.com/250x300' && user.role == 'Driver') {
+      let fileName = Date.now()
+      let filepath = base64Img.imgSync(
+        req.body.image,
+        path.join("/home/xcero/public", "drivers"),
+        //path.join("./uploads", "laboratory"),
+        fileName
+      )
+      user.image = "http://xcero.com/images/drivers/" + fileName + path.extname(filepath)
+    }
+
     user = await user.save()
     let userInfo = setUserInfo(user)
 

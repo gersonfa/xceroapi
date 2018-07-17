@@ -116,6 +116,15 @@ module.exports = (app, io) => {
   api_routes.get('/user/user_status', require_auth, user_controller.user_status)
   api_routes.get('/user/:driver_id/driver_details', require_auth, user_controller.driver_details)
   /**
+   * @api {put} /api/user/update_image Update image
+   * @apiName Update image
+   * @apiGroup Drivers
+   * @apiPermission Token
+
+   * @apiSuccess (200 Success) image imagen en base64
+   */
+  api_routes.put('/user/update_image', require_auth, user_controller.driver_update_image)
+  /**
    * @api {post} /api/driver/:driver_id/add_review Review create
    * @apiName Review create
    * @apiGroup User
