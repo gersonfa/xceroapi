@@ -24,7 +24,7 @@ app.use(helmet())
 
 app.use(passport.initialize())
 
-app.use(express.static('public'));
+app.use(express.static('public/dist'));
 
 require('./startup/logging')()
 require('./startup/routes')(app, io)
