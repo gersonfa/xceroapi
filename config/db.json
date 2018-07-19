@@ -1,3 +1,4 @@
 {
-    "database": "mongodb://localhost:27017/xcero"
+    "database": "mongodb://localhost:27017/xcero",
+    "test": "mongodb://xcero:xcero123@ds125881.mlab.com:25881/xcero"
 }

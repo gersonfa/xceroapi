@@ -305,6 +305,33 @@
     "groupTitle": "Drivers"
   },
   {
+    "type": "put",
+    "url": "/api/user/update_image",
+    "title": "Update image",
+    "name": "Update_image",
+    "group": "Drivers",
+    "permission": [
+      {
+        "name": "Token"
+      }
+    ],
+    "success": {
+      "fields": {
+        "200 Success": [
+          {
+            "group": "200 Success",
+            "optional": false,
+            "field": "image",
+            "description": "<p>imagen en base64</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "routes/index.js",
+    "groupTitle": "Drivers"
+  },
+  {
     "type": "get",
     "url": "/api/diver/:driver_id/inbox",
     "title": "Inbox list",
@@ -654,6 +681,33 @@
   },
   {
     "type": "put",
+    "url": "/api/service/:service_id/neate",
+    "title": "Service negate",
+    "name": "Service_negate",
+    "group": "Service",
+    "permission": [
+      {
+        "name": "Token"
+      }
+    ],
+    "success": {
+      "fields": {
+        "200 Success": [
+          {
+            "group": "200 Success",
+            "optional": false,
+            "field": "Object",
+            "description": "<p>service</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "routes/index.js",
+    "groupTitle": "Service"
+  },
+  {
+    "type": "put",
     "url": "/api/service/:service_id/service_reject",
     "title": "Service reject",
     "name": "Service_reject",
@@ -772,7 +826,7 @@
   },
   {
     "type": "post",
-    "url": "/api/driver/:driver_id/add_review",
+    "url": "/api/user/:user_id/add_review",
     "title": "Review create",
     "name": "Review_create",
     "group": "User",

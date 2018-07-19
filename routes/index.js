@@ -115,6 +115,7 @@ module.exports = (app, io) => {
    */
   api_routes.get('/user/user_status', require_auth, user_controller.user_status)
   api_routes.get('/user/:driver_id/driver_details', require_auth, user_controller.driver_details)
+  api_routes.put('/user/:driver_id/driver_update', require_auth, user_controller.driver_update)
   /**
    * @api {put} /api/user/update_image Update image
    * @apiName Update image
@@ -125,7 +126,7 @@ module.exports = (app, io) => {
    */
   api_routes.put('/user/update_image', require_auth, user_controller.driver_update_image)
   /**
-   * @api {post} /api/driver/:driver_id/add_review Review create
+   * @api {post} /api/user/:user_id/add_review Review create
    * @apiName Review create
    * @apiGroup User
    * @apiPermission Token
@@ -134,7 +135,7 @@ module.exports = (app, io) => {
 
    * @apiSuccess (200 Success) Object service
    */
-  api_routes.post('/driver/:driver_id/add_review', require_auth, user_controller.driver_add_review)
+  api_routes.post('/user/:driver_id/add_review', require_auth, user_controller.user_add_review)
   /**
    * @api {post} /api/service Service create
    * @apiName Service create
@@ -198,6 +199,15 @@ module.exports = (app, io) => {
    * @apiSuccess (200 Success) Object service
    */
   api_routes.put('/service/:service_id/cancel', require_auth, service_controller.service_cancel)
+  /**
+   * @api {put} /api/service/:service_id/neate Service negate
+   * @apiName Service negate
+   * @apiGroup Service
+   * @apiPermission Token
+
+   * @apiSuccess (200 Success) Object service
+   */
+  api_routes.put('/service/:service_id/negate', require_auth, service_controller.service_negate)
   /**
    * @api {put} /api/service/:service_id/service_reject Service reject
    * @apiName Service reject
@@ -269,7 +279,7 @@ module.exports = (app, io) => {
    * @apiGroup UserSockets
    * @apiSuccess (200 Success) Object service
   */
- 
+
  /**
    * @api {get} /service_end service end
    * @apiName Service end

@@ -46,7 +46,7 @@ async function set_tariff (service) {
         return service
       }
     } else return service
-  
+
 }
 
 async function get_colonies(lat, lng) {
@@ -96,7 +96,8 @@ async function get_close_drivers(service) {
       }
     },
     role: 'Driver',
-    inService: false
+    inService: false,
+    enable: true
   })
 
   return drivers

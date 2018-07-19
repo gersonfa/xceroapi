@@ -81,7 +81,7 @@ module.exports = (io, users_online) => {
         sendJSONresponse(res, 402, {eror: 'No hay servicios disponibles desde la ubicación establecida.'})
       }
 
-      
+
     } catch(e) {
       return next(e)
     }
@@ -234,7 +234,7 @@ module.exports = (io, users_online) => {
       if (user_socket) {
         io.to(user_socket).emit('service_end', service)
       }
-      
+
       sendJSONresponse(res, 200, service)
 
     } catch(e) {
@@ -255,12 +255,12 @@ module.exports = (io, users_online) => {
       if (user.role == 'Driver') {
         await emit_new_service(service)
         sendJSONresponse(res, 200, {message: 'Servicio asignado a otro conductor.'})
-        
+
       } else {
 
         service.state = 'canceled'
         service = await service.save()
-        
+
         if (service.driver) {
           let driver = await User.findById(service.driver)
           driver.inService = false
@@ -275,7 +275,7 @@ module.exports = (io, users_online) => {
         sendJSONresponse(res, 200, service)
       }
 
-      
+
     } catch(e) {
       return next(e)
     }
@@ -288,8 +288,35 @@ module.exports = (io, users_online) => {
 
       let service = await Service.findById(service_id).populate('origin_colony origin_place')
       await emit_new_service(service, user._id)
-      
+
       sendJSONresponse(res, 200, {message: 'Servicio rechazado correctamente'})
+    } catch(e) {
+      return next(e)
+    }
+  }
+
+  async function service_negate (req, res, next) {
+    try {
+      let driver = req.user
+      const service_id = req.params.service_id
+
+      let service = await Service.findById(service_id)
+      service.state = 'negated'
+      service = await service.save()
+
+      driver.inService = false
+      await driver.save()
+
+      let user = await User.findById(service.user)
+      await user.save()
+
+      let user_socket = users_online.get(service.user.toString())
+
+      if (user_socket) {
+        io.to(user_socket).emit('service_rejected', service)
+      }
+
+      sendJSONresponse(res, 200, service)
     } catch(e) {
       return next(e)
     }
@@ -311,13 +338,13 @@ module.exports = (io, users_online) => {
       } else if (driver_reject) {
         //  Verificar si el rechazo vino de base
         if (base.stack.map(d => d.toString).includes(driver_reject.toString)) {
-        
+
           const reject_position = base.stack.indexOf(driver_reject) + 1
 
           if (base.stack.length != 0 && base.stack.length > reject_position) {
 
             const socket_driver = users_online.get(base.stack[reject_position + 1])
-  
+
             if (socket_driver) {
               io.to(socket_driver).emit('new_service', service)
               return true
@@ -328,7 +355,7 @@ module.exports = (io, users_online) => {
         } else {
           await assign_to_close_driver(service, driver_reject)
         }
-        
+
       //  Servicio nuevo
       } else {
         if (base.stack.length > 0) {
@@ -356,9 +383,9 @@ module.exports = (io, users_online) => {
     }
 
     if (drivers.length > 0) {
-      
+
       const driver_socket = users_online.get(drivers[0]._id.toString())
-          
+
       if (driver_socket) {
         service = await User.populate(service, {path: 'user', select: 'full_name image'})
         io.to(driver_socket).emit('new_service', service)
@@ -407,6 +434,7 @@ module.exports = (io, users_online) => {
     service_end,
     service_cancel,
     service_reject,
-    service_by_driver
+    service_by_driver,
+    service_negate
   }
 }

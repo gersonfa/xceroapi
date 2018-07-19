@@ -20,7 +20,8 @@ const userSchema = new Schema({
   rating: { type: Number, max: 5, default: 3},
   unit_number: { type: Number, unique: true },
   inService: { type: Boolean, default: false },
-  reviews: [reviewSchema]
+  reviews: [reviewSchema],
+  enable: { type: Boolean, default: true}
 }, {
   versionKey: false
 })

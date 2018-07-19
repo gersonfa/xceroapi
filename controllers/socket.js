@@ -9,7 +9,7 @@ module.exports = (io, users_online) => {
     const socket_id = socket.id
     let user_id = socket.handshake.query.user_id
     users_online.set(user_id, socket.id)
-    
+
     let user = await User.findById(user_id)
 
     console.log(users_online.entries())
@@ -27,7 +27,7 @@ module.exports = (io, users_online) => {
         await user.save()
       }
 
-      if (!user.inService) {
+      if (!user.inService && user.enable) {
         const point = {
           type: 'Point',
           coordinates: coords

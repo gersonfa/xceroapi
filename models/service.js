@@ -10,7 +10,7 @@ const serviceSchema = new Schema({
 
   tariff: { type: Schema.Types.ObjectId, ref: 'Tariff' },
   address: { type: String },
-  state: { type: String, enum: ['pending', 'on_the_way', 'in_process', 'completed', 'canceled'], default: 'pending'},
+  state: { type: String, enum: ['pending', 'on_the_way', 'in_process', 'completed', 'canceled', 'negated'], default: 'pending'},
 
   origin_colony: { type: Schema.Types.ObjectId, ref: 'Colony' },
   destiny_colony: { type: Schema.Types.ObjectId, ref: 'Colony'},

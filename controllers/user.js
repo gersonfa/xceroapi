@@ -31,11 +31,13 @@ async function driver_exit (req, res, next) {
   try {
     const user = req.user
 
-    let base = await Base.findOne({stack: user.id})
-    
-    if (base) {
-      base.stack = base.stack.filter(d => d != user.id)
-      await base.save()
+    let bases = await Base.find({stack: user.id})
+
+    if (bases.length > 0) {
+      bases.map(async (base) => {
+        base.stack = base.stack.filter(d => d != user.id)
+        await base.save()
+      })
     }
 
     user.inService = true
@@ -64,7 +66,7 @@ async function user_status (req, res, next) {
     const user = req.user
 
     let service = await Service.findOne({
-      $or: [{driver: user._id}, {user: user._id}], 
+      $or: [{driver: user._id}, {user: user._id}],
       state: {$in: ['on_the_way', 'in_process', 'pending']}})
       .populate('origin_colony destiny_colony origin_place destiny_place')
       .populate({path: 'user', select: 'full_name image'})
@@ -80,7 +82,7 @@ async function driver_details (req, res, next) {
   try {
     const driver_id = req.params.driver_id
 
-    let driver = await User.findById(driver_id, 'full_name image rating email image')
+    let driver = await User.findById(driver_id, 'full_name image rating email image enable')
 
     sendJSONresponse(res, 200, driver)
   } catch(e) {
@@ -88,7 +90,7 @@ async function driver_details (req, res, next) {
   }
 }
 
-async function driver_add_review (req, res, next) {
+async function user_add_review (req, res, next) {
   try {
     const user = req.user
     const driver_id = req.params.driver_id
@@ -143,6 +145,19 @@ async function driver_update_image (req, res, next) {
   }
 }
 
+async function driver_update (req, res, next) {
+  try {
+    const driver_id = req.params.driver_id
+
+    let driver = await User.findByIdAndUpdate(driver_id, req.body, { new: true })
+    delete driver.password
+
+    sendJSONresponse(res, 200, driver)
+  } catch (e) {
+    return next(e)
+  }
+}
+
 module.exports = {
   user_drivers_list,
   drivers_location,
@@ -150,6 +165,7 @@ module.exports = {
   driver_in,
   user_status,
   driver_details,
-  driver_add_review,
-  driver_update_image
+  user_add_review,
+  driver_update_image,
+  driver_update
 }
