@@ -33,6 +33,15 @@ auth_routes.post('/register', authenticathion_controller.register)
  *
  */
 auth_routes.post('/login', require_login, authenticathion_controller.login)
+/**
+ * @api {post} /api/auth/facebook Login
+ * @apiName Facebook Login
+ * @apiGroup Authentication
+ * @apiParam (body) {String} facebook_id
+ * @apiSuccess (200 Success) {String} token
+ * @apiSuccess (200 Success) {Object} user
+ *
+ */
 auth_routes.post('/facebook', authenticathion_controller.facebook_login)
 
 module.exports = auth_routes

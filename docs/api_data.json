@@ -1,6 +1,49 @@
 [
   {
     "type": "post",
+    "url": "/api/auth/facebook",
+    "title": "Login",
+    "name": "Facebook_Login",
+    "group": "Authentication",
+    "parameter": {
+      "fields": {
+        "body": [
+          {
+            "group": "body",
+            "type": "String",
+            "optional": false,
+            "field": "facebook_id",
+            "description": ""
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "200 Success": [
+          {
+            "group": "200 Success",
+            "type": "String",
+            "optional": false,
+            "field": "token",
+            "description": ""
+          },
+          {
+            "group": "200 Success",
+            "type": "Object",
+            "optional": false,
+            "field": "user",
+            "description": ""
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "routes/auth.js",
+    "groupTitle": "Authentication"
+  },
+  {
+    "type": "post",
     "url": "/api/auth/login",
     "title": "Login",
     "name": "Login",
@@ -295,6 +338,33 @@
             "group": "200 Success",
             "optional": false,
             "field": "message",
+            "description": ""
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "routes/index.js",
+    "groupTitle": "Drivers"
+  },
+  {
+    "type": "put",
+    "url": "/api/user/driver__leave_base",
+    "title": "Leave base",
+    "name": "Leave_base",
+    "group": "Drivers",
+    "permission": [
+      {
+        "name": "Token"
+      }
+    ],
+    "success": {
+      "fields": {
+        "200 Success": [
+          {
+            "group": "200 Success",
+            "optional": false,
+            "field": "base",
             "description": ""
           }
         ]
@@ -681,7 +751,7 @@
   },
   {
     "type": "put",
-    "url": "/api/service/:service_id/neate",
+    "url": "/api/service/:service_id/negate",
     "title": "Service negate",
     "name": "Service_negate",
     "group": "Service",

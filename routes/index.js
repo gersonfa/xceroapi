@@ -114,6 +114,15 @@ module.exports = (app, io) => {
    * * @apiSuccess (200 Success) service service object if exist
    */
   api_routes.get('/user/user_status', require_auth, user_controller.user_status)
+  /**
+   * @api {put} /api/user/driver__leave_base Leave base
+   * @apiName Leave base
+   * @apiGroup Drivers
+   * @apiPermission Token
+
+   * @apiSuccess (200 Success) base
+   */
+  api_routes.put('/user/driver_leave_base', require_auth, user_controller.driver_leave_base)
   api_routes.get('/user/:driver_id/driver_details', require_auth, user_controller.driver_details)
   api_routes.put('/user/:driver_id/driver_update', require_auth, user_controller.driver_update)
   /**
@@ -200,7 +209,7 @@ module.exports = (app, io) => {
    */
   api_routes.put('/service/:service_id/cancel', require_auth, service_controller.service_cancel)
   /**
-   * @api {put} /api/service/:service_id/neate Service negate
+   * @api {put} /api/service/:service_id/negate Service negate
    * @apiName Service negate
    * @apiGroup Service
    * @apiPermission Token

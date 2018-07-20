@@ -33,12 +33,11 @@ async function driver_exit (req, res, next) {
 
     let bases = await Base.find({stack: user.id})
 
-    if (bases.length > 0) {
-      bases.map(async (base) => {
-        base.stack = base.stack.filter(d => d != user.id)
-        await base.save()
-      })
-    }
+    bases.map(async (base) => {
+      base.stack = base.stack.filter(d => d != user.id)
+      await base.save()
+    })
+    
 
     user.inService = true
     await user.save()
@@ -72,7 +71,9 @@ async function user_status (req, res, next) {
       .populate({path: 'user', select: 'full_name image'})
       .populate({path: 'driver', select: 'full_name image rating unit_number'})
 
-    sendJSONresponse(res, 200, {inService: user.inService, service})
+    let base = await Base.findOne({stack: user._id})
+
+    sendJSONresponse(res, 200, {inService: user.inService, service, base})
   } catch(e) {
     return next(e)
   }
@@ -158,6 +159,29 @@ async function driver_update (req, res, next) {
   }
 }
 
+async function driver_leave_base (req, res, next) {
+  try {
+    const user = req.user
+
+    let bases = await Base.find({stack: user.id})
+
+    if (bases.length > 0) {
+      bases.map(async (base) => {
+        base.stack = base.stack.filter(d => d != user.id)
+        await base.save()
+      })
+  
+      sendJSONresponse(res, 200, {base: bases[0]})
+    } else {
+      sendJSONresponse(res, 200, {message: 'Conductor fuera de base.'})
+    }
+
+    
+  } catch (e) {
+    return next(e)
+  }
+}
+
 module.exports = {
   user_drivers_list,
   drivers_location,
@@ -167,5 +191,6 @@ module.exports = {
   driver_details,
   user_add_review,
   driver_update_image,
-  driver_update
+  driver_update,
+  driver_leave_base
 }
