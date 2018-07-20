@@ -2,7 +2,7 @@
   {
     "type": "post",
     "url": "/api/auth/facebook",
-    "title": "Login",
+    "title": "Facebbok Login",
     "name": "Facebook_Login",
     "group": "Authentication",
     "parameter": {
@@ -349,7 +349,7 @@
   },
   {
     "type": "put",
-    "url": "/api/user/driver__leave_base",
+    "url": "/api/user/driver_leave_base",
     "title": "Leave base",
     "name": "Leave_base",
     "group": "Drivers",
