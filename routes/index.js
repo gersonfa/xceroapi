@@ -115,7 +115,7 @@ module.exports = (app, io) => {
    */
   api_routes.get('/user/user_status', require_auth, user_controller.user_status)
   /**
-   * @api {put} /api/user/driver__leave_base Leave base
+   * @api {put} /api/user/driver_leave_base Leave base
    * @apiName Leave base
    * @apiGroup Drivers
    * @apiPermission Token

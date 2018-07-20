@@ -34,7 +34,7 @@ auth_routes.post('/register', authenticathion_controller.register)
  */
 auth_routes.post('/login', require_login, authenticathion_controller.login)
 /**
- * @api {post} /api/auth/facebook Login
+ * @api {post} /api/auth/facebook Facebbok Login
  * @apiName Facebook Login
  * @apiGroup Authentication
  * @apiParam (body) {String} facebook_id
