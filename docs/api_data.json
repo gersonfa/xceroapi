@@ -1061,5 +1061,87 @@
     "version": "0.0.0",
     "filename": "routes/index.js",
     "groupTitle": "User"
+  },
+  {
+    "type": "put",
+    "url": "/api/user/change_password",
+    "title": "Change password",
+    "name": "Change_password",
+    "group": "Users",
+    "permission": [
+      {
+        "name": "Token"
+      }
+    ],
+    "parameter": {
+      "fields": {
+        "body": [
+          {
+            "group": "body",
+            "type": "string",
+            "optional": false,
+            "field": "old_password",
+            "description": "<p>Contraseña actual</p>"
+          },
+          {
+            "group": "body",
+            "type": "string",
+            "optional": false,
+            "field": "new_password",
+            "description": "<p>Nueva contraseña</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "200 Success": [
+          {
+            "group": "200 Success",
+            "optional": false,
+            "field": "message",
+            "description": ""
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "routes/index.js",
+    "groupTitle": "Users"
+  },
+  {
+    "type": "post",
+    "url": "/api/user/new_password",
+    "title": "New password",
+    "name": "New_password",
+    "group": "Users",
+    "parameter": {
+      "fields": {
+        "body": [
+          {
+            "group": "body",
+            "type": "string",
+            "optional": false,
+            "field": "email",
+            "description": "<p>Email de usuario</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "200 Success": [
+          {
+            "group": "200 Success",
+            "optional": false,
+            "field": "message",
+            "description": ""
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "routes/index.js",
+    "groupTitle": "Users"
   }
 ]

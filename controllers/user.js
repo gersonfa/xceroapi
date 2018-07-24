@@ -3,8 +3,10 @@
 const User = require('../models/user')
 const sendJSONresponse = require('../shared/common').sendJSONresponse
 const Base = require('../models/base')
+const bcrypt = require('bcrypt-nodejs')
 const Service = require('../models/service')
 const boom = require('boom')
+const email_sender = require('../utils/email')
 
 async function user_drivers_list(req, res, next) {
   try {
@@ -182,6 +184,53 @@ async function driver_leave_base (req, res, next) {
   }
 }
 
+async function user_change_password (req, res, next) {
+  try {
+    let user = req.user
+
+    if (!old_password || !new_password) {
+      throw boom.badRequest('old_password and new_password are requireds.')
+    }
+
+    let password_match = await bcrypt.compareSync(req.body.old_password, user.password)
+
+    if (password_match) {
+      user.password = req.body.new_password
+      await user.save()
+      sendJSONresponse(res, 200, {message: 'Contraseña actualizada.'})
+
+    } else {
+      sendJSONresponse(res, 402, {message: 'old_password don´t match'})
+    }
+  } catch(e) {
+    return next(e)
+  }
+}
+
+async function user_new_password (req, res, next) {
+  try {
+    let email = req.body.email
+
+    if (!email) throw boom.badRequest('email is required')
+
+    let user = await User.findOne({email: user.email})
+
+    if (user) {
+      let new_password = 'fvwefvwe'
+      user.password = new_password
+      await user.save()
+
+      email_sender.new_password(user.email, user.full_name, new_password)
+      sendJSONresponse(res, 200, {message: 'Se ha enviado una nueva contraseña a tu email.'})
+    } else {
+      sendJSONresponse(res, 200, {meesage: 'email not found'})
+    }
+
+  } catch (e) {
+    return next(e)
+  }
+}
+
 module.exports = {
   user_drivers_list,
   drivers_location,
@@ -192,5 +241,7 @@ module.exports = {
   user_add_review,
   driver_update_image,
   driver_update,
-  driver_leave_base
+  driver_leave_base,
+  user_change_password,
+  user_new_password
 }

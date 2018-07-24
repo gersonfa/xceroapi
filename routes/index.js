@@ -123,6 +123,24 @@ module.exports = (app, io) => {
    * @apiSuccess (200 Success) base
    */
   api_routes.put('/user/driver_leave_base', require_auth, user_controller.driver_leave_base)
+  /**
+   * @api {put} /api/user/change_password Change password
+   * @apiName Change password
+   * @apiGroup Users
+   * @apiPermission Token
+   * @apiParam (body) {string} old_password Contraseña actual
+   * @apiParam (body) {string} new_password Nueva contraseña
+   * @apiSuccess (200 Success) message
+   */
+  api_routes.put('/user/change_password', require_auth, user_controller.user_change_password)
+  /**
+   * @api {post} /api/user/new_password New password
+   * @apiName New password
+   * @apiGroup Users
+   * @apiParam (body) {string} email Email de usuario
+   * @apiSuccess (200 Success) message
+   */
+  api_routes.post('/user/new_password', require_auth, user_controller.user_new_password)
   api_routes.get('/user/:driver_id/driver_details', require_auth, user_controller.driver_details)
   api_routes.put('/user/:driver_id/driver_update', require_auth, user_controller.driver_update)
   /**
