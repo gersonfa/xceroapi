@@ -38,7 +38,7 @@ async function register(req, res, next) {
         //path.join("./uploads", "laboratory"),
         fileName
       )
-      user.image = "http://xcero.com/images/drivers/" + fileName + path.extname(filepath)
+      user.image = "http://45.56.121.162/images/" + fileName + path.extname(filepath)
     }
 
     user = await user.save()
