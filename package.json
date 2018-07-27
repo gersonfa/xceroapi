@@ -10,7 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "base64-img": "^1.0.3",
+    "base64-img": "^1.0.4",
     "bcrypt": "^1.0.3",
     "bcrypt-nodejs": "0.0.3",
     "bluebird": "3.5.0",

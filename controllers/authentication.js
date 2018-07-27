@@ -1,12 +1,11 @@
 'use strict'
 
-const crypto = require('crypto')
 const User = require('../models/user')
 const sendJSONresponse = require('../shared/common').sendJSONresponse
 const generateToken = require('../shared/common').generateToken
 const setUserInfo = require('../shared/common').setUserInfo
 const boom = require('boom')
-const winston = require('winston')
+const base64Img = require('base64-img')
 
 function login(req, res, next) {
   let userInfo = setUserInfo(req.user)
