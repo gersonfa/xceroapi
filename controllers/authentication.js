@@ -6,6 +6,7 @@ const generateToken = require('../shared/common').generateToken
 const setUserInfo = require('../shared/common').setUserInfo
 const boom = require('boom')
 const base64Img = require('base64-img')
+const path = require('path')
 
 function login(req, res, next) {
   let userInfo = setUserInfo(req.user)
