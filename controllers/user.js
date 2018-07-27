@@ -231,6 +231,16 @@ async function user_new_password (req, res, next) {
   }
 }
 
+async function driver_delete (req, res, next) {
+  try {
+    let driver = await User.findByIdAndRemove(req.params.driver_id)
+
+    sendJSONresponse(res, 200, driver)
+  } catch(e) {
+    return next(e)
+  }
+}
+
 module.exports = {
   user_drivers_list,
   drivers_location,
@@ -243,5 +253,6 @@ module.exports = {
   driver_update,
   driver_leave_base,
   user_change_password,
-  user_new_password
+  user_new_password,
+  driver_delete
 }

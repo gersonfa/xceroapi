@@ -143,6 +143,7 @@ module.exports = (app, io) => {
   api_routes.post('/user/new_password', require_auth, user_controller.user_new_password)
   api_routes.get('/user/:driver_id/driver_details', require_auth, user_controller.driver_details)
   api_routes.put('/user/:driver_id/driver_update', require_auth, user_controller.driver_update)
+  api_routes.delete('/driver/:driver_id/delete', require_auth, user_controller.driver_delete)
   /**
    * @api {put} /api/user/update_image Update image
    * @apiName Update image
