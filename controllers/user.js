@@ -85,7 +85,7 @@ async function driver_details (req, res, next) {
   try {
     const driver_id = req.params.driver_id
 
-    let driver = await User.findById(driver_id, 'full_name image rating email image enable')
+    let driver = await User.findById(driver_id, 'full_name image rating email image enable unit_number account')
 
     sendJSONresponse(res, 200, driver)
   } catch(e) {
@@ -151,8 +151,23 @@ async function driver_update_image (req, res, next) {
 async function driver_update (req, res, next) {
   try {
     const driver_id = req.params.driver_id
+    let driver = req.body
 
-    let driver = await User.findByIdAndUpdate(driver_id, req.body, { new: true })
+    let old_driver = await User.findById(driver._id)
+
+    if (driver.image != old_driver.image) {
+      let fileName = Date.now()
+      let filepath = base64Img.imgSync(
+        driver.image,
+        path.join("/home/images", "profile"),
+        //path.join("./uploads", "laboratory"),
+        fileName
+      )
+      driver.image = "http://45.56.121.162/images/profile/" + fileName + path.extname(filepath)
+    }
+
+    old_driver = Object.assign(old_driver, driver)
+    await old_driver.save()
     delete driver.password
 
     sendJSONresponse(res, 200, driver)
