@@ -34,7 +34,7 @@ async function register(req, res, next) {
       let fileName = Date.now()
       let filepath = base64Img.imgSync(
         req.body.image,
-        path.join("/home/", "drivers"),
+        path.join("/home/images", "profile"),
         //path.join("./uploads", "laboratory"),
         fileName
       )
