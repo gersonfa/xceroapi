@@ -7,6 +7,8 @@ const bcrypt = require('bcrypt-nodejs')
 const Service = require('../models/service')
 const boom = require('boom')
 const email_sender = require('../utils/email')
+const base64Img = require('base64-img')
+const path = require('path')
 
 async function user_drivers_list(req, res, next) {
   try {
