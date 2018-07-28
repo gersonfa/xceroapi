@@ -15,7 +15,6 @@ const localOptions = {
 // Setting up local login Strategy
 const localLogin = new LocalStrategy(
   localOptions, async (account, password, done) => {
-    try {
       let user = await User.findOne({ account })
       if (user) {
         user.comparePassword(password, (err, isMatch) => {
@@ -26,9 +25,6 @@ const localLogin = new LocalStrategy(
       } else {
         throw boom.unauthorized("Nombre de usuario o contraseña incorrectos.");
       }
-    } catch (e) {
-      return done(e);
-    }
   }
 );
 

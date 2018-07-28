@@ -73,7 +73,7 @@ module.exports = (app, io) => {
   api_routes.get('/driver/:driver_id/inbox', require_auth, inbox_controller.inbox_list)
 
   /**
-   * @api {get} /api/group/place Colony list
+   * @api {get} /api/colony Colony list
    * @apiName Colony list
    * @apiGroup Colony
    * @apiPermission Token
