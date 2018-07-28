@@ -18,8 +18,11 @@ const localLogin = new LocalStrategy(
       let user = await User.findOne({ account })
       if (user) {
         user.comparePassword(password, (err, isMatch) => {
-          if (err || !isMatch) done(null, false)
-          return done(null, user);
+          if (err || !isMatch) {
+            done(null, false)
+          } else {
+            return done(null, user);
+          }
         });
       } else {
         done(null, false)
