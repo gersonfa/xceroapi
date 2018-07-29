@@ -126,7 +126,7 @@ module.exports = (app, io) => {
   /**
    * @api {put} /api/user/change_password Change password
    * @apiName Change password
-   * @apiGroup Users
+   * @apiGroup User
    * @apiPermission Token
    * @apiParam (body) {string} old_password Contraseña actual
    * @apiParam (body) {string} new_password Nueva contraseña
@@ -136,7 +136,7 @@ module.exports = (app, io) => {
   /**
    * @api {post} /api/user/new_password New password
    * @apiName New password
-   * @apiGroup Users
+   * @apiGroup User
    * @apiParam (body) {string} email Email de usuario
    * @apiSuccess (200 Success) message
    */
@@ -257,6 +257,19 @@ module.exports = (app, io) => {
    * @apiSuccess (200 Success) object {colony:object} devuelve la colonia si se encontro
    */
   api_routes.get('/get_location', require_auth, service_controller.get_location)
+  /**
+   * @api {get} /api/get_location Get driver location
+   * @apiName Get driver location
+   * @apiGroup Service
+   * @apiDescription Esta ruta es para obtener la ubicación del conductor para que se muestre en el mapa en el transcurso del viaje.
+   * @apiPermission Token
+   * @apiParam (query) {String} origin_lng Longitud
+   * @apiParam (query) {String} origin_lat Latitud
+
+   * @apiSuccess (200 Success) object {place: object} devuelve un lugar si se encontro
+   * @apiSuccess (200 Success) object {colony:object} devuelve la colonia si se encontro
+   */
+  api_routes.get('/service/:service_id/driver_location', require_auth, user_controller.driver_location)
   api_routes.get('/service/driver/:driver_id', require_auth, service_controller.service_by_driver)
 
   /**

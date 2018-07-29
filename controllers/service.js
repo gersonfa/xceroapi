@@ -90,9 +90,9 @@ module.exports = (io, users_online) => {
   async function service_list(req, res, next) {
     try {
       const user = req.user
-      const state = req.params.state || 'completed'
+      const state = req.query.state || 'completed'
 
-      const services = await Service.find({user: user._id, state: state}).populate('origin_colony destiny_colony origin_place destiny_place')
+      const services = await Service.find({$or: [{user: user._id, state: state}, {driver: user._id, state: state}]}).populate('origin_colony destiny_colony origin_place destiny_place')
 
       sendJSONresponse(res, 200, services)
     } catch(e) {
