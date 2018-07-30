@@ -51,6 +51,8 @@ async function gp_list() {
 		let group_places = []
 
 		groups.forEach(g => {
+			if (!g.base) return
+
 			let group = {
 				_id: g._id,
 				name: g.name,
@@ -62,6 +64,8 @@ async function gp_list() {
 		})
 
 		places.forEach(p => {
+			if (!p.base) return
+			
 			let place = {
 				_id: p._id,
 				name: p.name,
