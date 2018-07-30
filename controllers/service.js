@@ -92,7 +92,10 @@ module.exports = (io, users_online) => {
       const user = req.user
       const state = req.query.state || 'completed'
 
-      const services = await Service.find({$or: [{user: user._id, state: state}, {driver: user._id, state: state}]}).populate('origin_colony destiny_colony origin_place destiny_place')
+      const services = await Service.find({$or: [{user: user._id, state: state}, {driver: user._id, state: state}]})
+      .populate('origin_colony destiny_colony origin_place destiny_place')
+      .populate({path: 'user', select: 'full_name'})
+      .populate({path: 'driver', select: 'full_name unit_number'})
 
       sendJSONresponse(res, 200, services)
     } catch(e) {
@@ -135,11 +138,15 @@ module.exports = (io, users_online) => {
     try {
       const driver = req.user
       const service_id = req.params.service_id
+      const start_time = req.body.start_time
+      
+      if (!start_time) throw boom.badRequest('start_time is required') 
 
       let service = await Service.findById(service_id)
 
       if (service_utils.withinRadius({longitude: service.origin_coords[0], latitude: service.origin_coords[1]}, {longitude: driver.coords[0], latitude: driver.coords[1]}, 0.2)) {
         service.state = 'in_process'
+        service.start_time = start_time
         await service.save()
 
         let passenger = service.user.toString()
@@ -192,12 +199,14 @@ module.exports = (io, users_online) => {
       const service_id = req.params.service_id
       const destiny_lat = req.body.destiny_lat
       const destiny_lng = req.body.destiny_lng
+      const end_time = req.body.end_time
 
-      if (!destiny_lat || !destiny_lng) throw boom.badRequest('destiny_lat & destiny_lng are requireds')
+      if (!destiny_lat || !destiny_lng || !end_time) throw boom.badRequest('destiny_lat, destiny_lng and end_time are requireds')
 
       let service = await Service.findById(service_id)
       service.state = 'completed'
       service.destiny_coords = [parseFloat(destiny_lng), parseFloat(destiny_lat)]
+      service.end_time = end_time
 
       let place = await service_utils.get_places(destiny_lat, destiny_lng)
 

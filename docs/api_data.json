@@ -736,6 +736,12 @@
             "optional": false,
             "field": "destiny_lng",
             "description": "<p>Longitud de origen</p>"
+          },
+          {
+            "group": "body",
+            "optional": false,
+            "field": "end_time",
+            "description": "<p>getTime del objeto date</p>"
           }
         ]
       }
@@ -870,6 +876,18 @@
             "optional": false,
             "field": "Object",
             "description": "<p>service updated</p>"
+          }
+        ]
+      }
+    },
+    "parameter": {
+      "fields": {
+        "body": [
+          {
+            "group": "body",
+            "optional": false,
+            "field": "start_time",
+            "description": "<p>getTime del objeto date</p>"
           }
         ]
       }

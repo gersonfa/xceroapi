@@ -205,6 +205,7 @@ module.exports = (app, io) => {
    * @apiPermission Token
 
    * @apiSuccess (200 Success) Object service updated
+   * @apiParam (body) start_time getTime del objeto date
    */
   api_routes.put('/service/:service_id/start', require_auth, service_controller.service_start)
   /**
@@ -216,6 +217,7 @@ module.exports = (app, io) => {
    * @apiParam (body) {Number} destiny_lng Longitud de origen
 
    * @apiSuccess (200 Success) Object service
+   * @apiParam (body) end_time getTime del objeto date
    */
   api_routes.put('/service/:service_id/end', require_auth, service_controller.service_end)
   /**

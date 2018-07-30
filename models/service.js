@@ -16,7 +16,10 @@ const serviceSchema = new Schema({
   destiny_colony: { type: Schema.Types.ObjectId, ref: 'Colony'},
 
   origin_place: { type: Schema.Types.ObjectId, ref: 'Place'},
-  destiny_place: { type: Schema.Types.ObjectId, ref: 'Place'}
+  destiny_place: { type: Schema.Types.ObjectId, ref: 'Place'},
+
+  start_time: { type: Number },
+  end_time: { type: Number }
 })
 
 module.exports = mongoose.model('Service', serviceSchema)
