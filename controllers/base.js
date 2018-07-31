@@ -43,6 +43,19 @@ async function base_delete(req, res, next) {
 
 		let base = await Base.findByIdAndRemove(base_id)
 
+		let places_ids = await Place.find({base: base_id}).distinct('_id')
+		let groups_ids = await Groups.find({base: base_id}).distinct('_id')
+		let colonies_ids = await Colony.find({group: {$in: groups_ids}})
+
+		let tariffs = await Tariff.find({$or: [
+			{origin_place: {$in: places_ids}}, 
+			{destiny_place: {$in: places_ids}},
+			{origin_colony: {$in: colonies_ids}},
+			{destiny_colony: {$in: colonies_ids}}
+		]})
+
+		console.log(tariffs, places_ids, groups_ids, colonies_ids)
+
 		sendJSONresponse(res, 200, base)
 	} catch(e) {
 		return next(e)

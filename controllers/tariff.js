@@ -30,15 +30,28 @@ async function tariff_create(req, res, next) {
 
 async function tariff_list(req, res, next) {
 	try {
-		//let tariffs = await Tariff.find().populate('origin_group destiny_group origin_place destiny_place')
-		let tariffs = await Tariff.find().populate([
+		const perPage = 15
+		var page = req.query.page || 1
+		
+		let tariffs = await Tariff
+		.find()
+		.skip((perPage * page) - perPage)
+        .limit(perPage)
+		.populate([
 			{path: 'origin_group', populate: {path: 'base', select: 'name'}},
 			{path: 'destiny_group', populate: {path: 'base', select: 'name'}},
 			{path: 'origin_place', populate: {path: 'base', select: 'name'}},
 			{path: 'destiny_place', populate: {path: 'base', select: 'name'}}
 		])
 
-		sendJSONresponse(res, 200, tariffs)
+		let count = await Tariff.count()
+
+		sendJSONresponse(res, 200, {
+			tariffs,
+			pages: Math.ceil(count / perPage),
+			current: page,
+			count
+		})
 	} catch(e) {
 		return next(e)
 	}
