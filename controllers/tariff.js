@@ -174,12 +174,6 @@ async function tariff_by_groups (req, res, next) {
 			{origin_place: group1_id, destiny_place: group2_id},
 			{origin_place: group2_id, destiny_place: group1_id}
 		]})
-		.populate([
-			{path: 'origin_group', populate: {path: 'base', select: 'name'}},
-			{path: 'destiny_group', populate: {path: 'base', select: 'name'}},
-			{path: 'origin_place', populate: {path: 'base', select: 'name'}},
-			{path: 'destiny_place', populate: {path: 'base', select: 'name'}}
-		])
 
 		sendJSONresponse(res, 200, tariff)
 	} catch (e) {
@@ -192,6 +186,12 @@ async function tariff_details (req, res, next) {
 		const tariff_id = req.params.tariff_id
 
 		let tariff = await Tariff.findById(tariff_id)
+		.populate([
+			{path: 'origin_group', populate: {path: 'base', select: 'name'}},
+			{path: 'destiny_group', populate: {path: 'base', select: 'name'}},
+			{path: 'origin_place', populate: {path: 'base', select: 'name'}},
+			{path: 'destiny_place', populate: {path: 'base', select: 'name'}}
+		])
 
 		sendJSONresponse(res, 200, tariff)
 	} catch (e) {
