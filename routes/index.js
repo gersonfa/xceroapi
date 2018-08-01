@@ -49,6 +49,7 @@ module.exports = (app, io) => {
   api_routes.delete('/base/:base_id/place/:place_id', require_auth, place_controller.place_delete)
 
   api_routes.post('/base/:base_id/group', require_auth, group_controller.group_create)
+  api_routes.delete('/base/:base_id/group/:group_id', require_auth, group_controller.group_delete)
   api_routes.get('/base/:base_id/group', require_auth, group_controller.group_by_base)
 
   api_routes.get('/group/place', require_auth, group_controller.group_place_list)

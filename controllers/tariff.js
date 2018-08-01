@@ -161,11 +161,51 @@ async function tariff_update_all (req, res, next) {
 	}
 }
 
+async function tariff_by_groups (req, res, next) {
+	try {
+		const group1_id = req.params.group1_id
+		const group2_id = req.params.group2_id
+
+		let tariff = await Tariff.findOne({$or: [
+			{origin_group: group1_id, destiny_group: group2_id},
+			{origin_group:group2_id, destiny_group: group1_id},
+			{origin_group: group1_id, destiny_place: group2_id},
+			{origin_group: group2_id, destiny_place: group1_id},
+			{origin_place: group1_id, destiny_place: group2_id},
+			{origin_place: group2_id, destiny_place: group1_id}
+		]})
+		.populate([
+			{path: 'origin_group', populate: {path: 'base', select: 'name'}},
+			{path: 'destiny_group', populate: {path: 'base', select: 'name'}},
+			{path: 'origin_place', populate: {path: 'base', select: 'name'}},
+			{path: 'destiny_place', populate: {path: 'base', select: 'name'}}
+		])
+
+		sendJSONresponse(res, 200, tariff)
+	} catch (e) {
+		return next(e)
+	}
+}
+
+async function tariff_details (req, res, next) {
+	try {
+		const tariff_id = req.params.tariff_id
+
+		let tariff = await Tariff.findById(tariff_id)
+
+		sendJSONresponse(res, 200, tariff)
+	} catch (e) {
+		return next(e)
+	}
+}
+
 module.exports = {
 	tariff_create,
 	tariff_list,
 	tariff_check,
 	tariff_delete,
 	tariff_update,
-	tariff_update_all
+	tariff_update_all,
+	tariff_by_groups,
+	tariff_details
 }

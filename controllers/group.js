@@ -4,6 +4,7 @@ const sendJSONresponse = require('../shared/common').sendJSONresponse
 const Group = require('../models/group')
 const Tariff = require('../models/tariff')
 const Place = require('../models/place')
+const Colony = require('../models/colony')
 const mongoose = require('mongoose')
 
 async function group_create(req, res, next) {
@@ -146,10 +147,26 @@ async function group_place_available(req, res, next) {
 	}
 }
 
+async function group_delete (req, res, next) {
+	try {
+		const group_id = req.params.group_id
+
+		let group = await Group.findByIdAndRemove(group_id)
+		
+		await Colony.deleteMany({group: group_id})
+		await Tariff.deleteMany({$or: [{origin_group: group_id}, {destiny_group: group_id}]})
+
+		sendJSONresponse(res, 200, group)
+	} catch(e) {
+		return next(e)
+	}
+}
+
 module.exports = {
 	group_create,
 	group_list,
 	group_by_base,
 	group_place_available,
-	group_place_list
+	group_place_list,
+	group_delete
 }
