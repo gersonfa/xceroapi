@@ -2,6 +2,10 @@
 const sendJSONresponse = require('../shared/common').sendJSONresponse
 
 const Base = require('../models/base')
+const Place = require('../models/place')
+const Group = require('../models/group')
+const Colony = require('../models/colony')
+const Tariff = require('../models/tariff')
 const boom = require('boom')
 
 async function base_create(req, res, next) {
@@ -44,15 +48,18 @@ async function base_delete(req, res, next) {
 		let base = await Base.findByIdAndRemove(base_id)
 
 		let places_ids = await Place.find({base: base_id}).distinct('_id')
-		let groups_ids = await Groups.find({base: base_id}).distinct('_id')
-		let colonies_ids = await Colony.find({group: {$in: groups_ids}})
+		let groups_ids = await Group.find({base: base_id}).distinct('_id')
+		let colonies_ids = await Colony.deleteMany({group: {$in: groups_ids}}).distinct('_id')
 
-		let tariffs = await Tariff.find({$or: [
+		let tariffs = await Tariff.deleteMany({$or: [
 			{origin_place: {$in: places_ids}}, 
 			{destiny_place: {$in: places_ids}},
-			{origin_colony: {$in: colonies_ids}},
-			{destiny_colony: {$in: colonies_ids}}
+			{origin_group: {$in: groups_ids}},
+			{destiny_group: {$in: groups_ids}}
 		]})
+
+		await Place.deleteMany({base: base_id})
+		await Group.deleteMany({base: base_id})
 
 		console.log(tariffs, places_ids, groups_ids, colonies_ids)
 
