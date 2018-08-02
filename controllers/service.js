@@ -94,8 +94,8 @@ module.exports = (io, users_online) => {
 
       const services = await Service.find({$or: [{user: user._id, state: state}, {driver: user._id, state: state}]})
       .populate('origin_colony destiny_colony origin_place destiny_place')
-      .populate({path: 'user', select: 'full_name'})
-      .populate({path: 'driver', select: 'full_name unit_number'})
+      .populate({path: 'user', select: 'full_name image'})
+      .populate({path: 'driver', select: 'full_name unit_number image'})
 
       sendJSONresponse(res, 200, services)
     } catch(e) {
