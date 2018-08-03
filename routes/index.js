@@ -283,7 +283,7 @@ module.exports = (app, io) => {
    */
   api_routes.get('/get_location', require_auth, service_controller.get_location)
   /**
-   * @api {get} /api/get_location Get driver location
+   * @api {get} /api/driver_location/:driver_id Get driver location
    * @apiName Get driver location
    * @apiGroup Service
    * @apiDescription Esta ruta es para obtener la ubicación del conductor para que se muestre en el mapa en el transcurso del viaje.
@@ -292,7 +292,7 @@ module.exports = (app, io) => {
    * @apiSuccess (200 Success) {String} unit_number número de unidad
    * @apiSuccess (200 Success) {Array} coords coordenadas
    */
-  api_routes.get('/service/:driver_id/driver_location', require_auth, user_controller.driver_location)
+  api_routes.get('/driver_location/:driver_id', require_auth, user_controller.driver_location)
   api_routes.get('/service/driver/:driver_id', require_auth, service_controller.service_by_driver)
   /**
    * @api {post} /api/report Report create

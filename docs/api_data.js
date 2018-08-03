@@ -555,7 +555,7 @@ define({ "api": [
   },
   {
     "type": "get",
-    "url": "/api/get_location",
+    "url": "/api/driver_location/:driver_id",
     "title": "Get driver location",
     "name": "Get_driver_location",
     "group": "Service",
