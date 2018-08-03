@@ -486,6 +486,74 @@
     "groupTitle": "Place"
   },
   {
+    "type": "post",
+    "url": "/api/report",
+    "title": "Report create",
+    "name": "Report_create",
+    "group": "Report",
+    "permission": [
+      {
+        "name": "Token"
+      }
+    ],
+    "parameter": {
+      "fields": {
+        "body": [
+          {
+            "group": "body",
+            "type": "String",
+            "optional": false,
+            "field": "reason",
+            "description": ""
+          },
+          {
+            "group": "body",
+            "type": "String",
+            "optional": false,
+            "field": "text",
+            "description": "<p>commentario opcional</p>"
+          },
+          {
+            "group": "body",
+            "type": "Number",
+            "optional": false,
+            "field": "date",
+            "description": "<p>gatTime del objeto date</p>"
+          },
+          {
+            "group": "body",
+            "type": "String",
+            "optional": false,
+            "field": "service",
+            "description": "<p>id del servicio</p>"
+          },
+          {
+            "group": "body",
+            "type": "String",
+            "optional": false,
+            "field": "driver",
+            "description": "<p>id del conductor</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "200 Success": [
+          {
+            "group": "200 Success",
+            "optional": false,
+            "field": "Object",
+            "description": "<p>service</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "routes/index.js",
+    "groupTitle": "Report"
+  },
+  {
     "type": "get",
     "url": "/api/get_location",
     "title": "Get driver location",
@@ -497,34 +565,22 @@
         "name": "Token"
       }
     ],
-    "parameter": {
-      "fields": {
-        "query": [
-          {
-            "group": "query",
-            "type": "String",
-            "optional": false,
-            "field": "origin_lng",
-            "description": "<p>Longitud</p>"
-          },
-          {
-            "group": "query",
-            "type": "String",
-            "optional": false,
-            "field": "origin_lat",
-            "description": "<p>Latitud</p>"
-          }
-        ]
-      }
-    },
     "success": {
       "fields": {
         "200 Success": [
           {
             "group": "200 Success",
+            "type": "String",
             "optional": false,
-            "field": "object",
-            "description": "<p>{place: object} devuelve un lugar si se encontro</p>"
+            "field": "unit_number",
+            "description": "<p>número de unidad</p>"
+          },
+          {
+            "group": "200 Success",
+            "type": "Array",
+            "optional": false,
+            "field": "coords",
+            "description": "<p>coordenadas</p>"
           }
         ]
       }
@@ -999,6 +1055,75 @@
             "optional": false,
             "field": "message",
             "description": ""
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "routes/index.js",
+    "groupTitle": "User"
+  },
+  {
+    "type": "post",
+    "url": "/api/user/:user_id/add_review",
+    "title": "Emergency disable",
+    "name": "Emergency_disable",
+    "group": "User",
+    "permission": [
+      {
+        "name": "Token"
+      }
+    ],
+    "description": "<p>Solo lo puede desactivar el conductor o la administración</p>",
+    "success": {
+      "fields": {
+        "200 Success": [
+          {
+            "group": "200 Success",
+            "optional": false,
+            "field": "emergency",
+            "description": "<p>boolean</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "routes/index.js",
+    "groupTitle": "User"
+  },
+  {
+    "type": "post",
+    "url": "/api/user/:user_id/add_review",
+    "title": "Emergency enable",
+    "name": "Emergency_enable",
+    "group": "User",
+    "description": "<p>se le envia un socket a los conductores cercanos 'emergency'</p>",
+    "permission": [
+      {
+        "name": "Token"
+      }
+    ],
+    "parameter": {
+      "fields": {
+        "query": [
+          {
+            "group": "query",
+            "type": "String",
+            "optional": false,
+            "field": "service_id",
+            "description": "<p>En caso de ser un cliente, mandar service_id</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "200 Success": [
+          {
+            "group": "200 Success",
+            "optional": false,
+            "field": "emergency",
+            "description": "<p>boolean</p>"
           }
         ]
       }

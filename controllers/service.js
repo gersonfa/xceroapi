@@ -433,6 +433,75 @@ module.exports = (io, users_online) => {
     }
   }
 
+  async function set_emergency (req, res, next) {
+    try {
+      let driver = req.driver
+      const service_id = req.query.service
+  
+      if (service_id) {
+        let service = await Service.findById(service_id)
+        driver = await User.findById(service.driver)
+      }
+  
+      driver.emergency = true
+      await driver.save()
+  
+      
+  
+    } catch(e) {
+      return next(e)
+    }
+  }
+
+  async function emergency_enable (req, res, next) {
+    try {
+      let driver = req.driver
+      const service_id = req.query.service
+  
+      if (service_id) {
+        let service = await Service.findById(service_id)
+        driver = await User.findById(service.driver)
+      }
+  
+      driver.emergency = true
+      await driver.save()
+  
+      let near_drivers = service_utils.get_close_drivers({ origin_coords: driver.coords})
+
+      near_drivers.forEach(d => {
+        let d_socket = users_online.get(d._id.toString())
+        io.to(d_socket).emit('emergency', {
+          unit_number: driver.unit_number,
+          full_name: driver.full_name,
+          coords: driver.coords
+        })
+      })
+
+      sendJSONresponse(res, 200, {emergency: driver.emergency})
+  
+    } catch(e) {
+      return next(e)
+    }
+  }
+
+  async function emergency_disable (req, res, next) {
+    try {
+      let driver = req.user
+      const driver_id = req.query.driver
+
+      if (driver_id) {
+        driver = await User.findById(driver_id)
+      }
+
+      driver.emergency = false
+      await driver.save()
+
+      sendJSONresponse(res, 200, {emergency: driver.emergency})
+    } catch(e) {
+      return next(e)
+    }
+  }
+
 
   return {
     service_create,
@@ -444,6 +513,8 @@ module.exports = (io, users_online) => {
     service_cancel,
     service_reject,
     service_by_driver,
-    service_negate
+    service_negate,
+    emergency_enable,
+    emergency_disable
   }
 }

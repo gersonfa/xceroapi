@@ -21,7 +21,8 @@ const userSchema = new Schema({
   unit_number: { type: Number, unique: true },
   inService: { type: Boolean, default: false },
   reviews: [reviewSchema],
-  enable: { type: Boolean, default: true}
+  enable: { type: Boolean, default: true},
+  emergency: { type: Boolean, default: false }
 }, {
   versionKey: false
 })

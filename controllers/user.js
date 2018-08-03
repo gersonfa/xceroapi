@@ -33,10 +33,9 @@ async function drivers_location (req, res, next) {
 
 async function driver_location (req, res, next) {
   try {
-    const service_id = req.params.service_id
+    const driver_id = req.params.driver_id
 
-    let service = await Service.findById(service_id)
-    let driver = await User.findById(service.driver, 'coords unit_number')
+    let driver = await User.findById(driver_id, 'coords unit_number emergency')
 
     sendJSONresponse(res, 200, driver)
   } catch(e) {
@@ -270,6 +269,7 @@ async function driver_delete (req, res, next) {
     return next(e)
   }
 }
+
 
 module.exports = {
   user_drivers_list,

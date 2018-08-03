@@ -13,6 +13,7 @@ module.exports = (app, io) => {
   const colony_controller = require('../controllers/colony')
   const place_controller = require('../controllers/place')
   const inbox_controller = require('../controllers/inbox')
+  const report_controller = require('../controllers/report')
   const service_controller = require('../controllers/service')(io, users_online)
 
   require('../controllers/socket')(io, users_online)
@@ -166,6 +167,27 @@ module.exports = (app, io) => {
    */
   api_routes.post('/user/:driver_id/add_review', require_auth, user_controller.user_add_review)
   /**
+   * @api {post} /api/user/:user_id/add_review Emergency enable
+   * @apiName Emergency enable
+   * @apiGroup User
+   * @apiDescription se le envia un socket a los conductores cercanos 'emergency'
+   * @apiPermission Token
+   * @apiParam (query) {String} service_id En caso de ser un cliente, mandar service_id
+
+   * @apiSuccess (200 Success) emergency boolean
+   */
+  api_routes.post('/emergency_enable', require_auth, service_controller.emergency_enable)
+  /**
+   * @api {post} /api/user/:user_id/add_review Emergency disable
+   * @apiName Emergency disable
+   * @apiGroup User
+   * @apiPermission Token
+   * @apiDescription Solo lo puede desactivar el conductor o la administración
+
+   * @apiSuccess (200 Success) emergency boolean
+   */
+  api_routes.post('emergengy_disable', require_auth, service_controller.emergency_disable)
+  /**
    * @api {post} /api/service Service create
    * @apiName Service create
    * @apiGroup Service
@@ -266,14 +288,27 @@ module.exports = (app, io) => {
    * @apiGroup Service
    * @apiDescription Esta ruta es para obtener la ubicación del conductor para que se muestre en el mapa en el transcurso del viaje.
    * @apiPermission Token
-   * @apiParam (query) {String} origin_lng Longitud
-   * @apiParam (query) {String} origin_lat Latitud
 
-   * @apiSuccess (200 Success) object {place: object} devuelve un lugar si se encontro
-   * @apiSuccess (200 Success) object {colony:object} devuelve la colonia si se encontro
+   * @apiSuccess (200 Success) {String} unit_number número de unidad
+   * @apiSuccess (200 Success) {Array} coords coordenadas
    */
-  api_routes.get('/service/:service_id/driver_location', require_auth, user_controller.driver_location)
+  api_routes.get('/service/:driver_id/driver_location', require_auth, user_controller.driver_location)
   api_routes.get('/service/driver/:driver_id', require_auth, service_controller.service_by_driver)
+  /**
+   * @api {post} /api/report Report create
+   * @apiName Report create
+   * @apiGroup Report
+   * @apiPermission Token
+   * @apiParam (body) {String} reason
+   * @apiParam (body) {String} text commentario opcional
+   * @apiParam (body) {Number} date gatTime del objeto date
+   * @apiParam (body) {String} service id del servicio
+   * @apiParam (body) {String} driver id del conductor
+
+   * @apiSuccess (200 Success) Object service
+   */
+  api_routes.post('/report', require_auth, report_controller.report_create)
+  api_routes.get('/report/:driver_id', require_auth, report_controller.report_driver_list)
 
   /**
    * @api {post} /update_location update location
