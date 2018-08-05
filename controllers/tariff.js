@@ -32,9 +32,24 @@ async function tariff_list(req, res, next) {
 	try {
 		const perPage = 15
 		var page = req.query.page || 1
+		const base_id = req.query.base_id
+
+		let query = {}
+
+		if (base_id) {
+			let groups_ids = await Group.find({base: base_id}).distinct('_id')
+			let places_ids = await Place.find({base: base_id}).distinct('_id')
+
+			query.$or = [
+				{origin_place: {$in: places_ids}}, 
+				{destiny_place: {$in: places_ids}},
+				{origin_group: {$in: groups_ids}},
+				{destiny_group: {$in: groups_ids}}
+			]
+		}
 		
 		let tariffs = await Tariff
-		.find()
+		.find(query)
 		.skip((perPage * page) - perPage)
         .limit(perPage)
 		.populate([
@@ -44,7 +59,7 @@ async function tariff_list(req, res, next) {
 			{path: 'destiny_place', populate: {path: 'base', select: 'name'}}
 		])
 
-		let count = await Tariff.count()
+		let count = await Tariff.count(query)
 
 		sendJSONresponse(res, 200, {
 			tariffs,
