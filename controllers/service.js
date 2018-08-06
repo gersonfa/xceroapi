@@ -433,25 +433,6 @@ module.exports = (io, users_online) => {
     }
   }
 
-  async function set_emergency (req, res, next) {
-    try {
-      let driver = req.driver
-      const service_id = req.query.service
-  
-      if (service_id) {
-        let service = await Service.findById(service_id)
-        driver = await User.findById(service.driver)
-      }
-  
-      driver.emergency = true
-      await driver.save()
-  
-      
-  
-    } catch(e) {
-      return next(e)
-    }
-  }
 
   async function emergency_enable (req, res, next) {
     try {

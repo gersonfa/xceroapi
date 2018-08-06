@@ -24,7 +24,8 @@ const userSchema = new Schema({
   enable: { type: Boolean, default: true},
   emergency: { type: Boolean, default: false }
 }, {
-  versionKey: false
+  versionKey: false,
+  usePushEach: true
 })
 
 userSchema.pre('save', function (next) {
