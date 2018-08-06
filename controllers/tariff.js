@@ -33,40 +33,66 @@ async function tariff_list(req, res, next) {
 		const perPage = 15
 		var page = req.query.page || 1
 		const base_id = req.query.base_id
+		const group_id = req.query.group_id
 
 		let query = {}
+		let tariffs = []
 
-		if (base_id) {
-			let groups_ids = await Group.find({base: base_id}).distinct('_id')
-			let places_ids = await Place.find({base: base_id}).distinct('_id')
+		if (base_id && (group_id || place_id)) {
+			/* let groups_ids = await Group.find({base: base_id}).distinct('_id')
+			let places_ids = await Place.find({base: base_id}).distinct('_id') */
 
-			query.$or = [
+			/* query.$or = [
 				{origin_place: {$in: places_ids}}, 
 				{destiny_place: {$in: places_ids}},
 				{origin_group: {$in: groups_ids}},
 				{destiny_group: {$in: groups_ids}}
-			]
+			] */
+
+			if (group_id) {
+				query.$or = [
+					{origin_group: group_id},
+					{destiny_group: group_id}
+				]
+			} else if (place_id) {
+				query.$or = [
+					{origin_place: place_id}, 
+					{destiny_place: place_id}
+				]
+			}
+
+			tariffs = await Tariff
+			.find(query)
+			.populate([
+				{path: 'origin_group', populate: {path: 'base', select: 'name'}},
+				{path: 'destiny_group', populate: {path: 'base', select: 'name'}},
+				{path: 'origin_place', populate: {path: 'base', select: 'name'}},
+				{path: 'destiny_place', populate: {path: 'base', select: 'name'}}
+			])
+
+			sendJSONresponse(res, 200, { tariffs, pages: 1, current: 1})
+		} else {
+			tariffs = await Tariff
+			.find(query)
+			.skip((perPage * page) - perPage)
+			.limit(perPage)
+			.populate([
+				{path: 'origin_group', populate: {path: 'base', select: 'name'}},
+				{path: 'destiny_group', populate: {path: 'base', select: 'name'}},
+				{path: 'origin_place', populate: {path: 'base', select: 'name'}},
+				{path: 'destiny_place', populate: {path: 'base', select: 'name'}}
+			])
+
+			let count = await Tariff.count(query)
+
+			sendJSONresponse(res, 200, {
+				tariffs,
+				pages: Math.ceil(count / perPage),
+				current: page,
+				count
+			})
 		}
 		
-		let tariffs = await Tariff
-		.find(query)
-		.skip((perPage * page) - perPage)
-        .limit(perPage)
-		.populate([
-			{path: 'origin_group', populate: {path: 'base', select: 'name'}},
-			{path: 'destiny_group', populate: {path: 'base', select: 'name'}},
-			{path: 'origin_place', populate: {path: 'base', select: 'name'}},
-			{path: 'destiny_place', populate: {path: 'base', select: 'name'}}
-		])
-
-		let count = await Tariff.count(query)
-
-		sendJSONresponse(res, 200, {
-			tariffs,
-			pages: Math.ceil(count / perPage),
-			current: page,
-			count
-		})
 	} catch(e) {
 		return next(e)
 	}
