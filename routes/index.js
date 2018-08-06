@@ -144,6 +144,7 @@ module.exports = (app, io) => {
    */
   api_routes.post('/user/new_password', user_controller.user_new_password)
   api_routes.get('/user/:driver_id/driver_details', require_auth, user_controller.driver_details)
+  api_routes.get('/user/:driver_id/reviews', require_auth, user_controller.driver_reviews)
   api_routes.put('/user/:driver_id/driver_update', require_auth, user_controller.driver_update)
   api_routes.delete('/driver/:driver_id/delete', require_auth, user_controller.driver_delete)
   /**
@@ -186,7 +187,7 @@ module.exports = (app, io) => {
 
    * @apiSuccess (200 Success) emergency boolean
    */
-  api_routes.post('emergengy_disable', require_auth, service_controller.emergency_disable)
+  api_routes.post('/emergency_disable', require_auth, service_controller.emergency_disable)
   /**
    * @api {post} /api/service Service create
    * @apiName Service create

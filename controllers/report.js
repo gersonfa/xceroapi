@@ -19,7 +19,7 @@ async function report_driver_list (req, res, next) {
   try {
     const driver_id = req.params.driver_id
 
-    let reports = await Report.find({driver: driver_id})
+    let reports = await Report.find({driver: driver_id}).populate({path: 'user', select: 'full_name'})
 
     sendJSONresponse(res, 200, reports)
   } catch(e) {

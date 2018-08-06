@@ -23,7 +23,7 @@ async function user_drivers_list(req, res, next) {
 
 async function drivers_location (req, res, next) {
   try {
-    let drivers = await User.find({role: 'Driver'}, 'coords full_name unit_number')
+    let drivers = await User.find({role: 'Driver'}, 'coords full_name unit_number emergency')
 
     sendJSONresponse(res, 200, drivers)
   } catch (e) {
@@ -89,7 +89,7 @@ async function user_status (req, res, next) {
 
     let base = await Base.findOne({stack: user._id})
 
-    sendJSONresponse(res, 200, {inService: user.inService, service, base})
+    sendJSONresponse(res, 200, {inService: user.inService, service, base, emergency: user.emergency})
   } catch(e) {
     return next(e)
   }
@@ -99,9 +99,21 @@ async function driver_details (req, res, next) {
   try {
     const driver_id = req.params.driver_id
 
-    let driver = await User.findById(driver_id, 'full_name image rating email image enable unit_number account')
+    let driver = await User.findById(driver_id, 'full_name image rating email image enable unit_number account emergency')
 
     sendJSONresponse(res, 200, driver)
+  } catch(e) {
+    return next(e)
+  }
+}
+
+async function driver_reviews (req, res, next) {
+  try {
+    const driver_id = req.params.driver_id
+
+    let driver = await User.findById(driver_id).populate({path: 'reviews.author', select: 'full_name'})
+
+    sendJSONresponse(res, 200, driver.reviews)
   } catch(e) {
     return next(e)
   }
@@ -285,5 +297,6 @@ module.exports = {
   driver_leave_base,
   user_change_password,
   user_new_password,
-  driver_delete
+  driver_delete,
+  driver_reviews
 }

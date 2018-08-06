@@ -468,7 +468,7 @@ module.exports = (io, users_online) => {
   async function emergency_disable (req, res, next) {
     try {
       let driver = req.user
-      const driver_id = req.query.driver
+      const driver_id = req.query.driver_id
 
       if (driver_id) {
         driver = await User.findById(driver_id)
