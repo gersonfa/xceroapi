@@ -254,7 +254,7 @@ async function user_new_password (req, res, next) {
 
     if (!email) throw boom.badRequest('email is required')
 
-    let user = await User.findOne({email: user.email})
+    let user = await User.findOne({email: email})
 
     if (user) {
       let new_password = 'fvwefvwe'
