@@ -18,7 +18,7 @@ const userSchema = new Schema({
   facebook_id: { type: String },
   image: { type: String, default: 'http://via.placeholder.com/250x300' },
   rating: { type: Number, max: 5, default: 3},
-  unit_number: { type: Number, unique: true },
+  unit_number: { type: Number },
   inService: { type: Boolean, default: false },
   reviews: [reviewSchema],
   enable: { type: Boolean, default: true},
