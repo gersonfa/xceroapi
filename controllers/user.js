@@ -228,12 +228,14 @@ async function driver_leave_base (req, res, next) {
 async function user_change_password (req, res, next) {
   try {
     let user = req.user
+    const old_password = req.body.old_password
+    const new_password = req.body.new_password
 
     if (!old_password || !new_password) {
       throw boom.badRequest('old_password and new_password are requireds.')
     }
 
-    let password_match = await bcrypt.compareSync(req.body.old_password, user.password)
+    let password_match = await bcrypt.compareSync(old_password, user.password)
 
     if (password_match) {
       user.password = req.body.new_password
