@@ -40,15 +40,25 @@ module.exports = (io, users_online) => {
 
         let bases = await Base.geoNear(point, geoOptions)
 
-        if (bases.length > 0) {
+        if (bases.length > 0) { // Se encuentra cerca de una base
+
           let base = bases[0].obj
 
-          if (!(base.stack.map(u => u.toString()).includes(user.id))) {
+          if (!(base.stack.map(u => u.toString()).includes(user.id))) { // Entra si el conductor no esta ya registrado en el stack
             base.stack.push(user._id)
             await base.save()
 
             io.to(socket_id).emit('added', { base: base.name, position: base.stack.indexOf(user.id) + 1 })
           }
+        } else { // No esta en ninguna base hay que sacarlo de las bases que este registrado
+          let bases = await Base.find({stack: user.id})
+
+          if (bases.length > 0) {
+              bases.map(async (base) => {
+                base.stack = base.stack.filter(d => d != user.id)
+                await base.save()
+              })
+            }
         }
       }
     })
