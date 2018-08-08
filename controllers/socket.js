@@ -35,7 +35,7 @@ module.exports = (io, users_online) => {
 
         const geoOptions = {
           spherical: true,
-          maxDistance: theEarth.getMetersFromKilometers(0.3)
+          maxDistance: theEarth.getMetersFromKilometers(0.2)
         }
 
         let bases = await Base.geoNear(point, geoOptions)
@@ -49,8 +49,12 @@ module.exports = (io, users_online) => {
             await base.save()
 
             io.to(socket_id).emit('added', { base: base.name, position: base.stack.indexOf(user.id) + 1 })
+
+            let bases_in = await Base.find({_id: {$ne: base._id}, stack: user.id})
+
+            console.log(bases_in)
           }
-        } else { // No esta en ninguna base hay que sacarlo de las bases que este registrado
+        } /* else { 
           let bases = await Base.find({stack: user.id})
 
           if (bases.length > 0) {
@@ -59,7 +63,7 @@ module.exports = (io, users_online) => {
                 await base.save()
               })
             }
-        }
+        } */
       }
     })
   })
