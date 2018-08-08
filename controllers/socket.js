@@ -53,8 +53,17 @@ module.exports = (io, users_online) => {
             let bases_in = await Base.find({_id: {$ne: base._id}, stack: user.id})
 
             console.log(bases_in)
+
+            if (bases_in.length > 0) {
+              bases_in.map(async (base) => {
+                base.stack = base.stack.filter(d => d != user.id)
+                await base.save()
+              })
+            }
           }
-        } /* else { 
+        }
+        
+        /* else { 
           let bases = await Base.find({stack: user.id})
 
           if (bases.length > 0) {
