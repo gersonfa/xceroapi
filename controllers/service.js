@@ -422,8 +422,21 @@ module.exports = (io, users_online) => {
   async function service_by_driver (req, res, next) {
     try {
       const driver_id = req.params.driver_id
+      const time = req.query.time
+      let query = {
+        driver: driver_id
+      }
 
-      let services = await Service.find({driver: driver_id})
+      if (time === 'day') {
+        let today = new Date(new Date().setHours(0, 0, 0, 0))
+        query.start_time = { $gt: today.getTime() }
+      } else if (time === 'week') {
+        let today = new Date(new Date().setHours(0, 0, 0, 0))
+        let monday = getMonday(today)
+        query.start_time = { $gt: monday.getTime() }
+      }
+
+      let services = await Service.find(query)
       .populate('origin_colony origin_place destiny_colony destiny_place')
       .populate({path: 'user', select: 'full_name'})
 
@@ -431,6 +444,12 @@ module.exports = (io, users_online) => {
     } catch (e) {
       return next(e)
     }
+  }
+
+  function getMonday(d) {
+    var day = d.getDay(),
+        diff = d.getDate() - day + (day == 0 ? -6 : 1);
+    return new Date(d.setDate(diff));
   }
 
 

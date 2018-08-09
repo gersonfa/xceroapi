@@ -61,6 +61,16 @@ module.exports = (io, users_online) => {
               })
             }
           }
+        } else {
+          let bases_in = await Base.find({stack: user.id})
+
+          if (bases_in.length > 0) {
+            io.to(socket_id).emit('removed', { base: bases_in[0].name })
+            bases_in.map(async (base) => {
+              base.stack = base.stack.filter(d => d != user.id)
+              await base.save()
+            })
+          }
         }
         
         /* else { 
