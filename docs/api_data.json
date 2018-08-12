@@ -637,6 +637,46 @@
     "groupTitle": "Service"
   },
   {
+    "type": "delete",
+    "url": "/api/service/:service_id/fee/:fee_id",
+    "title": "Remove fee",
+    "name": "Remove_fee",
+    "group": "Service",
+    "permission": [
+      {
+        "name": "Token"
+      }
+    ],
+    "parameter": {
+      "fields": {
+        "param": [
+          {
+            "group": "param",
+            "type": "String",
+            "optional": false,
+            "field": "fee_id",
+            "description": "<p>Id de cuota</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "200 Success": [
+          {
+            "group": "200 Success",
+            "optional": false,
+            "field": "Object",
+            "description": ""
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "routes/index.js",
+    "groupTitle": "Service"
+  },
+  {
     "type": "put",
     "url": "/api/service/:service_id/accept",
     "title": "Service accept",
@@ -944,6 +984,93 @@
             "optional": false,
             "field": "start_time",
             "description": "<p>getTime del objeto date</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "routes/index.js",
+    "groupTitle": "Service"
+  },
+  {
+    "type": "post",
+    "url": "/api/service/:service_id/fee",
+    "title": "Set fee",
+    "name": "Set_fee",
+    "group": "Service",
+    "permission": [
+      {
+        "name": "Token"
+      }
+    ],
+    "parameter": {
+      "fields": {
+        "body": [
+          {
+            "group": "body",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>Nombre de cuota</p>"
+          },
+          {
+            "group": "body",
+            "type": "Number",
+            "optional": false,
+            "field": "price",
+            "description": "<p>Precio de cuota</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "200 Success": [
+          {
+            "group": "200 Success",
+            "optional": false,
+            "field": "Object",
+            "description": ""
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "routes/index.js",
+    "groupTitle": "Service"
+  },
+  {
+    "type": "put",
+    "url": "/api/service/:service_id/price",
+    "title": "Set price",
+    "name": "Set_price",
+    "group": "Service",
+    "permission": [
+      {
+        "name": "Token"
+      }
+    ],
+    "parameter": {
+      "fields": {
+        "body": [
+          {
+            "group": "body",
+            "type": "Number",
+            "optional": false,
+            "field": "price",
+            "description": "<p>Precio establecido por el conductor</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "200 Success": [
+          {
+            "group": "200 Success",
+            "optional": false,
+            "field": "price",
+            "description": ""
           }
         ]
       }
