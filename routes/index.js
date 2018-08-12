@@ -272,6 +272,37 @@ module.exports = (app, io) => {
    */
   api_routes.put('/service/:service_id/service_reject', require_auth, service_controller.service_reject)
   /**
+   * @api {post} /api/service/:service_id/fee Set fee
+   * @apiName Set fee
+   * @apiGroup Service
+   * @apiPermission Token
+
+   * @apiParam (body) {String} name Nombre de cuota
+   * @apiParam (body) {Number} price Precio de cuota
+   * @apiSuccess (200 Success) Object 
+   */
+  api_routes.post('/service/:service_id/fee', require_auth, service_controller.add_fee)
+  /**
+   * @api {delete} /api/service/:service_id/fee/:fee_id Remove fee
+   * @apiName Remove fee
+   * @apiGroup Service
+   * @apiPermission Token
+
+   * @apiParam (param) {String} fee_id Id de cuota
+   * @apiSuccess (200 Success) Object 
+   */
+  api_routes.delete('/service/:service_id/fee/:fee_id', require_auth, service_controller.remove_fee)
+  /**
+   * @api {put} /api/service/:service_id/price Set price
+   * @apiName Set price
+   * @apiGroup Service
+   * @apiPermission Token
+
+   * @apiParam (body) {Number} price Precio establecido por el conductor
+   * @apiSuccess (200 Success) price 
+   */
+  api_routes.put('/service/:service_id/price', require_auth, service_controller.add_price)
+  /**
    * @api {get} /api/get_location Get location
    * @apiName Get location
    * @apiGroup Service

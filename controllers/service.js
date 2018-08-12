@@ -93,7 +93,7 @@ module.exports = (io, users_online) => {
       const state = req.query.state || 'completed'
 
       const services = await Service.find({$or: [{user: user._id, state: state}, {driver: user._id, state: state}]})
-      .populate('origin_colony destiny_colony origin_place destiny_place')
+      .populate('origin_colony destiny_colony origin_place destiny_place tariff')
       .populate({path: 'user', select: 'full_name image'})
       .populate({path: 'driver', select: 'full_name unit_number image'})
 
@@ -437,7 +437,7 @@ module.exports = (io, users_online) => {
       }
 
       let services = await Service.find(query)
-      .populate('origin_colony origin_place destiny_colony destiny_place')
+      .populate('origin_colony origin_place destiny_colony destiny_place tariff')
       .populate({path: 'user', select: 'full_name'})
 
       sendJSONresponse(res, 200, services)
@@ -466,7 +466,7 @@ module.exports = (io, users_online) => {
       driver.emergency = true
       await driver.save()
   
-      let near_drivers = service_utils.get_close_drivers({ origin_coords: driver.coords}, 3000)
+      let near_drivers = service_utils.get_close_drivers({ origin_coords: driver.coords})
 
       near_drivers.forEach(d => {
         let d_socket = users_online.get(d._id.toString())
@@ -502,6 +502,55 @@ module.exports = (io, users_online) => {
     }
   }
 
+  async function add_fee (req, res, next) {
+    try {
+      let service_id = service_id
+      let fee = req.body
+
+      let service = await Service.findById(service_id)
+      if (service) {
+        service.fees.push(fee)
+        await service.save()
+
+        sendJSONresponse(res, 200, fee)
+      } else {
+        throw new boom.badRequest('service not found')
+      }
+    } catch (e) {
+      return next(e)
+    }
+  }
+
+  async function remove_fee (req, res, next) {
+    try {
+      let service_id = service_id
+      let fee_id = req.params.fee_id
+
+      let service = await Service.findById(service_id)
+      let fee = service.fees.id(fee_id)
+      service.fees.id(fee_id).remove()
+      await service.save()
+
+      sendJSONresponse(res, 200, fee)
+    } catch(e) {
+      return next(e)
+    }
+  }
+
+  async function add_price (req, res, next) {
+    try {
+      let service_id = service_id
+
+      let service = await Service.findById(service_id)
+      service.price = req.body.price
+      await service.save()
+
+      sendJSONresponse(res, 200, {_id: service._id, price: req.body.price})
+    } catch (e) {
+      return next(e)
+    }
+  }
+
 
   return {
     service_create,
@@ -515,6 +564,9 @@ module.exports = (io, users_online) => {
     service_by_driver,
     service_negate,
     emergency_enable,
-    emergency_disable
+    emergency_disable,
+    add_fee,
+    remove_fee,
+    add_price
   }
 }

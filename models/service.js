@@ -1,6 +1,11 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
+const feeSchema = new Schema({
+  name: { type: String, required: true },
+  price: { type: Number, required: true }
+})
+
 const serviceSchema = new Schema({
   origin_coords: { type: [Number], index: "2dsphere" },
   destiny_coords: { type: [Number], index: "2dsphere" },
@@ -19,7 +24,10 @@ const serviceSchema = new Schema({
   destiny_place: { type: Schema.Types.ObjectId, ref: 'Place'},
 
   start_time: { type: Number },
-  end_time: { type: Number }
+  end_time: { type: Number },
+
+  fees: [feeSchema],
+  price: { type: Number }
 })
 
 module.exports = mongoose.model('Service', serviceSchema)

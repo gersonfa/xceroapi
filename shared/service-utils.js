@@ -92,6 +92,7 @@ async function get_close_drivers(service, distance) {
           type: 'Point',
           coordinates: service.origin_coords
         },
+        // Distancia en metros 40km por defecto
         $maxDistance: distance || 40000
       }
     },
