@@ -539,7 +539,7 @@ module.exports = (io, users_online) => {
 
   async function add_price (req, res, next) {
     try {
-      let service_id = service_id
+      let service_id = req.params.service_id
 
       let service = await Service.findById(service_id)
       service.price = req.body.price
