@@ -9,7 +9,7 @@ const reviewSchema = new Schema({
 })
 
 const userSchema = new Schema({
-  account: { type: String, unique: true},
+  account: { type: String },
   password: { type: String },
   email: { type: String },
   full_name: { type: String, required: true },
