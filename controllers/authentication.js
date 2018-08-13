@@ -59,7 +59,7 @@ async function facebook_login(req, res, next) {
 
     if (!facebook_id) boom.badRequest('facebook_id is required')
 
-    let user = User.findOne({
+    let user = await User.findOne({
       facebook_id: facebook_id
     })
     if (user) {
