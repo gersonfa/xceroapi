@@ -1,4 +1,5 @@
 const Tariff = require('../models/tariff')
+const Colony = require('../models/colony')
 const Place = require('../models/place')
 const User = require('../models/user')
 const Group = require('../models/group')
@@ -38,10 +39,36 @@ async function set_tariff (service) {
     } else if (service.origin_place) {
       if (service.destiny_colony) {
         let tariff = await Tariff.findOne({origin_place: service.origin_place._id, destiny_colony: service.destiny_colony._id})
+        if (!tariff) {
+          let colonies = await get_colonies(service.destiny_coords[1], service.destiny_coords[0])
+          let colony = await Colony.find({place_id: {$in: colonies}})
+          if (colony) {
+            tariff = await Tariff.findOne({
+              $or: [
+                {origin_group: colony.group, destiny_group: service.destiny_colony.group},
+                {origin_group: service.destiny_colony.group, destiny_group: colony.group}
+              ]
+            })
+          }
+        }
+        
         service.tariff = tariff
         return service
       } else {
         let tariff = await Tariff.findOne({origin_group: service.origin_colony.group, destiny_place: service.destiny_place._id})
+        if (!tariff) {
+          let colonies = await get_colonies(service.destiny_coords[1], service.destiny_coords[0])
+          let colony = await Colony.find({place_id: {$in: colonies}})
+          if (colony) {
+            tariff = await Tariff.findOne({
+              $or: [
+                {origin_group: colony.group, destiny_group: service.origin_colony.group},
+                {origin_group: service.origin_colony.group, destiny_group: colony.group}
+              ]
+            })
+          }
+        }
+        
         service.tariff = tariff
         return service
       }

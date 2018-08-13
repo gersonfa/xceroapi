@@ -21,6 +21,7 @@ app.use(cookieParser())
 app.use(cors())
 app.use(logger('dev'))
 app.use(helmet())
+app.enable('trust proxy')
 
 app.use(passport.initialize())
 
