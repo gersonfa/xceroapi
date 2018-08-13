@@ -72,7 +72,7 @@ async function facebook_login(req, res, next) {
     }
 
     user = new User(req.body)
-    user.image = `https://graph.facebook.com/${facebook_id}/picture?type=small`
+    user.image = `https://graph.facebook.com/${facebook_id}/picture?type=large`
 
     user = await user.save()
     let userInfo = setUserInfo(user)
