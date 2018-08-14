@@ -72,18 +72,17 @@ module.exports = (io, users_online) => {
             })
           }
         }
-        
-        /* else { 
-          let bases = await Base.find({stack: user.id})
-
-          if (bases.length > 0) {
-              bases.map(async (base) => {
-                base.stack = base.stack.filter(d => d != user.id)
-                await base.save()
-              })
-            }
-        } */
       }
+    })
+
+    socket.on('disconnect', async (socket) => {
+      const user_id = socket.user_id
+      let bases = await Base.find({stack: user_id})
+
+      bases.map(async (base) => {
+        base.stack = base.stack.filter(d => d != user.id)
+        await base.save()
+      })
     })
   })
 }
