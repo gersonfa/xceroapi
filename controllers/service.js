@@ -68,8 +68,9 @@ module.exports = (io, users_online) => {
       service = await Place.populate(service, 'origin_place destiny_place')
 
       if (service.origin_colony || service.origin_place) {
+        console.log(service)
         const assign_to_driver = await emit_new_service(service)
-        console.log(assign_to_driver)
+        console.log('response', assign_to_driver)
         if (assign_to_driver) {
           service = await service.save()
           user.inService = true
