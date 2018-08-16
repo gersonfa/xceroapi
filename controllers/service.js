@@ -343,9 +343,11 @@ module.exports = (io, users_online) => {
       // Servicio cancelado por conductor
       if (service.driver) {
         const result = await assign_to_close_driver(service, service.driver)
+        console.log('result', result)
         return result
       //  Servicio rechazado en cola o en algun otro lugar
       } else if (driver_reject) {
+        console.log('driver_reject')
         //  Verificar si el rechazo vino de base
         if (base.stack.map(d => d.toString).includes(driver_reject.toString)) {
 
