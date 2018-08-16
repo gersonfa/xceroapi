@@ -35,7 +35,7 @@ module.exports = (io, users_online) => {
 
         const geoOptions = {
           spherical: true,
-          maxDistance: theEarth.getMetersFromKilometers(0.1)
+          maxDistance: theEarth.getMetersFromKilometers(0.02)
         }
 
         let bases = await Base.geoNear(point, geoOptions)
