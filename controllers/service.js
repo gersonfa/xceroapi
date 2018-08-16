@@ -69,7 +69,7 @@ module.exports = (io, users_online) => {
 
       if (service.origin_colony || service.origin_place) {
         const assign_to_driver = await emit_new_service(service)
-        console.log(assign_to_close_driver)
+        console.log(assign_to_driver)
         if (assign_to_driver) {
           service = await service.save()
           user.inService = true
