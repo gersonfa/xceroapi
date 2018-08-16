@@ -338,7 +338,7 @@ module.exports = (io, users_online) => {
     if (service.status === 'Canceled') return false
 
     let base = await service_utils.get_base(service)
-
+    console.log(base)
     if (base) {
       service = await User.populate(service, {path: 'user', select: 'full_name image'})
       // Servicio cancelado por conductor
