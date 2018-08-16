@@ -139,7 +139,7 @@ async function get_base(service) {
   } else if (service.origin_place) {
     base = await Base.findById(service.origin_place.base)
   }
-
+  console.log('get_base', base)
   return base
 }
 
