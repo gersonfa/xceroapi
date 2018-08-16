@@ -15,6 +15,7 @@ module.exports = (io, users_online) => {
   async function service_create (req, res, next) {
     try {
       const user = req.user
+      console.log(req.body)
 
       if (user.inService) throw boom.badRequest('no puedes crear un servicio si estas activo en uno.')
 
