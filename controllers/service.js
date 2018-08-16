@@ -386,7 +386,7 @@ module.exports = (io, users_online) => {
 
   async function assign_to_close_driver (service, user_id) {
     let drivers = await service_utils.get_close_drivers(service)
-
+    console.log(drivers)
     if (user_id) {
       drivers = drivers.filter(d => d._id.toString() != user_id.toString())
     }
