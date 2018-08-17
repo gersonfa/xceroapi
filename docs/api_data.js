@@ -609,14 +609,14 @@ define({ "api": [
             "group": "200 Success",
             "type": "String",
             "optional": false,
-            "field": "body.name",
+            "field": "body",
             "description": ""
           },
           {
             "group": "200 Success",
             "type": "Number",
             "optional": false,
-            "field": "body.date",
+            "field": "date",
             "description": ""
           }
         ]
@@ -625,6 +625,48 @@ define({ "api": [
     "version": "0.0.0",
     "filename": "routes/index.js",
     "groupTitle": "Inbox"
+  },
+  {
+    "type": "get",
+    "url": "/api/notice",
+    "title": "Notice list",
+    "name": "Notice_list",
+    "group": "Notice",
+    "permission": [
+      {
+        "name": "Token"
+      }
+    ],
+    "success": {
+      "fields": {
+        "200 Success": [
+          {
+            "group": "200 Success",
+            "type": "Object[]",
+            "optional": false,
+            "field": "Notice",
+            "description": "<p>Array de notice</p>"
+          },
+          {
+            "group": "200 Success",
+            "type": "String",
+            "optional": false,
+            "field": "body",
+            "description": ""
+          },
+          {
+            "group": "200 Success",
+            "type": "Number",
+            "optional": false,
+            "field": "date",
+            "description": ""
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "routes/index.js",
+    "groupTitle": "Notice"
   },
   {
     "type": "get",
@@ -1519,6 +1561,28 @@ define({ "api": [
   },
   {
     "type": "get",
+    "url": "/inbox",
+    "title": "new inbox",
+    "name": "New_inbox",
+    "group": "UserSockets",
+    "success": {
+      "fields": {
+        "200 Success": [
+          {
+            "group": "200 Success",
+            "optional": false,
+            "field": "Object",
+            "description": "<p>service</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "routes/index.js",
+    "groupTitle": "UserSockets"
+  },
+  {
+    "type": "get",
     "url": "/service_end",
     "title": "service end",
     "name": "Service_end",
@@ -1588,6 +1652,28 @@ define({ "api": [
     "url": "/service_started",
     "title": "service started",
     "name": "Service_started",
+    "group": "UserSockets",
+    "success": {
+      "fields": {
+        "200 Success": [
+          {
+            "group": "200 Success",
+            "optional": false,
+            "field": "Object",
+            "description": "<p>service</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "routes/index.js",
+    "groupTitle": "UserSockets"
+  },
+  {
+    "type": "get",
+    "url": "/notice",
+    "title": "new notice",
+    "name": "new_notice",
     "group": "UserSockets",
     "success": {
       "fields": {
