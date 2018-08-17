@@ -47,7 +47,7 @@ module.exports = (io, users_online) => {
         } else {
           // Buscar colonia
             const place_ids = await service_utils.get_colonies(origin_lat, origin_lng)
-
+            console.log(place_ids)
             let colony = await Colony.findOne({place_id: { "$in": place_ids }})
             if (colony) {
               service.origin_colony = colony._id
