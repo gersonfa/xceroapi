@@ -414,9 +414,11 @@ module.exports = (io, users_online) => {
 
     if (drivers.length > 0) {
 
-      const driver_socket = users_online.get(drivers[0]._id.toString())
+      const driver_online = drivers.find(d => users_online.get(d.id))
+      
 
-      if (driver_socket) {
+      if (driver_online) {
+        const driver_socket = users_online.get(driver_online.id)
         service = await User.populate(service, {path: 'user', select: 'full_name image'})
         io.to(driver_socket).emit('new_service', service)
         return true

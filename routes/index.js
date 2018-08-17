@@ -12,7 +12,7 @@ module.exports = (app, io) => {
   const group_controller = require('../controllers/group')
   const colony_controller = require('../controllers/colony')
   const place_controller = require('../controllers/place')
-  const inbox_controller = require('../controllers/inbox')
+  const inbox_controller = require('../controllers/inbox')(io, users_online)
   const report_controller = require('../controllers/report')
   const frequent_controller = require('../controllers/frequent')
   const service_controller = require('../controllers/service')(io, users_online)
@@ -70,10 +70,23 @@ module.exports = (app, io) => {
 
    * @apiSuccess (200 Success) {Object[]} inbox Array de inbox
    * @apiSuccess (200 Success) {String} inbox._id
-   * @apiSuccess (200 Success) {String} body.name
-   * @apiSuccess (200 Success) {Number} body.date
+   * @apiSuccess (200 Success) {String} body
+   * @apiSuccess (200 Success) {Number} date
    */
   api_routes.get('/driver/:driver_id/inbox', require_auth, inbox_controller.inbox_list)
+  api_routes.post('/notice', require_auth, inbox_controller.notice_create)
+  /**
+   * @api {get} /api/notice Notice list
+   * @apiName Notice list
+   * @apiGroup Notice
+   * @apiPermission Token
+
+   * @apiSuccess (200 Success) {Object[]} Notice Array de notice
+   * @apiSuccess (200 Success) {String} body
+   * @apiSuccess (200 Success) {Number} date
+   */
+  api_routes.get('/notice', require_auth, inbox_controller.notice_list)
+  api_routes.delete('/notice/:notice_id', require_auth, inbox_controller.notice_delete)
 
   /**
    * @api {get} /api/colony Colony list
@@ -440,6 +453,20 @@ module.exports = (app, io) => {
  /**
    * @api {get} /service_end service end
    * @apiName Service end
+   * @apiGroup UserSockets
+   * @apiSuccess (200 Success) Object service
+  */
+
+  /**
+   * @api {get} /inbox new inbox
+   * @apiName New inbox
+   * @apiGroup UserSockets
+   * @apiSuccess (200 Success) Object service
+  */
+
+  /**
+   * @api {get} /notice new notice
+   * @apiName new notice
    * @apiGroup UserSockets
    * @apiSuccess (200 Success) Object service
   */
