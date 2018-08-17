@@ -15,7 +15,6 @@ module.exports = (io, users_online) => {
   async function service_create (req, res, next) {
     try {
       const user = req.user
-      console.log(req.body)
 
       if (user.inService) throw boom.badRequest('no puedes crear un servicio si estas activo en uno.')
 
@@ -68,13 +67,22 @@ module.exports = (io, users_online) => {
       service = await Place.populate(service, 'origin_place destiny_place')
 
       if (service.origin_colony || service.origin_place) {
-        console.log(service)
         const assign_to_driver = await emit_new_service(service)
-        console.log('response', assign_to_driver)
         if (assign_to_driver) {
           service = await service.save()
-          user.inService = true
-          await user.save()
+
+          setTimeout(async () => {
+            let check_service = await Service.findById(service._id)
+            if (!check_service.driver) {
+              check_service.state = 'negated'
+              check_service = await check_service.save()
+
+              let passenger = check_service.user.toString()
+              let passenger_socket = users_online.get(passenger)
+              io.to(passenger_socket).emit('service_rejected', check_service)
+            }
+          }, 180000)
+
           sendJSONresponse(res, 200, service)
         } else {
           sendJSONresponse(res, 402, {error: 'No hay conductores disponibles.'})
@@ -111,6 +119,9 @@ module.exports = (io, users_online) => {
       const service_id = req.params.service_id
 
       let service = await Service.findById(service_id).populate('origin_colony origin_place')
+      if (service.state === 'canceled' || service.state === 'negated') {
+        throw boom.badRequest('service is canceled')
+      }
 
       service.driver = req.user._id
       service.state = 'on_the_way'
@@ -122,9 +133,12 @@ module.exports = (io, users_online) => {
       await service.save()
       service = await User.populate(service, {path: 'driver', select: 'full_name image rating'})
 
-      let driver = await User.findById(user._id)
-      driver.inService = true;
-      await driver.save()
+      user.inService = true;
+      await user.save()
+
+      let client = await User.findById(service.user)
+      client.inService = true
+      await client.save()
 
       let passenger = service.user.toString()
       let passenger_socket = users_online.get(passenger)
@@ -319,6 +333,7 @@ module.exports = (io, users_online) => {
       await driver.save()
 
       let user = await User.findById(service.user)
+      user.inService = false
       await user.save()
 
       let user_socket = users_online.get(service.user.toString())
@@ -335,35 +350,34 @@ module.exports = (io, users_online) => {
 
   async function emit_new_service (service, driver_reject) {
 
-    if (service.status === 'Canceled') return false
+    if (service.state === 'canceled' || service.state === 'negated') return false
 
     let base = await service_utils.get_base(service)
-    console.log(base)
     if (base) {
       service = await User.populate(service, {path: 'user', select: 'full_name image'})
       // Servicio cancelado por conductor
       if (service.driver) {
         const result = await assign_to_close_driver(service, service.driver)
-        console.log('result', result)
         return result
       //  Servicio rechazado en cola o en algun otro lugar
       } else if (driver_reject) {
-        console.log('driver_reject')
         //  Verificar si el rechazo vino de base
         if (base.stack.map(d => d.toString).includes(driver_reject.toString)) {
 
           const reject_position = base.stack.indexOf(driver_reject) + 1
+          let drivers_in_base = base.stack.slice(reject_position)
 
-          if (base.stack.length != 0 && base.stack.length > reject_position) {
+          if (base.stack.length != 0 && drivers_in_base.length > 0) {
 
-            const socket_driver = users_online.get(base.stack[reject_position + 1])
-
-            if (socket_driver) {
+            const driver_online = drivers_in_base.find(d => users_online.get(d.toString()))
+            
+            if (driver_online) {
+              let socket_driver = users_online.get(driver_online.toString())
               io.to(socket_driver).emit('new_service', service)
               return true
             }
           } else {
-            await assign_to_close_driver(service)
+            await assign_to_close_driver(service, driver_reject)
           }
         } else {
           await assign_to_close_driver(service, driver_reject)
@@ -372,11 +386,15 @@ module.exports = (io, users_online) => {
       //  Servicio nuevo
       } else {
         if (base.stack.length > 0) {
-          const socket_driver = users_online.get(base.stack[0].toString())
-
-          if (socket_driver) {
+          const driver_online = base.stack.find(d => users_online.get(d.toString()))
+          //users_online.get(base.stack[0].toString())
+          if (driver_online) {
+            let socket_driver = users_online.get(driver_online.toString())
             io.to(socket_driver).emit('new_service', service)
             return true
+          } else {
+            const result = await assign_to_close_driver(service)
+            return result
           }
         } else {
           const result = await assign_to_close_driver(service)
@@ -390,7 +408,6 @@ module.exports = (io, users_online) => {
 
   async function assign_to_close_driver (service, user_id) {
     let drivers = await service_utils.get_close_drivers(service)
-    console.log(drivers)
     if (user_id) {
       drivers = drivers.filter(d => d._id.toString() != user_id.toString())
     }
@@ -410,7 +427,7 @@ module.exports = (io, users_online) => {
       // Avisar que no hay conductores
       const user_socket = users_online.get(service.user.toString())
 
-      service.state = 'canceled'
+      service.state = 'negated'
       service = await service.save()
 
       let user = await User.findById(service.user)
@@ -518,7 +535,7 @@ module.exports = (io, users_online) => {
 
         sendJSONresponse(res, 200, fee)
       } else {
-        throw new boom.badRequest('service not found')
+        throw boom.badRequest('service not found')
       }
     } catch (e) {
       return next(e)

@@ -12,6 +12,19 @@ module.exports = (io, users_online) => {
 
     let user = await User.findById(user_id)
 
+    let check = setInterval(async () => {
+      if (!socket.connected) {
+        users_online.delete(user_id)
+        let bases = await Base.find({stack: user_id})
+
+        bases.map(async (base) => {
+          base.stack = base.stack.filter(d => d != user.id)
+          await base.save()
+        })
+        clearInterval(check)
+      }
+    }, 10000)
+
     console.log(users_online.entries())
 
     socket.on('update_location', async (socket) => {
@@ -77,12 +90,18 @@ module.exports = (io, users_online) => {
 
     socket.on('disconnect', async (socket) => {
       const user_id = socket.user_id
+      users_online.delete(user_id)
       let bases = await Base.find({stack: user_id})
 
       bases.map(async (base) => {
         base.stack = base.stack.filter(d => d != user.id)
         await base.save()
       })
+
+      /* let user = await User.findById(user_id)
+      user.inService = true
+      await user.save() */
+
     })
   })
 }

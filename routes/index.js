@@ -14,6 +14,7 @@ module.exports = (app, io) => {
   const place_controller = require('../controllers/place')
   const inbox_controller = require('../controllers/inbox')
   const report_controller = require('../controllers/report')
+  const frequent_controller = require('../controllers/frequent')
   const service_controller = require('../controllers/service')(io, users_online)
 
   require('../controllers/socket')(io, users_online)
@@ -341,6 +342,51 @@ module.exports = (app, io) => {
    */
   api_routes.post('/report', require_auth, report_controller.report_create)
   api_routes.get('/report/:driver_id', require_auth, report_controller.report_driver_list)
+
+  /**
+   * @api {post} /api/frequent Frequent create
+   * @apiName Frequent create
+   * @apiGroup Frequent
+   * @apiPermission Token
+   * @apiParam (body) {String} name
+   * @apiParam (body) {String} address 
+   * @apiParam (body) {Number} lat 
+   * @apiParam (body) {Number} lng
+
+   * @apiSuccess (200 Success) Object frequent
+   */
+  api_routes.post('/frequent', require_auth, frequent_controller.frequent_create)
+  /**
+   * @api {get} /api/frequent Frequent list
+   * @apiName Frequent list
+   * @apiGroup Frequent
+   * @apiPermission Token
+
+   * @apiSuccess (200 Success) [frequent] frequents
+   */
+  api_routes.get('/frequent', require_auth, frequent_controller.frequent_list)
+  /**
+   * @api {post} /api/frequent/:frequent_id Frequent update
+   * @apiName Frequent update
+   * @apiGroup Frequent
+   * @apiPermission Token
+   * @apiParam (body) {String} name
+   * @apiParam (body) {String} address 
+   * @apiParam (body) {Number} lat 
+   * @apiParam (body) {Number} lng
+
+   * @apiSuccess (200 Success) Object frequent
+   */
+  api_routes.put('/frequent/:frequent_id', require_auth, frequent_controller.frequent_update)
+  /**
+   * @api {post} /api/frequent/:frequent_id Frequent delete
+   * @apiName Frequent delete
+   * @apiGroup Frequent
+   * @apiPermission Token
+
+   * @apiSuccess (200 Success) Object frequent
+   */
+  api_routes.delete('/frequent/:frequent_id', require_auth, frequent_controller.frequent_delete)
 
   /**
    * @api {post} /update_location update location

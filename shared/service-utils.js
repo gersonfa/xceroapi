@@ -119,8 +119,8 @@ async function get_close_drivers(service, distance) {
           type: 'Point',
           coordinates: service.origin_coords
         },
-        // Distancia en metros 40km por defecto
-        $maxDistance: distance || 40000
+        // Distancia en metros 3km por defecto
+        $maxDistance: distance || 3000
       }
     },
     role: 'Driver',
@@ -139,7 +139,6 @@ async function get_base(service) {
   } else if (service.origin_place) {
     base = await Base.findById(service.origin_place.base)
   }
-  console.log('get_base', base)
   return base
 }
 

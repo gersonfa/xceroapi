@@ -27,7 +27,8 @@ const serviceSchema = new Schema({
   end_time: { type: Number },
 
   fees: [feeSchema],
-  price: { type: Number }
+  price: { type: Number },
+  details: { type: String }
 })
 
 module.exports = mongoose.model('Service', serviceSchema)

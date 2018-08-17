@@ -402,6 +402,182 @@
     "groupTitle": "Drivers"
   },
   {
+    "type": "post",
+    "url": "/api/frequent",
+    "title": "Frequent create",
+    "name": "Frequent_create",
+    "group": "Frequent",
+    "permission": [
+      {
+        "name": "Token"
+      }
+    ],
+    "parameter": {
+      "fields": {
+        "body": [
+          {
+            "group": "body",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": ""
+          },
+          {
+            "group": "body",
+            "type": "String",
+            "optional": false,
+            "field": "address",
+            "description": ""
+          },
+          {
+            "group": "body",
+            "type": "Number",
+            "optional": false,
+            "field": "lat",
+            "description": ""
+          },
+          {
+            "group": "body",
+            "type": "Number",
+            "optional": false,
+            "field": "lng",
+            "description": ""
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "200 Success": [
+          {
+            "group": "200 Success",
+            "optional": false,
+            "field": "Object",
+            "description": "<p>frequent</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "routes/index.js",
+    "groupTitle": "Frequent"
+  },
+  {
+    "type": "post",
+    "url": "/api/frequent/:frequent_id",
+    "title": "Frequent delete",
+    "name": "Frequent_delete",
+    "group": "Frequent",
+    "permission": [
+      {
+        "name": "Token"
+      }
+    ],
+    "success": {
+      "fields": {
+        "200 Success": [
+          {
+            "group": "200 Success",
+            "optional": false,
+            "field": "Object",
+            "description": "<p>frequent</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "routes/index.js",
+    "groupTitle": "Frequent"
+  },
+  {
+    "type": "get",
+    "url": "/api/frequent",
+    "title": "Frequent list",
+    "name": "Frequent_list",
+    "group": "Frequent",
+    "permission": [
+      {
+        "name": "Token"
+      }
+    ],
+    "success": {
+      "fields": {
+        "200 Success": [
+          {
+            "group": "200 Success",
+            "optional": true,
+            "field": "frequent",
+            "description": "<p>frequents</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "routes/index.js",
+    "groupTitle": "Frequent"
+  },
+  {
+    "type": "post",
+    "url": "/api/frequent/:frequent_id",
+    "title": "Frequent update",
+    "name": "Frequent_update",
+    "group": "Frequent",
+    "permission": [
+      {
+        "name": "Token"
+      }
+    ],
+    "parameter": {
+      "fields": {
+        "body": [
+          {
+            "group": "body",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": ""
+          },
+          {
+            "group": "body",
+            "type": "String",
+            "optional": false,
+            "field": "address",
+            "description": ""
+          },
+          {
+            "group": "body",
+            "type": "Number",
+            "optional": false,
+            "field": "lat",
+            "description": ""
+          },
+          {
+            "group": "body",
+            "type": "Number",
+            "optional": false,
+            "field": "lng",
+            "description": ""
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "200 Success": [
+          {
+            "group": "200 Success",
+            "optional": false,
+            "field": "Object",
+            "description": "<p>frequent</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "routes/index.js",
+    "groupTitle": "Frequent"
+  },
+  {
     "type": "get",
     "url": "/api/diver/:driver_id/inbox",
     "title": "Inbox list",
