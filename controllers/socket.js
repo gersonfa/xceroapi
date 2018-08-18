@@ -14,6 +14,7 @@ module.exports = (io, users_online) => {
 
     let check = setInterval(async () => {
       if (!socket.connected) {
+        console.log('se desconecto', user_id)
         users_online.delete(user_id)
         let bases = await Base.find({stack: user_id})
 
