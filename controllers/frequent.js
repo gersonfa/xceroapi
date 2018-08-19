@@ -6,7 +6,7 @@ async function frequent_create(req, res, next) {
     try {
         const user = req.user
         const name = req.body.name
-        const address = req.body.name
+        const address = req.body.address
         const lat = req.body.lat
         const lng = req.body.lng
 
