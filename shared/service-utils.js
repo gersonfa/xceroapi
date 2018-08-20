@@ -82,7 +82,6 @@ async function get_colonies(lat, lng) {
     while (place_ids.length == 0) {
       const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=AIzaSyAogodmHuA-P4Ais69knDP1HBlLOWCrCdg`)
       const json = await response.json()
-      console.log(json)
       place_ids = json.results.map(p => p.place_id)
     }
 

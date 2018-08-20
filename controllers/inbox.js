@@ -58,7 +58,7 @@ module.exports = (io, users_online) => {
 
   async function notice_list (req, res, next) {
     try {
-      let notices = await Notice.find()
+      let notices = await Notice.find().sort({date: -1})
 
       sendJSONresponse(res, 200, notices)
     } catch(e) {
