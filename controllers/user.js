@@ -112,8 +112,9 @@ async function driver_reviews (req, res, next) {
     const driver_id = req.params.driver_id
 
     let driver = await User.findById(driver_id).populate({path: 'reviews.author', select: 'full_name'})
+    let reviews = driver.reviews.filter(r => r.comment)
 
-    sendJSONresponse(res, 200, driver.reviews)
+    sendJSONresponse(res, 200, reviews)
   } catch(e) {
     return next(e)
   }
