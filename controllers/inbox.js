@@ -29,7 +29,7 @@ module.exports = (io, users_online) => {
     try {
       const driver_id = req.params.driver_id
 
-      let inboxs = await Inbox.find({driver: driver_id})
+      let inboxs = await Inbox.find({driver: driver_id}).sort({date: -1})
 
       sendJSONresponse(res, 200, inboxs)
     } catch(e) {
