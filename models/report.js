@@ -7,7 +7,8 @@ const reportSchema = new Schema({
   service: { type: Schema.Types.ObjectId, ref: 'Service', required: true},
   reason: { type: String, required: true },
   text: { type: String },
-  date: { type: Number, required: true }
+  date: { type: Number, required: true },
+  phone: { type: Number }
 })
 
 module.exports = mongoose.model('Report', reportSchema)

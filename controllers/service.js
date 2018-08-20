@@ -452,13 +452,18 @@ module.exports = (io, users_online) => {
       }
 
       if (time === 'day') {
-        let today = new Date(new Date().setHours(0, 0, 0, 0))
+        let date = new Date()
+        let date_fix = new Date(date.setHours(date.getHours() - 5))
+        let today = new Date(date_fix.setHours(0, 0, 0, 0))
         query.start_time = { $gt: today.getTime() }
       } else if (time === 'week') {
-        let today = new Date(new Date().setHours(0, 0, 0, 0))
+        let date = new Date()
+        let date_fix = new Date(date.setHours(date.getHours() - 5))
+        let today = new Date(date_fix.setHours(0, 0, 0, 0))
         let monday = getMonday(today)
         query.start_time = { $gt: monday.getTime() }
       }
+
 
       let services = await Service.find(query)
       .populate('origin_colony origin_place destiny_colony destiny_place tariff')
