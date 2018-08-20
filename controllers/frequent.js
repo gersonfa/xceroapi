@@ -29,7 +29,7 @@ async function frequent_update(req, res, next) {
     try {
         const frequent_id = req.params.frequent_id
         const name = req.body.name
-        const address = req.body.name
+        const address = req.body.address
         const lat = req.body.lat
         const lng = req.body.lng
 
