@@ -32,7 +32,8 @@ module.exports = (io, users_online) => {
       let service = new Service({
         origin_coords: [parseFloat(origin_lng), parseFloat(origin_lat)],
         user: user._id,
-        address: req.body.address
+        address: req.body.address,
+        details: req.body.details
       })
 
       if (!origin_colony && !origin_place) {
@@ -47,7 +48,6 @@ module.exports = (io, users_online) => {
         } else {
           // Buscar colonia
             const place_ids = await service_utils.get_colonies(origin_lat, origin_lng)
-            console.log(place_ids)
             let colony = await Colony.findOne({place_id: { "$in": place_ids }})
             if (colony) {
               service.origin_colony = colony._id
