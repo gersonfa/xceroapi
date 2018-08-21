@@ -168,6 +168,8 @@ module.exports = (io, users_online) => {
 
         let passenger = service.user.toString()
         let passenger_socket = users_online.get(passenger)
+        console.log(users_online.entries())
+        console.log(passenger_socket)
         io.to(passenger_socket).emit('service_started', service)
 
         sendJSONresponse(res, 200, service)
