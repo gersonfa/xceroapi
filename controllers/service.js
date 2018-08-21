@@ -533,7 +533,7 @@ module.exports = (io, users_online) => {
 
   async function add_fee (req, res, next) {
     try {
-      let service_id = service_id
+      let service_id = req.params.service_id
       let fee = req.body
 
       let service = await Service.findById(service_id)
@@ -552,7 +552,7 @@ module.exports = (io, users_online) => {
 
   async function remove_fee (req, res, next) {
     try {
-      let service_id = service_id
+      let service_id = req.params.service_id
       let fee_id = req.params.fee_id
 
       let service = await Service.findById(service_id)
