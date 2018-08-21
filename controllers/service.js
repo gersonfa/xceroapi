@@ -167,9 +167,10 @@ module.exports = (io, users_online) => {
         await service.save()
 
         let passenger = service.user.toString()
+        console.log('pasajero_id', passenger)
         let passenger_socket = users_online.get(passenger)
         console.log(users_online.entries())
-        console.log(passenger_socket)
+        console.log('pasajero_socket', passenger_socket)
         io.to(passenger_socket).emit('service_started', service)
 
         sendJSONresponse(res, 200, service)
