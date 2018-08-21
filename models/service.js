@@ -4,6 +4,8 @@ const Schema = mongoose.Schema
 const feeSchema = new Schema({
   name: { type: String, required: true },
   price: { type: Number, required: true }
+}, {
+  usePushEach: true
 })
 
 const serviceSchema = new Schema({
@@ -29,6 +31,8 @@ const serviceSchema = new Schema({
   fees: [feeSchema],
   price: { type: Number },
   details: { type: String }
+}, {
+  usePushEach: true
 })
 
 module.exports = mongoose.model('Service', serviceSchema)
