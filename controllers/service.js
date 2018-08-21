@@ -541,7 +541,7 @@ module.exports = (io, users_online) => {
         service.fees.push(fee)
         await service.save()
 
-        sendJSONresponse(res, 200, fee)
+        sendJSONresponse(res, 200, service.fees)
       } else {
         throw boom.badRequest('service not found')
       }
