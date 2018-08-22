@@ -393,7 +393,9 @@ module.exports = (io, users_online) => {
           const driver_online = base.stack.find(d => users_online.get(d.toString()))
           //users_online.get(base.stack[0].toString())
           if (driver_online) {
+            
             let socket_driver = users_online.get(driver_online.toString())
+            console.log('driver_socket', socket_driver)
             io.to(socket_driver).emit('new_service', service)
             return true
           } else {
@@ -424,6 +426,7 @@ module.exports = (io, users_online) => {
       if (driver_online) {
         const driver_socket = users_online.get(driver_online.id)
         service = await User.populate(service, {path: 'user', select: 'full_name image'})
+        console.log('driver_socket', driver_socket)
         io.to(driver_socket).emit('new_service', service)
         return true
       } else {
