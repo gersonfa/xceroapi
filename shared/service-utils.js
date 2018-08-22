@@ -56,18 +56,22 @@ async function set_tariff (service) {
         return service
       } else {
         let tariff = await Tariff.findOne({origin_place: service.origin_place._id, destiny_place: service.destiny_place._id})
-        /* if (!tariff) {
+        if (!tariff) {
           let colonies = await get_colonies(service.destiny_coords[1], service.destiny_coords[0])
-          let colony = await Colony.findOne({place_id: {$in: colonies}})
-          if (colony) {
+          let colony_destiny = await Colony.findOne({place_id: {$in: colonies}})
+          colonies = await get_colonies(service.origin_coords[1], service.origin_coords[0])
+          let colony_origin = await Colony.findOne({place_id: {$in: colonies}})
+          if (colony_destiny && colony_origin) {
             tariff = await Tariff.findOne({
               $or: [
-                {origin_group: colony.group, destiny_group: service.destiny_place._id},
-                {origin_group: service.origin_colony.group, destiny_group: colony.group}
+                {origin_group: colony_origin.group, destiny_group: colony_destiny.group},
+                {origin_group: colony_destiny.group, destiny_group: colony_origin.group}
               ]
             })
           }
-        } */
+        }
+
+        console.log('tarifa', tariff)
         
         service.tariff = tariff
         return service
