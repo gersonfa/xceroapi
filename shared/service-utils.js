@@ -41,7 +41,7 @@ async function set_tariff (service) {
         let tariff = await Tariff.findOne({origin_place: service.origin_place._id, destiny_colony: service.destiny_colony._id})
         if (!tariff) {
           let colonies = await get_colonies(service.destiny_coords[1], service.destiny_coords[0])
-          let colony = await Colony.find({place_id: {$in: colonies}})
+          let colony = await Colony.findOne({place_id: {$in: colonies}})
           if (colony) {
             tariff = await Tariff.findOne({
               $or: [
@@ -58,7 +58,7 @@ async function set_tariff (service) {
         let tariff = await Tariff.findOne({origin_group: service.origin_colony.group, destiny_place: service.destiny_place._id})
         if (!tariff) {
           let colonies = await get_colonies(service.destiny_coords[1], service.destiny_coords[0])
-          let colony = await Colony.find({place_id: {$in: colonies}})
+          let colony = await Colony.findOne({place_id: {$in: colonies}})
           if (colony) {
             tariff = await Tariff.findOne({
               $or: [
