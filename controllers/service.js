@@ -73,7 +73,7 @@ module.exports = (io, users_online) => {
 
           setTimeout(async () => {
             let check_service = await Service.findById(service._id)
-            if (!check_service.driver) {
+            if (!check_service.driver && check_service.state != 'canceled') {
               check_service.state = 'negated'
               check_service = await check_service.save()
 
@@ -81,7 +81,7 @@ module.exports = (io, users_online) => {
               let passenger_socket = users_online.get(passenger)
               io.to(passenger_socket).emit('service_rejected', check_service)
             }
-          }, 180000)
+          }, 120000)
 
           sendJSONresponse(res, 200, service)
         } else {
