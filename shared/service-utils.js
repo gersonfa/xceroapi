@@ -104,7 +104,7 @@ async function get_places(lat, lng) {
               type: 'Point',
               coordinates: [parseFloat(lng), parseFloat(lat)]
             },
-            $maxDistance: 500
+            $maxDistance: 100
           }
         }
     })
