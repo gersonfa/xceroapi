@@ -316,8 +316,12 @@ module.exports = (io, users_online) => {
       const service_id = req.params.service_id
 
       let service = await Service.findById(service_id).populate('origin_colony origin_place')
-      await emit_new_service(service, user._id)
+      if (service.state == 'canceled') {
+        sendJSONresponse(res, 200, {message: 'Servicio rechazado correctamente'})
+        return
+      }
 
+      await emit_new_service(service, user._id)
       sendJSONresponse(res, 200, {message: 'Servicio rechazado correctamente'})
     } catch(e) {
       return next(e)
