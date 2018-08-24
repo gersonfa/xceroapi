@@ -354,6 +354,7 @@ module.exports = (app, io) => {
    * @apiSuccess (200 Success) Object service
    */
   api_routes.post('/report', require_auth, report_controller.report_create)
+  api_routes.get('/report', require_auth, report_controller.report_list)
   api_routes.get('/report/:driver_id', require_auth, report_controller.report_driver_list)
 
   /**

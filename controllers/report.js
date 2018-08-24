@@ -27,7 +27,17 @@ async function report_driver_list (req, res, next) {
   }
 }
 
+async function report_list(req, res, next) {
+  try {
+    let reports = await Report.find().populate({path: 'user', select: 'full_name'})
+
+    sendJSONresponse(res, 200, reports)
+  } catch(e) {
+    return next(e)
+  }
+}
 module.exports = {
   report_create,
-  report_driver_list
+  report_driver_list,
+  report_list
 }
