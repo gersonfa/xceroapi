@@ -29,7 +29,9 @@ async function report_driver_list (req, res, next) {
 
 async function report_list(req, res, next) {
   try {
-    let reports = await Report.find().populate({path: 'user', select: 'full_name'})
+    let reports = await Report.find()
+      .populate({path: 'user', select: 'full_name'})
+      .populate({path: 'driver', select: 'full_name'})
 
     sendJSONresponse(res, 200, reports)
   } catch(e) {
