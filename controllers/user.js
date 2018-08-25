@@ -180,7 +180,7 @@ async function driver_update (req, res, next) {
     const driver_id = req.params.driver_id
     let driver = req.body
 
-    let old_driver = await User.findById(driver._id)
+    let old_driver = await User.findById(driver_id)
 
     if (driver.image && (driver.image != old_driver.image)) {
       let fileName = Date.now()
@@ -192,8 +192,6 @@ async function driver_update (req, res, next) {
       )
       driver.image = "http://45.56.121.162/images/profile/" + fileName + path.extname(filepath)
     }
-
-    console.log(driver, old_driver)
 
     old_driver = Object.assign(old_driver, driver)
     await old_driver.save()
