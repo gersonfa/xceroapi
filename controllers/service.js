@@ -278,6 +278,8 @@ module.exports = (io, users_online) => {
 
       let service = await Service.findById(service_id).populate('origin_colony')
 
+      if (service.state == 'completed' || service.state == 'negated') throw boom.badRequest('No se puede cancelar un servicio que ya ha sido completo.')
+
       user.inService = false
       await user.save()
 
