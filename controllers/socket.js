@@ -13,7 +13,7 @@ module.exports = (io, users_online) => {
     let user = await User.findById(user_id)
 
     let check = setInterval(async () => {
-      if (!socket.connected) {
+      if (!socket.connected && user.role == 'Driver') {
         console.log('se desconecto', user)
         users_online.delete(user_id)
         let bases = await Base.find({stack: user_id})
