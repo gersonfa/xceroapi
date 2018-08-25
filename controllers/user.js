@@ -182,7 +182,7 @@ async function driver_update (req, res, next) {
 
     let old_driver = await User.findById(driver._id)
 
-    if (driver.image != old_driver.image) {
+    if (driver.image && (driver.image != old_driver.image)) {
       let fileName = Date.now()
       let filepath = base64Img.imgSync(
         driver.image,
