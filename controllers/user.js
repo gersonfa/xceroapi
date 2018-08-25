@@ -193,6 +193,8 @@ async function driver_update (req, res, next) {
       driver.image = "http://45.56.121.162/images/profile/" + fileName + path.extname(filepath)
     }
 
+    console.log(driver, old_driver)
+
     old_driver = Object.assign(old_driver, driver)
     await old_driver.save()
     delete driver.password
