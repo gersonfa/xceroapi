@@ -131,7 +131,7 @@ module.exports = (io, users_online) => {
       await base.save()
 
       await service.save()
-      service = await User.populate(service, {path: 'driver', select: 'full_name image rating'})
+      service = await User.populate(service, {path: 'driver', select: 'full_name image rating unit_number'})
 
       user.inService = true;
       await user.save()
