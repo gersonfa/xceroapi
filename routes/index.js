@@ -182,7 +182,7 @@ module.exports = (app, io) => {
    */
   api_routes.post('/user/:driver_id/add_review', require_auth, user_controller.user_add_review)
   /**
-   * @api {post} /api/user/:user_id/add_review Emergency enable
+   * @api {post} /api/emergency_enable Emergency enable
    * @apiName Emergency enable
    * @apiGroup User
    * @apiDescription se le envia un socket a los conductores cercanos 'emergency'
@@ -193,7 +193,7 @@ module.exports = (app, io) => {
    */
   api_routes.post('/emergency_enable', require_auth, service_controller.emergency_enable)
   /**
-   * @api {post} /api/user/:user_id/add_review Emergency disable
+   * @api {post} /api/emergency_disable Emergency disable
    * @apiName Emergency disable
    * @apiGroup User
    * @apiPermission Token

@@ -30,7 +30,8 @@ const serviceSchema = new Schema({
 
   fees: [feeSchema],
   price: { type: Number },
-  details: { type: String }
+  details: { type: String },
+  reason_negated: { type: String }
 }, {
   usePushEach: true
 })

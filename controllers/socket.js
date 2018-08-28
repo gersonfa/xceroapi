@@ -14,7 +14,7 @@ module.exports = (io, users_online) => {
 
     let check = setInterval(async () => {
       if (!socket.connected && user.role == 'Driver') {
-        console.log('se desconecto', user)
+        //console.log('se desconecto', user.full_name)
         users_online.delete(user_id)
         let bases = await Base.find({stack: user_id})
 
@@ -26,11 +26,9 @@ module.exports = (io, users_online) => {
       }
     }, 10000)
 
-    console.log(users_online.entries())
+    //console.log(users_online.entries())
 
     socket.on('update_location', async (socket) => {
-      console.log(socket.user_id, socket.coords)
-      //console.log(io.sockets.clients())
 
       const coords = socket.coords
       const user_id = socket.user_id
@@ -66,8 +64,6 @@ module.exports = (io, users_online) => {
 
             let bases_in = await Base.find({_id: {$ne: base._id}, stack: user.id})
 
-            console.log(bases_in)
-
             if (bases_in.length > 0) {
               bases_in.map(async (base) => {
                 base.stack = base.stack.filter(d => d != user.id)
@@ -98,10 +94,6 @@ module.exports = (io, users_online) => {
         base.stack = base.stack.filter(d => d != user.id)
         await base.save()
       })
-
-      /* let user = await User.findById(user_id)
-      user.inService = true
-      await user.save() */
 
     })
   })

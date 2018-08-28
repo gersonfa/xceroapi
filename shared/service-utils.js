@@ -124,7 +124,7 @@ async function get_close_drivers(service, distance) {
           coordinates: service.origin_coords
         },
         // Distancia en metros 3km por defecto
-        $maxDistance: distance || 3000
+        $maxDistance: distance || 2000
       }
     },
     role: 'Driver',

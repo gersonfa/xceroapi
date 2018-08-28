@@ -71,6 +71,8 @@ module.exports = (io, users_online) => {
         if (assign_to_driver) {
           service = await service.save()
 
+          sendJSONresponse(res, 200, service)
+          
           setTimeout(async () => {
             let check_service = await Service.findById(service._id)
             if (!check_service.driver && check_service.state != 'canceled') {
@@ -81,9 +83,9 @@ module.exports = (io, users_online) => {
               let passenger_socket = users_online.get(passenger)
               io.to(passenger_socket).emit('service_rejected', check_service)
             }
-          }, 120000)
+          }, 40000)
 
-          sendJSONresponse(res, 200, service)
+          
         } else {
           sendJSONresponse(res, 402, {error: 'No hay conductores disponibles.'})
         }
@@ -142,7 +144,6 @@ module.exports = (io, users_online) => {
 
       let passenger = service.user.toString()
       let passenger_socket = users_online.get(passenger)
-      console.log(passenger_socket)
       io.to(passenger_socket).emit('service_on_the_way', service)
 
       sendJSONresponse(res, 200, service)
@@ -167,10 +168,7 @@ module.exports = (io, users_online) => {
         await service.save()
 
         let passenger = service.user.toString()
-        console.log('pasajero_id', passenger)
         let passenger_socket = users_online.get(passenger)
-        console.log(users_online.entries())
-        console.log('pasajero_socket', passenger_socket)
         io.to(passenger_socket).emit('service_started', service)
 
         sendJSONresponse(res, 200, service)
@@ -334,9 +332,11 @@ module.exports = (io, users_online) => {
     try {
       let driver = req.user
       const service_id = req.params.service_id
+      const reason_negated = req.body.reason_negated
 
       let service = await Service.findById(service_id)
       service.state = 'negated'
+      service.reason_negated = reason_negated
       service = await service.save()
 
       driver.inService = false
@@ -401,7 +401,7 @@ module.exports = (io, users_online) => {
           if (driver_online) {
             
             let socket_driver = users_online.get(driver_online.toString())
-            console.log('driver_socket', socket_driver)
+            //console.log('driver_socket', socket_driver)
             io.to(socket_driver).emit('new_service', service)
             return true
           } else {
@@ -432,7 +432,7 @@ module.exports = (io, users_online) => {
       if (driver_online) {
         const driver_socket = users_online.get(driver_online.id)
         service = await User.populate(service, {path: 'user', select: 'full_name image'})
-        console.log('driver_socket', driver_socket)
+        //console.log('driver_socket', driver_socket)
         io.to(driver_socket).emit('new_service', service)
         return true
       } else {
