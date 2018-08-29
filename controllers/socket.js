@@ -11,6 +11,7 @@ module.exports = (io, users_online) => {
     users_online.set(user_id, socket.id)
 
     let user = await User.findById(user_id)
+    if (!user) { return }
 
     let check = setInterval(async () => {
       if (!socket.connected && user.role == 'Driver') {
