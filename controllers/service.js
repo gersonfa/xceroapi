@@ -496,8 +496,8 @@ module.exports = (io, users_online) => {
 
   async function emergency_enable (req, res, next) {
     try {
-      let driver = req.driver
-      const service_id = req.query.service
+      let driver = req.user
+      const service_id = req.query.service_id
   
       if (service_id) {
         let service = await Service.findById(service_id)
