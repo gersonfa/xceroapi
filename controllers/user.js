@@ -21,13 +21,17 @@ async function user_drivers_list(req, res, next) {
   }
 }
 
-async function drivers_location (req, res, next) {
-  try {
-    let drivers = await User.find({role: 'Driver'}, 'coords full_name unit_number emergency')
+function drivers_location (users) {
+  return async (req, res, next) => {
+    try {
+      let user_ids = Array.from(users.keys());
 
-    sendJSONresponse(res, 200, drivers)
-  } catch (e) {
-    return next(e)
+      let drivers = await User.find({role: 'Driver', _id: { $in: user_ids }}, 'coords full_name unit_number emergency')
+  
+      sendJSONresponse(res, 200, drivers)
+    } catch (e) {
+      return next(e)
+    }
   }
 }
 

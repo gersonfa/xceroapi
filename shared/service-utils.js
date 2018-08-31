@@ -70,8 +70,6 @@ async function set_tariff (service) {
             })
           }
         }
-
-        console.log('tarifa', tariff)
         
         service.tariff = tariff
         return service

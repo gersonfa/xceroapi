@@ -101,7 +101,7 @@ module.exports = (app, io) => {
   api_routes.get('/colony', require_auth, colony_controller.colony_list)
 
   api_routes.get('/user/drivers', require_auth, user_controller.user_drivers_list)
-  api_routes.get('/user/location', require_auth, user_controller.drivers_location)
+  api_routes.get('/user/location', require_auth, user_controller.drivers_location(users_online))
   /**
    * @api {put} /api/user/driver_exit Exit from app
    * @apiName Exit from app

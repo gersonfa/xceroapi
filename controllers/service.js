@@ -139,6 +139,7 @@ module.exports = (io, users_online) => {
 
       user.inService = true;
       await user.save()
+      console.log(user)
 
       let client = await User.findById(service.user)
       client.inService = true
