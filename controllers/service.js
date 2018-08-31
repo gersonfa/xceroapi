@@ -121,6 +121,7 @@ module.exports = (io, users_online) => {
       const service_id = req.params.service_id
 
       let service = await Service.findById(service_id).populate('origin_colony origin_place')
+      console.log(service)
       if (service.state === 'canceled' || service.state === 'negated') {
         throw boom.badRequest('service is canceled')
       }
@@ -131,6 +132,7 @@ module.exports = (io, users_online) => {
       let base = await service_utils.get_base(service)
       base.stack = base.stack.filter(d => d != user.id)
       await base.save()
+      console.log(base)
 
       await service.save()
       service = await User.populate(service, {path: 'driver', select: 'full_name image rating unit_number'})

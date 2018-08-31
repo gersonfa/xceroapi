@@ -61,8 +61,6 @@ async function base_delete(req, res, next) {
 		await Place.deleteMany({base: base_id})
 		await Group.deleteMany({base: base_id})
 
-		console.log(tariffs, places_ids, groups_ids, colonies_ids)
-
 		sendJSONresponse(res, 200, base)
 	} catch(e) {
 		return next(e)
@@ -73,7 +71,7 @@ async function base_details(req, res, next) {
 	try {
 		const base_id = req.params.base_id
 
-		let base = await Base.findById(base_id)
+		let base = await Base.findById(base_id).populate({path: 'stack', select: 'full_name unit_number'})
 
 		sendJSONresponse(res, 200, base)
 	} catch (e) {
@@ -95,6 +93,7 @@ async function base_empty_stack (req, res, next) {
 		return next(e)
 	}
 }
+
 
 module.exports = {
 	base_create,
