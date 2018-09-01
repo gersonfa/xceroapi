@@ -31,6 +31,7 @@ const serviceSchema = new Schema({
   fees: [feeSchema],
   price: { type: Number },
   details: { type: String },
+  destiny_details: { type: String },
   reason_negated: { type: String }
 }, {
   usePushEach: true
