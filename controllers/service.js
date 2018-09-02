@@ -516,6 +516,7 @@ module.exports = (io, users_online) => {
       near_drivers.forEach(d => {
         let d_socket = users_online.get(d._id.toString())
         io.to(d_socket).emit('emergency', {
+          _id: driver._id,
           unit_number: driver.unit_number,
           full_name: driver.full_name,
           coords: driver.coords
