@@ -33,7 +33,8 @@ module.exports = (io, users_online) => {
         origin_coords: [parseFloat(origin_lng), parseFloat(origin_lat)],
         user: user._id,
         address: req.body.address,
-        details: req.body.details
+        details: req.body.details,
+        destiny_details: req.body.destiny_details
       })
 
       if (!origin_colony && !origin_place) {
