@@ -17,12 +17,12 @@ module.exports = (io, users_online) => {
       if (!socket.connected && user.role == 'Driver') {
         //console.log('se desconecto', user.full_name)
         users_online.delete(user_id)
-        let bases = await Base.find({stack: user_id})
+        /* let bases = await Base.find({stack: user_id})
 
         bases.map(async (base) => {
           base.stack = base.stack.filter(d => d != user.id)
           await base.save()
-        })
+        }) */
         clearInterval(check)
       }
     }, 10000)
