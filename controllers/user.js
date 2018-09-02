@@ -82,7 +82,7 @@ async function driver_in (req, res, next) {
 
 async function user_status (req, res, next) {
   try {
-    const user = req.user
+    let user = req.user
 
     let service = await Service.findOne({
       $or: [{driver: user._id}, {user: user._id}],
@@ -92,6 +92,11 @@ async function user_status (req, res, next) {
       .populate({path: 'driver', select: 'full_name image rating unit_number'})
 
     let base = await Base.findOne({stack: user._id})
+
+    if (!service && user.inService) {
+      user.inService = false
+      user = await user.save()
+    }
 
     sendJSONresponse(res, 200, {inService: user.inService, service, base, emergency: user.emergency})
   } catch(e) {
