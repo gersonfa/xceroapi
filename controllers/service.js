@@ -512,6 +512,7 @@ module.exports = (io, users_online) => {
       await driver.save()
   
       let near_drivers = await service_utils.get_close_drivers({ origin_coords: driver.coords})
+      near_drivers = near_drivers.filter(d => d._id != driver._id)
 
       near_drivers.forEach(d => {
         let d_socket = users_online.get(d._id.toString())
