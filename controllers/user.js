@@ -91,7 +91,11 @@ async function user_status (req, res, next) {
       .populate({path: 'user', select: 'full_name image'})
       .populate({path: 'driver', select: 'full_name image rating unit_number'})
 
-    let base = await Base.findOne({stack: user._id})
+    let base
+
+    if (user.role == 'Driver') {
+      base = await Base.findOne({stack: user._id})
+    }
 
     if (!service && user.inService) {
       user.inService = false

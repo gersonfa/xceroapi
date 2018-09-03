@@ -16,6 +16,7 @@ module.exports = (app, io) => {
   const report_controller = require('../controllers/report')
   const frequent_controller = require('../controllers/frequent')
   const service_controller = require('../controllers/service')(io, users_online)
+  const version_controller = require('../controllers/version')
 
   require('../controllers/socket')(io, users_online)
 
@@ -60,6 +61,11 @@ module.exports = (app, io) => {
   api_routes.post('/group/:group_id/colony', require_auth, colony_controller.colony_create)
   api_routes.get('/group/:group_id/colony', require_auth, colony_controller.colony_by_group)
   api_routes.delete('/colony/:colony_id', require_auth, colony_controller.colony_delete)
+
+  api_routes.post('/version', require_auth, version_controller.version_create)
+  api_routes.get('/version/android', require_auth, version_controller.version_android)
+  api_routes.get('/version/ios', require_auth, version_controller.version_ios)
+  api_routes.put('/version', require_auth, version_controller.version_update)
 
   api_routes.post('/driver/:driver_id/inbox', require_auth, inbox_controller.inbox_create)
   /**

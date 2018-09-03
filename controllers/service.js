@@ -122,7 +122,6 @@ module.exports = (io, users_online) => {
       const service_id = req.params.service_id
 
       let service = await Service.findById(service_id).populate('origin_colony origin_place')
-      console.log(service)
       if (service.state === 'canceled' || service.state === 'negated') {
         throw boom.badRequest('service is canceled')
       }
@@ -133,14 +132,12 @@ module.exports = (io, users_online) => {
       let base = await service_utils.get_base(service)
       base.stack = base.stack.filter(d => d != user.id)
       await base.save()
-      console.log(base)
 
       await service.save()
       service = await User.populate(service, {path: 'driver', select: 'full_name image rating unit_number'})
 
       user.inService = true;
       await user.save()
-      console.log(user)
 
       let client = await User.findById(service.user)
       client.inService = true
@@ -191,6 +188,7 @@ module.exports = (io, users_online) => {
     try {
       const origin_lng = req.query.origin_lng
       const origin_lat = req.query.origin_lat
+      const place_id = req.query.place_id
 
       let place = await service_utils.get_places(origin_lat, origin_lng)
 
@@ -199,7 +197,16 @@ module.exports = (io, users_online) => {
 
         sendJSONresponse(res, 200, {place: place_location})
       } else {
+        if (place_id) {
+          let colony = await Colony.findOne({place_id: place_id })
 
+          if (colony) {
+            sendJSONresponse(res, 200, {colony: colony})
+          } else {
+            sendJSONresponse(res, 200, 'colony or place not found')
+          }
+          
+        } else {
           const place_ids = await service_utils.get_colonies(origin_lat, origin_lng)
 
           let colony = await Colony.findOne({place_id: { "$in": place_ids }})
@@ -209,6 +216,7 @@ module.exports = (io, users_online) => {
           } else {
             sendJSONresponse(res, 200, 'colony or place not found')
           }
+        }     
       }
     } catch(e) {
       return next(e)
@@ -246,13 +254,6 @@ module.exports = (io, users_online) => {
           }
       }
 
-      user.inService = false
-      await user.save()
-
-      let client = await User.findById(service.user)
-      client.inService = false
-      await client.save()
-
       // Buscar tarifa
       service = await Colony.populate(service, 'origin_colony destiny_colony')
       service = await Place.populate(service, 'origin_place destiny_place')
@@ -267,6 +268,13 @@ module.exports = (io, users_online) => {
       }
 
       sendJSONresponse(res, 200, service)
+
+      user.inService = false
+      await user.save()
+
+      let client = await User.findById(service.user)
+      client.inService = false
+      await client.save()
 
     } catch(e) {
       next(e)
