@@ -197,16 +197,6 @@ module.exports = (io, users_online) => {
 
         sendJSONresponse(res, 200, {place: place_location})
       } else {
-        if (place_id) {
-          let colony = await Colony.findOne({place_id: place_id })
-
-          if (colony) {
-            sendJSONresponse(res, 200, {colony: colony})
-          } else {
-            sendJSONresponse(res, 200, 'colony or place not found')
-          }
-          
-        } else {
           const place_ids = await service_utils.get_colonies(origin_lat, origin_lng)
 
           let colony = await Colony.findOne({place_id: { "$in": place_ids }})
@@ -216,7 +206,7 @@ module.exports = (io, users_online) => {
           } else {
             sendJSONresponse(res, 200, 'colony or place not found')
           }
-        }     
+             
       }
     } catch(e) {
       return next(e)
