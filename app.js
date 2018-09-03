@@ -10,6 +10,7 @@ const passport = require('passport')
 const chalk = require('chalk')
 const http = require('http')
 const cors = require('cors')
+require('appmetrics-dash').monitor()
 
 const server = http.createServer(app)
 const io = require('socket.io')(server)
