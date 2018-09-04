@@ -5,10 +5,11 @@ const RateLimit = require('express-rate-limit')
 
 const checkTariffLimiter = new RateLimit({
     windowMs: 60*60*1000, // 1 hour window
-    delayAfter: 0, // begin slowing down responses after the first request
-    delayMs: 0, // slow down subsequent responses by 3 seconds per request
-    max: 3, // start blocking after 5 requests
-    message: "Máximo 3 tarifas por hora."
+    max: 3, // start blocking after 3 requests
+    message: "Máximo 3 tarifas por hora.",
+    keyGenerator: function (req /*, res*/) {
+      return req.user._id;
+    }
   })
 
 const tariff_routes = express.Router()
@@ -28,7 +29,7 @@ tariff_routes.get('/', require_auth, tariff_controller.tariff_list)
  * @apiSuccess (200 Success) {Number} tariff.cost
  *
  */
-tariff_routes.get('/check', checkTariffLimiter, require_auth, tariff_controller.tariff_check)
+tariff_routes.get('/check', require_auth, checkTariffLimiter, tariff_controller.tariff_check)
 tariff_routes.get('/check/admin', require_auth, tariff_controller.tariff_check)
 tariff_routes.delete('/:tariff_id', require_auth, tariff_controller.tariff_delete)
 tariff_routes.put('/:tariff_id', require_auth, tariff_controller.tariff_update)
