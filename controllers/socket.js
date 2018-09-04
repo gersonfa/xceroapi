@@ -27,7 +27,7 @@ module.exports = (io, users_online) => {
       }
     }, 10000)
 
-    console.log(users_online.entries())
+    //console.log(users_online.entries())
 
     socket.on('update_location', async (socket) => {
 

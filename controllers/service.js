@@ -300,6 +300,7 @@ module.exports = (io, users_online) => {
 
           let driver_socket = users_online.get(service.driver.toString())
           if (driver_socket) {
+            console.log(users_online.entries())
             console.log(driver_socket)
             io.to(driver_socket).emit('service_canceled', service)
           }
