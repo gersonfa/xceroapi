@@ -296,9 +296,11 @@ module.exports = (io, users_online) => {
           let driver = await User.findById(service.driver)
           driver.inService = false
           await driver.save()
+          console.log('servicio con conductor')
 
           let driver_socket = users_online.get(service.driver.toString())
           if (driver_socket) {
+            console.log(driver_socket)
             io.to(driver_socket).emit('service_canceled', service)
           }
         }

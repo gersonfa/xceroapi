@@ -15,7 +15,7 @@ module.exports = (io, users_online) => {
 
     let check = setInterval(async () => {
       if (!socket.connected && user.role == 'Driver') {
-        //console.log('se desconecto', user.full_name)
+        console.log('se desconecto', user.full_name)
         users_online.delete(user_id)
         /* let bases = await Base.find({stack: user_id})
 
@@ -27,7 +27,7 @@ module.exports = (io, users_online) => {
       }
     }, 10000)
 
-    //console.log(users_online.entries())
+    console.log(users_online.entries())
 
     socket.on('update_location', async (socket) => {
 
