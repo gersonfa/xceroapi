@@ -4,7 +4,9 @@ const Place = require('../models/place')
 const User = require('../models/user')
 const Group = require('../models/group')
 const Base = require('../models/base')
+const Area = require('../models/area')
 const fetch = require('node-fetch')
+const inside = require('point-in-polygon')
 
 function withinRadius(point, interest, kms) {
   let R = 6371;
@@ -20,8 +22,37 @@ function withinRadius(point, interest, kms) {
   return (d <= kms);
 }
 
+async function inside_polygon (point) {
+  let areas = await Area.find()
+  let areas_map = areas.map(a => {
+    return {
+      _id: a._id,
+      group: a.group,
+      polygon: a.paths.map(p => [p.lat, p.lng] )
+    }
+  })
+
+  let area = areas_map.find(a => {
+    return inside(point, a.polygon)
+  })
+
+  return area
+}
+
 async function set_tariff (service) {
-    if (service.origin_colony) {
+  let origin_group = service.origin_group || service.origin_place.group || service.origin_colony.group
+  let destiny_group = service.destiny_group || service.destiny_group.group || service.destiny_colony.group
+
+  let tariff = await Tariff.findOne({
+    $or: [
+      {origin_group: origin_group, destiny_group: destiny_group},
+      {origin_group: destiny_group, destiny_group: origin_group}
+    ]
+  })
+  service.tariff = tariff
+  return service
+
+    /* if (service.origin_colony) {
       if (service.destiny_colony) {
         let tariff = await Tariff.findOne({
           $or: [
@@ -74,7 +105,7 @@ async function set_tariff (service) {
         service.tariff = tariff
         return service
       }
-    } else return service
+    } else return service */
 
 }
 
@@ -134,8 +165,10 @@ async function get_close_drivers(service, distance) {
 
 async function get_base(service) {
   let base
-
-  if (service.origin_colony) {
+  if (service.origin_group) {
+    const group = await Group.findById(service.origin_group)
+    base = await Base.findById(group.base)
+  } else if (service.origin_colony) {
     const group = await Group.findById(service.origin_colony.group)
     base = await Base.findById(group.base)
   } else if (service.origin_place) {
@@ -150,5 +183,6 @@ module.exports = {
   get_colonies,
   get_places,
   get_close_drivers,
-  get_base
+  get_base,
+  inside_polygon
 }

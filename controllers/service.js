@@ -24,50 +24,76 @@ module.exports = (io, users_online) => {
       let origin_colony = req.body.origin_colony
       let origin_place = req.body.origin_place
 
+      const details = req.body.details
+
       const destiny_colony = req.body.destiny_colony
       const destiny_place = req.body.destiny_place
 
-      if (!origin_lat || !origin_lng) throw boom.badRequest('origin_lat origin_lng are requireds')
+      if (!origin_lat || !origin_lng || !details) throw boom.badRequest('origin_lat origin_lng details are requireds')
+
+      const destiny_lat = req.body.destiny_lat
+      const destiny_lng = req.body.destiny_lng
 
       let service = new Service({
         origin_coords: [parseFloat(origin_lng), parseFloat(origin_lat)],
         user: user._id,
         address: req.body.address,
-        details: req.body.details,
+        details: details,
         destiny_details: req.body.destiny_details
       })
 
-      if (!origin_colony && !origin_place) {
-
-        let place = await service_utils.get_places(origin_lat, origin_lng)
-
-        if (place.length > 0) {
-          origin_place = place[0]
-
-          service.origin_place = origin_place._id
-
-        } else {
-          // Buscar colonia
-            const place_ids = await service_utils.get_colonies(origin_lat, origin_lng)
-            let colony = await Colony.findOne({place_id: { "$in": place_ids }})
-            if (colony) {
-              service.origin_colony = colony._id
-            }
-        }
-
-      } else {
-
-        service.origin_colony = origin_colony
-        service.origin_place = origin_place
+      if (destiny_lat && destiny_lng) {
+        let destiny_coords = [parseFloat(destiny_lng), parseFloat(destiny_lat)]
+        service.destiny_coords = destiny_coords
       }
 
-      service.destiny_colony = destiny_colony
-      service.destiny_place = destiny_place
+      let inside_area = await service_utils.inside_polygon(service.origin_coords.reverse())
 
-      service = await Colony.populate(service, 'origin_colony destiny_colony')
-      service = await Place.populate(service, 'origin_place destiny_place')
+      if (inside_area) {
+        service.origin_group = inside_area.group
 
-      if (service.origin_colony || service.origin_place) {
+        if (service.destiny_coords) {
+          let destiny_inside = await service_utils.inside_polygon(service.destiny_coords.reverse())
+
+          if (destiny_inside) {
+            service.destiny_group = destiny_inside.group
+            // Asignar tarifa
+          }
+
+
+        }
+      } else {
+        if (!origin_colony && !origin_place) {
+
+          let place = await service_utils.get_places(origin_lat, origin_lng)
+  
+          if (place.length > 0) {
+            origin_place = place[0]
+  
+            service.origin_place = origin_place._id
+  
+          } else {
+            // Buscar colonia
+              const place_ids = await service_utils.get_colonies(origin_lat, origin_lng)
+              let colony = await Colony.findOne({place_id: { "$in": place_ids }})
+              if (colony) {
+                service.origin_colony = colony._id
+              }
+          }
+  
+        } else {
+          service.origin_colony = origin_colony
+          service.origin_place = origin_place
+        }
+  
+          service.destiny_colony = destiny_colony
+          service.destiny_place = destiny_place
+    
+          service = await Colony.populate(service, 'origin_colony destiny_colony')
+          service = await Place.populate(service, 'origin_place destiny_place')
+      }
+
+      if (service.origin_colony || service.origin_place || service.origin_group) {
         const assign_to_driver = await emit_new_service(service)
         if (assign_to_driver) {
           service = await service.save()
@@ -159,7 +185,11 @@ module.exports = (io, users_online) => {
       const service_id = req.params.service_id
       const start_time = req.body.start_time
       
-      if (!start_time) throw boom.badRequest('start_time is required') 
+      if (!start_time) throw boom.badRequest('start_time is required')
+
+      if (service.state === 'canceled' || service.state === 'negated') {
+        throw boom.badRequest('service is canceled')
+      }
 
       let service = await Service.findById(service_id)
 
@@ -188,15 +218,19 @@ module.exports = (io, users_online) => {
     try {
       const origin_lng = req.query.origin_lng
       const origin_lat = req.query.origin_lat
-      const place_id = req.query.place_id
 
-      let place = await service_utils.get_places(origin_lat, origin_lng)
+      let inside_area = await service_utils.inside_polygon([parseFloat(origin_lat), parseFloat(origin_lng)])
 
-      if (place.length > 0) {
-        let place_location = place[0]
-
-        sendJSONresponse(res, 200, {place: place_location})
+      if (inside_area) {
+        sendJSONresponse(res, 200, {group: inside_area.group})
       } else {
+        let place = await service_utils.get_places(origin_lat, origin_lng)
+
+        if (place.length > 0) {
+          let place_location = place[0]
+
+          sendJSONresponse(res, 200, {place: place_location})
+        } else {
           const place_ids = await service_utils.get_colonies(origin_lat, origin_lng)
 
           let colony = await Colony.findOne({place_id: { "$in": place_ids }})
@@ -207,7 +241,10 @@ module.exports = (io, users_online) => {
             sendJSONresponse(res, 200, 'colony or place not found')
           }
              
+        } 
       }
+
+       
     } catch(e) {
       return next(e)
     }
@@ -223,30 +260,40 @@ module.exports = (io, users_online) => {
 
       if (!destiny_lat || !destiny_lng || !end_time) throw boom.badRequest('destiny_lat, destiny_lng and end_time are requireds')
 
+      if (service.state === 'canceled' || service.state === 'negated') {
+        throw boom.badRequest('service is canceled')
+      }
+
       let service = await Service.findById(service_id)
       service.state = 'completed'
       service.destiny_coords = [parseFloat(destiny_lng), parseFloat(destiny_lat)]
       service.end_time = end_time
 
-      let place = await service_utils.get_places(destiny_lat, destiny_lng)
+      let inside_area = await service_utils.inside_polygon(service.destiny_coords.reverse())
 
-      if (place.length > 0) {
-        let place_location = place[0]
-
-        service.destiny_place = place_location._id
+      if (inside_area) {
+        service.destiny_group = inside_area.group
       } else {
-          const place_ids = await service_utils.get_colonies(destiny_lat, destiny_lng)
-          let colony = await Colony.findOne({place_id: { "$in": place_ids }})
-          if (colony) {
-            service.destiny_colony = colony._id
-          } else {
-            // No se encontro ni place ni colony
-          }
-      }
+        let place = await service_utils.get_places(destiny_lat, destiny_lng)
 
-      // Buscar tarifa
-      service = await Colony.populate(service, 'origin_colony destiny_colony')
-      service = await Place.populate(service, 'origin_place destiny_place')
+        if (place.length > 0) {
+          let place_location = place[0]
+
+          service.destiny_place = place_location._id
+        } else {
+            const place_ids = await service_utils.get_colonies(destiny_lat, destiny_lng)
+            let colony = await Colony.findOne({place_id: { "$in": place_ids }})
+            if (colony) {
+              service.destiny_colony = colony._id
+            } else {
+              // No se encontro ni place ni colony
+            }
+        }
+
+        service = await Colony.populate(service, 'origin_colony destiny_colony')
+        service = await Place.populate(service, 'origin_place destiny_place')
+      }
+      
       service = await service_utils.set_tariff(service)
 
       service = await service.save()
@@ -296,12 +343,9 @@ module.exports = (io, users_online) => {
           let driver = await User.findById(service.driver)
           driver.inService = false
           await driver.save()
-          console.log('servicio con conductor')
 
           let driver_socket = users_online.get(service.driver.toString())
           if (driver_socket) {
-            console.log(users_online.entries())
-            console.log(driver_socket)
             io.to(driver_socket).emit('service_canceled', service)
           }
         }
@@ -599,6 +643,21 @@ module.exports = (io, users_online) => {
     }
   }
 
+  async function get_area (req, res, next) {
+    try {
+      const lat = req.body.lat
+      const lng = req.body.lng
+
+      const point = [parseFloat(lat), parseFloat(lng)]
+
+      let area = await service_utils.inside_polygon(point)
+
+      sendJSONresponse(res, 200, area)
+    } catch (e) {
+      return next(e)
+    }
+  }
+
 
   return {
     service_create,
@@ -615,6 +674,7 @@ module.exports = (io, users_online) => {
     emergency_disable,
     add_fee,
     remove_fee,
-    add_price
+    add_price,
+    get_area
   }
 }

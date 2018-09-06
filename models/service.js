@@ -25,14 +25,17 @@ const serviceSchema = new Schema({
   origin_place: { type: Schema.Types.ObjectId, ref: 'Place'},
   destiny_place: { type: Schema.Types.ObjectId, ref: 'Place'},
 
+  origin_group: { type: Schema.Types.ObjectId, ref: 'Group'},
+  destiny_group: { type: Schema.Types.ObjectId, ref: 'Group'},
+
   start_time: { type: Number },
   end_time: { type: Number },
 
   fees: [feeSchema],
-  price: { type: Number },
-  details: { type: String },
-  destiny_details: { type: String },
-  reason_negated: { type: String }
+  price: { type: Number }, // Precio que asigna el conductor si no se encuentra tarifa
+  details: { type: String }, // Dirección origen
+  destiny_details: { type: String }, // Dirección destino
+  reason_negated: { type: String } // Razón por la que un taxista nego el servicio
 }, {
   usePushEach: true
 })

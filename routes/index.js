@@ -12,6 +12,7 @@ module.exports = (app, io) => {
   const group_controller = require('../controllers/group')
   const colony_controller = require('../controllers/colony')
   const place_controller = require('../controllers/place')
+  const area_controller = require('../controllers/area')
   const inbox_controller = require('../controllers/inbox')(io, users_online)
   const report_controller = require('../controllers/report')
   const frequent_controller = require('../controllers/frequent')
@@ -61,6 +62,11 @@ module.exports = (app, io) => {
   api_routes.post('/group/:group_id/colony', require_auth, colony_controller.colony_create)
   api_routes.get('/group/:group_id/colony', require_auth, colony_controller.colony_by_group)
   api_routes.delete('/colony/:colony_id', require_auth, colony_controller.colony_delete)
+
+  api_routes.post('/group/:group_id/area', require_auth, area_controller.area_create)
+  api_routes.get('/group/:group_id/area', require_auth, area_controller.areas_by_group)
+  api_routes.get('/area', require_auth, area_controller.areas_list)
+  api_routes.delete('/area/:area_id', require_auth, area_controller.area_delete)
 
   api_routes.post('/version', require_auth, version_controller.version_create)
   api_routes.get('/version/android', require_auth, version_controller.version_android)
@@ -223,6 +229,7 @@ module.exports = (app, io) => {
    * @apiSuccess (200 Success) Object service
    */
   api_routes.post('/service', require_auth, service_controller.service_create)
+  api_routes.post('/get_area', service_controller.get_area)
   /**
    * @api {get} /api/service Service list
    * @apiName Service list
