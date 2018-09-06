@@ -6,6 +6,7 @@ const Group = require('../models/group')
 const Place = require('../models/place')
 const Colony = require('../models/colony')
 const boom = require('boom')
+const service_utils = require('../shared/service-utils')
 
 async function tariff_create(req, res, next) {
 	try {
@@ -105,32 +106,60 @@ async function tariff_check (req, res, next) {
 		let place_one = req.query.place_one
 		let place_two = req.query.place_two
 
-		if (colony_one) {
-			colony_one = await Colony.findById(colony_one)
-			let group_one = await Group.findById(colony_one.group)
+		let origin_lat = req.query.origin_lat
+		let origin_lng = req.query.origin_lng
 
-			if (colony_two) {
-				colony_two = await Colony.findById(colony_two)
-				let group_two = await Group.findById(colony_two.group)
+		let destiny_lat = req.query.destiny_lat
+		let destiny_lng = req.query.destiny_lng
 
-				let tariff = await Tariff.findOne({ $or: [{origin_group: group_one._id, destiny_group: group_two._id}, { origin_group: group_two._id, destiny_group: group_one._id }]})
+		if (origin_lat && origin_lng && destiny_lat && destiny_lng) {
+			let origin_coords = [parseFloat(origin_lat), parseFloat(origin_lng)]
+			let destiny_coords = [parseFloat(destiny_lat), parseFloat(destiny_lng)]
+
+			let origin = await service_utils.inside_polygon(origin_coords)
+			let destiny = await service_utils.inside_polygon(destiny_coords)
+
+			if (origin && destiny) {
+				let tariff = await Tariff.findOne(
+					{ $or: 
+						[
+							{origin_group: origin.group, destiny_group: destiny.group}, 
+							{ origin_group: destiny.group, destiny_group: origin.group }
+						]
+					})
 				sendJSONresponse(res, 200, tariff)
-			} else if (place_one) {
-				place_one = await Place.findById(place_one)
-
-				let tariff = await Tariff.findOne({origin_group: group_one._id, destiny_place: place_one._id})
-				sendJSONresponse(res, 200, tariff)
+				
+			} else {
+				if (colony_one) {
+					colony_one = await Colony.findById(colony_one)
+					let group_one = await Group.findById(colony_one.group)
+		
+					if (colony_two) {
+						colony_two = await Colony.findById(colony_two)
+						let group_two = await Group.findById(colony_two.group)
+		
+						let tariff = await Tariff.findOne({ $or: [{origin_group: group_one._id, destiny_group: group_two._id}, { origin_group: group_two._id, destiny_group: group_one._id }]})
+						sendJSONresponse(res, 200, tariff)
+					} else if (place_one) {
+						place_one = await Place.findById(place_one)
+		
+						let tariff = await Tariff.findOne({origin_group: group_one._id, destiny_place: place_one._id})
+						sendJSONresponse(res, 200, tariff)
+					}
+				} else if (place_one) {
+					// Buscar lugar
+					place_one = await Place.findById(place_one)
+					place_two = await Place.findById(place_two)
+		
+					let tariff = await Tariff.findOne({$or: [{origin_place: place_one._id, destiny_place: place_two._id}, {origin_place: place_two._id, destiny_place: place_one._id}]})
+					sendJSONresponse(res, 200, tariff)
+				} else {
+					throw boom.badRequest('colony_one or place_one are requireds')
+				}
 			}
-		} else if (place_one) {
-			// Buscar lugar
-			place_one = await Place.findById(place_one)
-			place_two = await Place.findById(place_two)
-
-			let tariff = await Tariff.findOne({$or: [{origin_place: place_one._id, destiny_place: place_two._id}, {origin_place: place_two._id, destiny_place: place_one._id}]})
-			sendJSONresponse(res, 200, tariff)
-		} else {
-			throw boom.badRequest('colony_one or place_one are requireds')
 		}
+
+		
 	} catch(e) {
 		return next(e)
 	}
