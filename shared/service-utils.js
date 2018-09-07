@@ -40,20 +40,23 @@ async function inside_polygon (point) {
 }
 
 async function set_tariff (service) {
+  console.log(service)
   let op_group = service.origin_place ? service.origin_place.group : null
   let oc_group = service.origin_colony ? service.origin_colony.group : null
 
   let dp_group = service.destiny_place ? service.destiny_place.group : null
   let dc_group = service.destiny_colony ? service.destin_colony.group: null
-  
+
   let origin_group = service.origin_group || op_group || oc_group
   let destiny_group = service.destiny_group || dp_group || dc_group
+
   let tariff = await Tariff.findOne({
     $or: [
       {origin_group: origin_group, destiny_group: destiny_group},
       {origin_group: destiny_group, destiny_group: origin_group}
     ]
   })
+
   service.tariff = tariff
   return service
 

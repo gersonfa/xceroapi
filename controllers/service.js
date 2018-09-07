@@ -269,9 +269,8 @@ module.exports = (io, client) => {
       service.end_time = end_time
 
       let inside_area = await service_utils.inside_polygon(service.destiny_coords.slice().reverse())
-      console.log(inside_area)
+
       if (inside_area) {
-        console.log('si entreeeee')
         service.destiny_group = inside_area.group
       } else {
         let place = await service_utils.get_places(destiny_lat, destiny_lng)
