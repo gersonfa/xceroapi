@@ -44,7 +44,7 @@ function drivers_location (client) {
   }
 }
 
-async function driver_location (client) {
+function driver_location (client) {
   return async (req, res, next) => {
     try {
       const driver_id = req.params.driver_id
