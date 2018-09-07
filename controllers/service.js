@@ -258,11 +258,12 @@ module.exports = (io, client) => {
 
       if (!destiny_lat || !destiny_lng || !end_time) throw boom.badRequest('destiny_lat, destiny_lng and end_time are requireds')
 
+      let service = await Service.findById(service_id)
+      
       if (service.state === 'canceled' || service.state === 'negated') {
         throw boom.badRequest('service is canceled')
       }
 
-      let service = await Service.findById(service_id)
       service.state = 'completed'
       service.destiny_coords = [parseFloat(destiny_lng), parseFloat(destiny_lat)]
       service.end_time = end_time
