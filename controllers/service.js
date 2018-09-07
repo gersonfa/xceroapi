@@ -8,7 +8,7 @@ const sendJSONresponse = require('../shared/common').sendJSONresponse
 const boom = require('boom')
 const service_utils = require('../shared/service-utils')
 
-module.exports = (io, service) => {
+module.exports = (io, client) => {
 
   async function service_create (req, res, next) {
     try {

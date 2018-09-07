@@ -18,6 +18,7 @@ module.exports = (io, client) => {
         console.log('se desconecto', user.full_name)
         
         await client.del(user_id)
+        await client.hdel('coords', user_id)
         /* let bases = await Base.find({stack: user_id})
 
         bases.map(async (base) => {
@@ -30,8 +31,7 @@ module.exports = (io, client) => {
 
     //console.log(users_online.entries())
     let keys = await client.keys('*')
-    let si = await client.get(user_id)
-    console.log(keys, si)
+    console.log(keys)
 
     socket.on('update_location', async (socket) => {
 
@@ -40,6 +40,9 @@ module.exports = (io, client) => {
 
       let user = await User.findById(user_id)
       if (user) {
+
+        client.hset('coords', user_id, JSON.stringify(coords))
+        
         user.coords = coords
         await user.save()
       }
