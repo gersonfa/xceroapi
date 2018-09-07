@@ -3,6 +3,8 @@ module.exports = (app, io) => {
   const multer = require('multer')
 
   let users_online = new Map()
+  const redis = require('async-redis')
+  const client = redis.createClient()
 
   const require_auth = require('../middlewares/auth').require_auth
   const require_login = require('../middlewares/auth').require_login
@@ -13,13 +15,13 @@ module.exports = (app, io) => {
   const colony_controller = require('../controllers/colony')
   const place_controller = require('../controllers/place')
   const area_controller = require('../controllers/area')
-  const inbox_controller = require('../controllers/inbox')(io)
+  const inbox_controller = require('../controllers/inbox')(io, client)
   const report_controller = require('../controllers/report')
   const frequent_controller = require('../controllers/frequent')
-  const service_controller = require('../controllers/service')(io)
+  const service_controller = require('../controllers/service')(io, client)
   const version_controller = require('../controllers/version')
 
-  require('../controllers/socket')(io)
+  require('../controllers/socket')(io, client)
 
   const auth_routes = require('./auth')
   const tariff_routes = require('./tariff')

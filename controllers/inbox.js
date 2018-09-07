@@ -5,7 +5,7 @@ const User = require('../models/user')
 const redis = require('async-redis')
 const client = redis.createClient()
 
-module.exports = (io) => {
+module.exports = (io, client) => {
 
   async function inbox_create (req, res, next) {
     try {

@@ -2,10 +2,8 @@
 const User = require('../models/user')
 const Base = require('../models/base')
 const theEarth = require('../shared/common').theEarth
-const redis = require('async-redis')
-const client = redis.createClient()
 
-module.exports = (io) => {
+module.exports = (io, client) => {
   io.on('connect',  async (socket) => {
     const socket_id = socket.id
     let user_id = socket.handshake.query.user_id

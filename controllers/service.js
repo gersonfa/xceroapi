@@ -7,10 +7,8 @@ const Colony = require('../models/colony')
 const sendJSONresponse = require('../shared/common').sendJSONresponse
 const boom = require('boom')
 const service_utils = require('../shared/service-utils')
-const redis = require('async-redis')
-const client = redis.createClient()
 
-module.exports = (io) => {
+module.exports = (io, service) => {
 
   async function service_create (req, res, next) {
     try {

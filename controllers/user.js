@@ -21,10 +21,10 @@ async function user_drivers_list(req, res, next) {
   }
 }
 
-function drivers_location (users) {
+function drivers_location (client) {
   return async (req, res, next) => {
     try {
-      let user_ids = Array.from(users.keys());
+      let user_ids = await client.keys('*')
 
       let drivers = await User.find({role: 'Driver', _id: { $in: user_ids }}, 'coords full_name unit_number emergency')
   
