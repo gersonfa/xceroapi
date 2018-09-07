@@ -2,13 +2,15 @@
 const User = require('../models/user')
 const Base = require('../models/base')
 const theEarth = require('../shared/common').theEarth
-const mongoose = require('mongoose')
+const redis = require('async-redis')
+const client = redis.createClient()
 
-module.exports = (io, users_online) => {
+module.exports = (io) => {
   io.on('connect',  async (socket) => {
     const socket_id = socket.id
     let user_id = socket.handshake.query.user_id
-    users_online.set(user_id, socket.id)
+    
+    await client.set(user_id, socket_id)
 
     let user = await User.findById(user_id)
     if (!user) { return }
@@ -16,7 +18,8 @@ module.exports = (io, users_online) => {
     let check = setInterval(async () => {
       if (!socket.connected && user.role == 'Driver') {
         console.log('se desconecto', user.full_name)
-        users_online.delete(user_id)
+        
+        await client.del(user_id)
         /* let bases = await Base.find({stack: user_id})
 
         bases.map(async (base) => {
@@ -28,6 +31,9 @@ module.exports = (io, users_online) => {
     }, 10000)
 
     //console.log(users_online.entries())
+    let keys = await client.keys('*')
+    let si = await client.get(user_id)
+    console.log(keys, si)
 
     socket.on('update_location', async (socket) => {
 
@@ -88,7 +94,9 @@ module.exports = (io, users_online) => {
 
     socket.on('disconnect', async (socket) => {
       const user_id = socket.user_id
-      users_online.delete(user_id)
+
+      await client.del(user_id)
+
       let bases = await Base.find({stack: user_id})
 
       bases.map(async (base) => {

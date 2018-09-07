@@ -2,8 +2,10 @@ const sendJSONresponse = require('../shared/common').sendJSONresponse
 const Inbox = require('../models/inbox')
 const Notice = require('../models/notice')
 const User = require('../models/user')
+const redis = require('async-redis')
+const client = redis.createClient()
 
-module.exports = (io, users_online) => {
+module.exports = (io) => {
 
   async function inbox_create (req, res, next) {
     try {
@@ -14,7 +16,7 @@ module.exports = (io, users_online) => {
 
       inbox = await inbox.save()
 
-      const driver_socket = users_online.get(driver_id)
+      const driver_socket = await client.get(driver_id)
       if (driver_socket) {
         io.to(driver_socket).emit('inbox', inbox)
       }
@@ -43,9 +45,10 @@ module.exports = (io, users_online) => {
       await notice.save()
 
       let drivers = await User.find({role: 'Driver'})
-      drivers.map(d => {
-        if (users_online.has(d.id)) {
-          let socket_driver = users_online.get(d.id)
+      drivers.map(async d => {
+        let exist = await client.exists(d.id)
+        if (exist) {
+          let socket_driver = await client.get(d.id)
           io.to(socket_driver).emit('notice', notice)
         }
       })

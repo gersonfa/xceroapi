@@ -1,16 +1,16 @@
 'use strict'
 
 const Service = require('../models/service')
-const Base = require('../models/base')
 const User = require('../models/user')
-const Group = require('../models/group')
 const Place = require('../models/place')
 const Colony = require('../models/colony')
 const sendJSONresponse = require('../shared/common').sendJSONresponse
 const boom = require('boom')
 const service_utils = require('../shared/service-utils')
+const redis = require('async-redis')
+const client = redis.createClient()
 
-module.exports = (io, users_online) => {
+module.exports = (io) => {
 
   async function service_create (req, res, next) {
     try {
@@ -47,13 +47,13 @@ module.exports = (io, users_online) => {
         service.destiny_coords = destiny_coords
       }
 
-      let inside_area = await service_utils.inside_polygon(service.origin_coords.reverse())
+      let inside_area = await service_utils.inside_polygon(service.origin_coords.slice().reverse())
 
       if (inside_area) {
         service.origin_group = inside_area.group
 
         if (service.destiny_coords) {
-          let destiny_inside = await service_utils.inside_polygon(service.destiny_coords.reverse())
+          let destiny_inside = await service_utils.inside_polygon(service.destiny_coords.slice().reverse())
 
           if (destiny_inside) {
             service.destiny_group = destiny_inside.group
@@ -107,7 +107,7 @@ module.exports = (io, users_online) => {
               check_service = await check_service.save()
 
               let passenger = check_service.user.toString()
-              let passenger_socket = users_online.get(passenger)
+              let passenger_socket = await client.get(passenger)
               io.to(passenger_socket).emit('service_rejected', check_service)
             }
           }, 40000)
@@ -170,7 +170,7 @@ module.exports = (io, users_online) => {
       await client.save()
 
       let passenger = service.user.toString()
-      let passenger_socket = users_online.get(passenger)
+      let passenger_socket = await client.get(passenger)
       io.to(passenger_socket).emit('service_on_the_way', service)
 
       sendJSONresponse(res, 200, service)
@@ -199,7 +199,7 @@ module.exports = (io, users_online) => {
         await service.save()
 
         let passenger = service.user.toString()
-        let passenger_socket = users_online.get(passenger)
+        let passenger_socket = await client.get(passenger)
         io.to(passenger_socket).emit('service_started', service)
 
         sendJSONresponse(res, 200, service)
@@ -269,7 +269,7 @@ module.exports = (io, users_online) => {
       service.destiny_coords = [parseFloat(destiny_lng), parseFloat(destiny_lat)]
       service.end_time = end_time
 
-      let inside_area = await service_utils.inside_polygon(service.destiny_coords.reverse())
+      let inside_area = await service_utils.inside_polygon(service.destiny_coords.slice().reverse())
 
       if (inside_area) {
         service.destiny_group = inside_area.group
@@ -298,7 +298,7 @@ module.exports = (io, users_online) => {
 
       service = await service.save()
 
-      let user_socket = users_online.get(service.user.toString())
+      let user_socket = await client.get(service.user.toString())
 
       if (user_socket) {
         io.to(user_socket).emit('service_end', service)
@@ -344,7 +344,7 @@ module.exports = (io, users_online) => {
           driver.inService = false
           await driver.save()
 
-          let driver_socket = users_online.get(service.driver.toString())
+          let driver_socket = await client.get(service.driver.toString())
           if (driver_socket) {
             io.to(driver_socket).emit('service_canceled', service)
           }
@@ -395,7 +395,7 @@ module.exports = (io, users_online) => {
       user.inService = false
       await user.save()
 
-      let user_socket = users_online.get(service.user.toString())
+      let user_socket = await client.get(service.user.toString())
 
       if (user_socket) {
         io.to(user_socket).emit('service_rejected', service)
@@ -428,10 +428,10 @@ module.exports = (io, users_online) => {
 
           if (base.stack.length != 0 && drivers_in_base.length > 0) {
 
-            const driver_online = drivers_in_base.find(d => users_online.get(d.toString()))
+            const driver_online = drivers_in_base.find(async d => await client.get(d.toString()))
             
             if (driver_online) {
-              let socket_driver = users_online.get(driver_online.toString())
+              let socket_driver = await client.get(driver_online.toString())
               io.to(socket_driver).emit('new_service', service)
               return true
             }
@@ -445,11 +445,11 @@ module.exports = (io, users_online) => {
       //  Servicio nuevo
       } else {
         if (base.stack.length > 0) {
-          const driver_online = base.stack.find(d => users_online.get(d.toString()))
-          //users_online.get(base.stack[0].toString())
+          const driver_online = base.stack.find(async d => await client.get(d.toString()))
+
           if (driver_online) {
             
-            let socket_driver = users_online.get(driver_online.toString())
+            let socket_driver = await client.get(driver_online.toString())
             //console.log('driver_socket', socket_driver)
             io.to(socket_driver).emit('new_service', service)
             return true
@@ -475,11 +475,11 @@ module.exports = (io, users_online) => {
 
     if (drivers.length > 0) {
 
-      const driver_online = drivers.find(d => users_online.get(d.id))
+      const driver_online = drivers.find(async d => await client.get(d.id))
       
 
       if (driver_online) {
-        const driver_socket = users_online.get(driver_online.id)
+        const driver_socket = await client.get(driver_online.id)
         service = await User.populate(service, {path: 'user', select: 'full_name image'})
         //console.log('driver_socket', driver_socket)
         io.to(driver_socket).emit('new_service', service)
@@ -489,7 +489,7 @@ module.exports = (io, users_online) => {
       }
     } else {
       // Avisar que no hay conductores
-      const user_socket = users_online.get(service.user.toString())
+      const user_socket = await client.get(service.user.toString())
 
       service.state = 'negated'
       service = await service.save()
@@ -559,8 +559,8 @@ module.exports = (io, users_online) => {
       let near_drivers = await service_utils.get_close_drivers({ origin_coords: driver.coords})
       near_drivers = near_drivers.filter(d => d._id != driver._id)
 
-      near_drivers.forEach(d => {
-        let d_socket = users_online.get(d._id.toString())
+      near_drivers.forEach(async d => {
+        let d_socket = await client.get(d._id.toString())
         io.to(d_socket).emit('emergency', {
           _id: driver._id,
           unit_number: driver.unit_number,

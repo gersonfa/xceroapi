@@ -13,13 +13,13 @@ module.exports = (app, io) => {
   const colony_controller = require('../controllers/colony')
   const place_controller = require('../controllers/place')
   const area_controller = require('../controllers/area')
-  const inbox_controller = require('../controllers/inbox')(io, users_online)
+  const inbox_controller = require('../controllers/inbox')(io)
   const report_controller = require('../controllers/report')
   const frequent_controller = require('../controllers/frequent')
-  const service_controller = require('../controllers/service')(io, users_online)
+  const service_controller = require('../controllers/service')(io)
   const version_controller = require('../controllers/version')
 
-  require('../controllers/socket')(io, users_online)
+  require('../controllers/socket')(io)
 
   const auth_routes = require('./auth')
   const tariff_routes = require('./tariff')
