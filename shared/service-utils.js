@@ -58,6 +58,7 @@ async function set_tariff (service) {
   })
 
   service.tariff = tariff
+  console.log(service)
   return service
 
     /* if (service.origin_colony) {
