@@ -259,7 +259,7 @@ module.exports = (io, client) => {
       if (!destiny_lat || !destiny_lng || !end_time) throw boom.badRequest('destiny_lat, destiny_lng and end_time are requireds')
 
       let service = await Service.findById(service_id)
-      
+
       if (service.state === 'canceled' || service.state === 'negated') {
         throw boom.badRequest('service is canceled')
       }
@@ -269,7 +269,7 @@ module.exports = (io, client) => {
       service.end_time = end_time
 
       let inside_area = await service_utils.inside_polygon(service.destiny_coords.slice().reverse())
-
+      console.log(inside_area)
       if (inside_area) {
         service.destiny_group = inside_area.group
       } else {
