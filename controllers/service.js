@@ -146,8 +146,8 @@ module.exports = (io, client) => {
       const service_id = req.params.service_id
 
       let service = await Service.findById(service_id).populate('origin_colony origin_place')
-      if (service.state === 'canceled' || service.state === 'negated') {
-        throw boom.badRequest('service is canceled')
+      if (service.state === 'canceled' || service.state === 'negated' || service.state === 'on_the_way') {
+        throw boom.badRequest('El servicio ah sido cancelado.')
       }
 
       service.driver = req.user._id
@@ -410,8 +410,10 @@ module.exports = (io, client) => {
     if (service.state === 'canceled' || service.state === 'negated') return false
 
     let base = await service_utils.get_base(service)
+
     if (base) {
       service = await User.populate(service, {path: 'user', select: 'full_name image'})
+      
       // Servicio cancelado por conductor
       if (service.driver) {
         const result = await assign_to_close_driver(service, service.driver)
@@ -430,7 +432,6 @@ module.exports = (io, client) => {
             
             if (driver_online) {
               let socket_driver = await client.hget('sockets', driver_online.toString())
-              console.log(socket_driver)
               io.to(socket_driver).emit('new_service', service)
               return true
             }
@@ -479,7 +480,6 @@ module.exports = (io, client) => {
 
       if (driver_online) {
         const driver_socket = await client.hget('sockets', driver_online.id)
-        console.log(driver_socket)
         service = await User.populate(service, {path: 'user', select: 'full_name image'})
         //console.log('driver_socket', driver_socket)
         io.to(driver_socket).emit('new_service', service)

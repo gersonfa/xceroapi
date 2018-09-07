@@ -44,16 +44,18 @@ function drivers_location (client) {
   }
 }
 
-async function driver_location (req, res, next) {
-  try {
-    const driver_id = req.params.driver_id
-
-    let driver = await User.findById(driver_id, 'unit_number emergency')
-    let coords = await client.hget('sockets', driver_id)
-
-    sendJSONresponse(res, 200, {_id: driver._id, unit_number: driver.unit_number, emergency: driver.emergency, coords: coords})
-  } catch(e) {
-    return next(e)
+async function driver_location (client) {
+  return async (req, res, next) => {
+    try {
+      const driver_id = req.params.driver_id
+  
+      let driver = await User.findById(driver_id, 'unit_number emergency')
+      let coords = await client.hget('sockets', driver_id)
+  
+      sendJSONresponse(res, 200, {_id: driver._id, unit_number: driver.unit_number, emergency: driver.emergency, coords: coords})
+    } catch(e) {
+      return next(e)
+    }
   }
 }
 

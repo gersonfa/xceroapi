@@ -353,7 +353,7 @@ module.exports = (app, io) => {
    * @apiSuccess (200 Success) {String} unit_number número de unidad
    * @apiSuccess (200 Success) {Array} coords coordenadas
    */
-  api_routes.get('/driver_location/:driver_id', require_auth, user_controller.driver_location)
+  api_routes.get('/driver_location/:driver_id', require_auth, user_controller.driver_location(client))
   api_routes.get('/service/driver/:driver_id', require_auth, service_controller.service_by_driver)
   /**
    * @api {post} /api/report Report create
