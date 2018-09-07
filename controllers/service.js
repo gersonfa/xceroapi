@@ -430,6 +430,7 @@ module.exports = (io, client) => {
             
             if (driver_online) {
               let socket_driver = await client.get(driver_online.toString())
+              console.log(socket_driver)
               io.to(socket_driver).emit('new_service', service)
               return true
             }
@@ -478,6 +479,7 @@ module.exports = (io, client) => {
 
       if (driver_online) {
         const driver_socket = await client.get(driver_online.id)
+        console.log(driver_socket)
         service = await User.populate(service, {path: 'user', select: 'full_name image'})
         //console.log('driver_socket', driver_socket)
         io.to(driver_socket).emit('new_service', service)
