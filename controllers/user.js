@@ -25,20 +25,18 @@ function drivers_location (client) {
   return async (req, res, next) => {
     try {
       let user_ids = await client.hkeys('coords')
-      console.log(user_ids)
 
       let drivers = await User.find({role: 'Driver', _id: { $in: user_ids }}, 'full_name unit_number emergency')
-      console.log(drivers)
 
       let drivers_map = drivers.map(async d => {
+        let coords = await client.hget('coords', d.id)
         return {
           full_name: d.full_name,
           unit_number: d.unit_number,
           emergency: d.emergency,
-          coords: await client.hget('coords', d.id)
+          coords: coords
         }
       })
-      console.log(drivers_map)
   
       sendJSONresponse(res, 200, drivers_map)
     } catch (e) {
