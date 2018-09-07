@@ -36,7 +36,7 @@ async function inside_polygon (point) {
     return inside(point, a.polygon)
   })
 
-  return area
+  return area || null
 }
 
 async function set_tariff (service) {
