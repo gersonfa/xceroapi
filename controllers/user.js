@@ -24,11 +24,20 @@ async function user_drivers_list(req, res, next) {
 function drivers_location (client) {
   return async (req, res, next) => {
     try {
-      let user_ids = await client.keys('*')
+      let user_ids = await client.hkeys('coords')
 
-      let drivers = await User.find({role: 'Driver', _id: { $in: user_ids }}, 'coords full_name unit_number emergency')
+      let drivers = await User.find({role: 'Driver', _id: { $in: user_ids }}, 'full_name unit_number emergency')
+
+      let drivers_map = drivers.map(d => {
+        return {
+          full_name: d.full_name,
+          unit_number: d.unit_number,
+          emergency: d.emergency,
+          coords: await client.hget('coords', d.id)
+        }
+      })
   
-      sendJSONresponse(res, 200, drivers)
+      sendJSONresponse(res, 200, drivers_map)
     } catch (e) {
       return next(e)
     }
@@ -39,14 +48,16 @@ async function driver_location (req, res, next) {
   try {
     const driver_id = req.params.driver_id
 
-    let driver = await User.findById(driver_id, 'coords unit_number emergency')
+    let driver = await User.findById(driver_id, 'unit_number emergency')
+    let coords = await client.hget('sockets', driver_id)
 
-    sendJSONresponse(res, 200, driver)
+    sendJSONresponse(res, 200, {_id: driver._id, unit_number: driver.unit_number, emergency: driver.emergency, coords: coords})
   } catch(e) {
     return next(e)
   }
 }
 
+//No se usa
 async function driver_exit (req, res, next) {
   try {
     const user = req.user
@@ -68,6 +79,7 @@ async function driver_exit (req, res, next) {
   }
 }
 
+//No se usa
 async function driver_in (req, res, next) {
   try {
     const user = req.user

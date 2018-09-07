@@ -8,7 +8,7 @@ module.exports = (io, client) => {
     const socket_id = socket.id
     let user_id = socket.handshake.query.user_id
     
-    await client.set(user_id, socket_id)
+    await client.hset('sockets', user_id, socket_id)
 
     let user = await User.findById(user_id)
     if (!user) { return }
@@ -17,7 +17,7 @@ module.exports = (io, client) => {
       if (!socket.connected && user.role == 'Driver') {
         console.log('se desconecto', user.full_name)
         
-        await client.del(user_id)
+        await client.hdel('sockets', user_id)
         await client.hdel('coords', user_id)
         /* let bases = await Base.find({stack: user_id})
 
@@ -96,7 +96,7 @@ module.exports = (io, client) => {
     socket.on('disconnect', async (socket) => {
       const user_id = socket.user_id
 
-      await client.del(user_id)
+      await client.hdel('sockets', user_id)
 
       let bases = await Base.find({stack: user_id})
 

@@ -16,7 +16,7 @@ module.exports = (io, client) => {
 
       inbox = await inbox.save()
 
-      const driver_socket = await client.get(driver_id)
+      const driver_socket = await client.hget('sockets', driver_id)
       if (driver_socket) {
         io.to(driver_socket).emit('inbox', inbox)
       }
@@ -46,9 +46,9 @@ module.exports = (io, client) => {
 
       let drivers = await User.find({role: 'Driver'})
       drivers.map(async d => {
-        let exist = await client.exists(d.id)
+        let exist = await client.hexists('sockets', d.id)
         if (exist) {
-          let socket_driver = await client.get(d.id)
+          let socket_driver = await client.hget('sockets', d.id)
           io.to(socket_driver).emit('notice', notice)
         }
       })
