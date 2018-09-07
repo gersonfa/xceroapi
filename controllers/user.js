@@ -28,7 +28,7 @@ function drivers_location (client) {
 
       let drivers = await User.find({role: 'Driver', _id: { $in: user_ids }}, 'full_name unit_number emergency')
 
-      let drivers_map = drivers.map(d => {
+      let drivers_map = drivers.map(async d => {
         return {
           full_name: d.full_name,
           unit_number: d.unit_number,
