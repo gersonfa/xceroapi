@@ -185,11 +185,11 @@ module.exports = (io, client) => {
       
       if (!start_time) throw boom.badRequest('start_time is required')
 
+      let service = await Service.findById(service_id)
+
       if (service.state === 'canceled' || service.state === 'negated') {
         throw boom.badRequest('service is canceled')
       }
-
-      let service = await Service.findById(service_id)
 
       if (service_utils.withinRadius({longitude: service.origin_coords[0], latitude: service.origin_coords[1]}, {longitude: driver.coords[0], latitude: driver.coords[1]}, 0.2)) {
         service.state = 'in_process'
