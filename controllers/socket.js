@@ -98,7 +98,7 @@ module.exports = (io, client) => {
 
     socket.on('disconnect', async (socket) => {
       const user_id = socket.user_id
-
+      console.log('disconnect', user_id)
       client.hdel('sockets', user_id)
 
       /* let bases = await Base.find({stack: user_id})
