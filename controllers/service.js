@@ -147,7 +147,7 @@ module.exports = (io, client) => {
 
       let service = await Service.findById(service_id).populate('origin_colony origin_place')
       if (service.state === 'canceled' || service.state === 'negated' || service.state === 'on_the_way') {
-        throw boom.badRequest('El servicio ah sido cancelado.')
+        throw boom.badRequest('El servicio ah sido cancelado o iniciado.')
       }
 
       service.driver = req.user._id
