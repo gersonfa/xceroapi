@@ -219,30 +219,25 @@ module.exports = (io, client) => {
 
       let inside_area = await service_utils.inside_polygon([parseFloat(origin_lat), parseFloat(origin_lng)])
 
-      if (inside_area) {
-        sendJSONresponse(res, 200, {group: inside_area.group})
+
+      let place = await service_utils.get_places(origin_lat, origin_lng)
+
+      if (place.length > 0) {
+        let place_location = place[0]
+
+        sendJSONresponse(res, 200, {place: place_location, group: inside_area.group})
       } else {
-        let place = await service_utils.get_places(origin_lat, origin_lng)
+        const place_ids = await service_utils.get_colonies(origin_lat, origin_lng)
 
-        if (place.length > 0) {
-          let place_location = place[0]
+        let colony = await Colony.findOne({place_id: { "$in": place_ids }})
 
-          sendJSONresponse(res, 200, {place: place_location})
+        if (colony) {
+           sendJSONresponse(res, 200, {colony: colony, group: inside_area.group})
         } else {
-          const place_ids = await service_utils.get_colonies(origin_lat, origin_lng)
-
-          let colony = await Colony.findOne({place_id: { "$in": place_ids }})
-
-          if (colony) {
-            sendJSONresponse(res, 200, {colony: colony})
-          } else {
-            sendJSONresponse(res, 200, 'colony or place not found')
-          }
+          sendJSONresponse(res, 200, 'colony or place not found')
+        }
              
-        } 
       }
-
-       
     } catch(e) {
       return next(e)
     }
@@ -324,7 +319,7 @@ module.exports = (io, client) => {
 
       let service = await Service.findById(service_id).populate('origin_colony')
 
-      if (service.state == 'completed' || service.state == 'negated') throw boom.badRequest('No se puede cancelar un servicio que ya ha sido completo.')
+      if (service.state == 'completed' || service.state == 'negated') throw boom.badRequest('No se puede cancelar un servicio que ya fue completado o negado.')
 
       user.inService = false
       await user.save()

@@ -97,15 +97,14 @@ module.exports = (io, client) => {
     })
 
     socket.on('disconnect', async (socket) => {
-      console.log('disconnect', user_id)
       client.hdel('sockets', user_id)
 
-      /* let bases = await Base.find({stack: user_id})
+      let bases = await Base.find({stack: user_id})
 
       bases.map(async (base) => {
-        base.stack = base.stack.filter(d => d != user.id)
+        base.stack = base.stack.filter(d => d != user_id)
         await base.save()
-      }) */
+      })
 
     })
   })
