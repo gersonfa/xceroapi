@@ -218,6 +218,7 @@ module.exports = (io, client) => {
       const origin_lat = req.query.origin_lat
 
       let inside_area = await service_utils.inside_polygon([parseFloat(origin_lat), parseFloat(origin_lng)])
+      let group_id = inside_area ? inside_area.group : null
 
 
       let place = await service_utils.get_places(origin_lat, origin_lng)
@@ -225,14 +226,14 @@ module.exports = (io, client) => {
       if (place.length > 0) {
         let place_location = place[0]
 
-        sendJSONresponse(res, 200, {place: place_location, group: inside_area.group})
+        sendJSONresponse(res, 200, {place: place_location, group: group_id})
       } else {
         const place_ids = await service_utils.get_colonies(origin_lat, origin_lng)
 
         let colony = await Colony.findOne({place_id: { "$in": place_ids }})
 
         if (colony) {
-           sendJSONresponse(res, 200, {colony: colony, group: inside_area.group})
+           sendJSONresponse(res, 200, {colony: colony, group: group_id})
         } else {
           sendJSONresponse(res, 200, 'colony or place not found')
         }
