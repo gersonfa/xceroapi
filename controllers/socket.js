@@ -17,8 +17,11 @@ module.exports = (io, client) => {
       if (!socket.connected && user.role == 'Driver') {
         console.log('se desconecto', user.full_name)
         
-        await client.hdel('sockets', user_id)
-        await client.hdel('coords', user_id)
+        client.hdel('sockets', user_id)
+        client.hdel('coords', user_id)
+
+        let keys = await client.hkeys('sockets')
+        console.log(keys)
         /* let bases = await Base.find({stack: user_id})
 
         bases.map(async (base) => {
