@@ -33,7 +33,7 @@ function drivers_location (client) {
           full_name: d.full_name,
           unit_number: d.unit_number,
           emergency: d.emergency,
-          coords: coords
+          coords: JSON.parse(coords)
         }
       })
 
@@ -54,7 +54,7 @@ function driver_location (client) {
       let driver = await User.findById(driver_id, 'unit_number emergency')
       let coords = await client.hget('coords', driver_id)
   
-      sendJSONresponse(res, 200, {_id: driver._id, unit_number: driver.unit_number, emergency: driver.emergency, coords: coords})
+      sendJSONresponse(res, 200, {_id: driver._id, unit_number: driver.unit_number, emergency: driver.emergency, coords: JSON.parse(coords)})
     } catch(e) {
       return next(e)
     }
