@@ -15,7 +15,7 @@ module.exports = (io, client) => {
 
     let check = setInterval(async () => {
       if (!socket.connected && user.role == 'Driver') {
-        console.log('se desconecto', user.full_name)
+        console.log('se desconecto', user.full_name, user_id)
         
         client.hdel('sockets', user_id)
         client.hdel('coords', user_id)
