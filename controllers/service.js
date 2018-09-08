@@ -250,6 +250,7 @@ module.exports = (io, client) => {
       const destiny_lat = req.body.destiny_lat
       const destiny_lng = req.body.destiny_lng
       const end_time = req.body.end_time
+      const destiny_details = req.body.destiny_details
 
       if (!destiny_lat || !destiny_lng || !end_time) throw boom.badRequest('destiny_lat, destiny_lng and end_time are requireds')
 
@@ -262,6 +263,7 @@ module.exports = (io, client) => {
       service.state = 'completed'
       service.destiny_coords = [parseFloat(destiny_lng), parseFloat(destiny_lat)]
       service.end_time = end_time
+      service.destiny_details = destiny_details
 
       let inside_area = await service_utils.inside_polygon(service.destiny_coords.slice().reverse())
 
