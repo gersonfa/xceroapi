@@ -30,6 +30,7 @@ function drivers_location (client) {
       console.log(drivers)
       let drivers_map = drivers.map(async d => {
         let coords = await client.hget('coords', d.id)
+        console.log(coords)
         return {
           full_name: d.full_name,
           unit_number: d.unit_number,
@@ -37,6 +38,8 @@ function drivers_location (client) {
           coords: coords
         }
       })
+
+      console.log(drivers_map)
   
       sendJSONresponse(res, 200, drivers_map)
     } catch (e) {
