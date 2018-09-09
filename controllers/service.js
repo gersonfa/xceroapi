@@ -559,6 +559,7 @@ module.exports = (io, client) => {
       near_drivers = near_drivers.filter(d => d._id != driver._id)
 
       near_drivers.forEach(async d => {
+        if (d.id == driver.id) return
         let d_socket = await client.hget('sockets', d._id.toString())
         let coords = await client.hget('coords', driver.id)
         io.to(d_socket).emit('emergency', {
