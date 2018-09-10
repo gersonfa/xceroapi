@@ -57,8 +57,6 @@ module.exports = (io, client) => {
             service.destiny_group = destiny_inside.group
             // Asignar tarifa
           }
-
-
         }
       } else {
         if (!origin_colony && !origin_place) {
@@ -92,28 +90,33 @@ module.exports = (io, client) => {
       }
 
       if (service.origin_colony || service.origin_place || service.origin_group) {
-        const assign_to_driver = await emit_new_service(service)
-        if (assign_to_driver) {
-          service = await service.save()
 
-          sendJSONresponse(res, 200, service)
+        service = await service.save()
+
+        sendJSONresponse(res, 200, service)
+        io.to('drivers').emit('new_request')
+
+        await emit_new_service(service)
           
-          setTimeout(async () => {
-            let check_service = await Service.findById(service._id)
-            if (!check_service.driver && check_service.state != 'canceled') {
-              check_service.state = 'negated'
-              check_service = await check_service.save()
+        setTimeout(async () => {
+          let check_service = await Service.findById(service._id)
+          if (!check_service.driver && check_service.state != 'canceled' || check_service.state != 'negated') {
+            check_service.state = 'negated'
+            check_service = await check_service.save()
 
-              let passenger = check_service.user.toString()
-              let passenger_socket = await client.hget('sockets', passenger)
-              io.to(passenger_socket).emit('service_rejected', check_service)
-            }
-          }, 40000)
+            let passenger = check_service.user.toString()
+            let passenger_socket = await client.hget('sockets', passenger)
+            io.to(passenger_socket).emit('service_rejected', check_service)
+          }
+        }, 40000)
 
-          
-        } else {
-          sendJSONresponse(res, 402, {error: 'No hay conductores disponibles.'})
-        }
+        setTimeout(async () => {
+          let check_service = await Service.findById(service._id)
+          if (!check_service.driver && check_service.state != 'canceled' || check_service.state != 'negated') {
+            await assign_to_close_driver(service)
+          }
+        }, 15000)
+
       } else {
         sendJSONresponse(res, 402, {eror: 'No hay servicios disponibles desde la ubicación establecida.'})
       }
@@ -146,32 +149,45 @@ module.exports = (io, client) => {
       const service_id = req.params.service_id
 
       let service = await Service.findById(service_id).populate('origin_colony origin_place')
+
       if (service.state === 'canceled' || service.state === 'negated' || service.state === 'on_the_way') {
         throw boom.badRequest('El servicio ah sido cancelado o iniciado.')
+      }
+
+      if (service.driver) {
+        throw boom.badRequest('El servicio ya ha sido asignado.')
       }
 
       service.driver = req.user._id
       service.state = 'on_the_way'
 
-      let base = await service_utils.get_base(service)
-      base.stack = base.stack.filter(d => d != user.id)
-      await base.save()
-
-      await service.save()
-      service = await User.populate(service, {path: 'driver', select: 'full_name image rating unit_number'})
-
-      user.inService = true;
-      await user.save()
-
-      let client_user = await User.findById(service.user)
-      client_user.inService = true
-      await client_user.save()
+      service = await service.save()
+      service.driver = {
+        _id: user._id,
+        full_name: user.full_name,
+        image: user.image,
+        rating: user.rating,
+        unit_number: user.unit_number
+      }
+      //await User.populate(service, {path: 'driver', select: 'full_name image rating unit_number'})
 
       let passenger = service.user.toString()
       let passenger_socket = await client.hget('sockets', passenger)
       io.to(passenger_socket).emit('service_on_the_way', service)
 
       sendJSONresponse(res, 200, service)
+
+      let client_user = await User.findById(service.user)
+      client_user.inService = true
+      await client_user.save()
+
+      user.inService = true;
+      await user.save()
+
+      let base = await service_utils.get_base(service)
+      base.stack = base.stack.filter(d => d != user.id)
+      await base.save()
+
     } catch (e) {
       return next(e)
     }
@@ -292,7 +308,6 @@ module.exports = (io, client) => {
       }
       
       service = await service_utils.set_tariff(service)
-
       service = await service.save()
 
       let user_socket = await client.hget('sockets', service.user.toString())
@@ -327,29 +342,21 @@ module.exports = (io, client) => {
       user.inService = false
       await user.save()
 
-      if (user.role == 'Driver') {
-        await emit_new_service(service)
-        sendJSONresponse(res, 200, {message: 'Servicio asignado a otro conductor.'})
+      service.state = 'canceled'
+      service = await service.save()
 
-      } else {
+      sendJSONresponse(res, 200, service)
 
-        service.state = 'canceled'
-        service = await service.save()
+      if (service.driver) {
+        let driver = await User.findById(service.driver)
+        driver.inService = false
+        await driver.save()
 
-        if (service.driver) {
-          let driver = await User.findById(service.driver)
-          driver.inService = false
-          await driver.save()
-
-          let driver_socket = await client.hget('sockets', service.driver.toString())
-          if (driver_socket) {
-            io.to(driver_socket).emit('service_canceled', service)
-          }
+        let driver_socket = await client.hget('sockets', service.driver.toString())
+        if (driver_socket) {
+          io.to(driver_socket).emit('service_canceled', service)
         }
-
-        sendJSONresponse(res, 200, service)
       }
-
 
     } catch(e) {
       return next(e)
@@ -362,12 +369,13 @@ module.exports = (io, client) => {
       const service_id = req.params.service_id
 
       let service = await Service.findById(service_id).populate('origin_colony origin_place')
-      if (service.state == 'canceled') {
+
+      if (service.state == 'canceled' || service.state == 'negated' || service.driver) {
         sendJSONresponse(res, 200, {message: 'Servicio rechazado correctamente'})
         return
       }
 
-      await emit_new_service(service, user._id)
+      //await emit_new_service(service, user._id)
       sendJSONresponse(res, 200, {message: 'Servicio rechazado correctamente'})
     } catch(e) {
       return next(e)
@@ -385,13 +393,6 @@ module.exports = (io, client) => {
       service.reason_negated = reason_negated
       service = await service.save()
 
-      driver.inService = false
-      await driver.save()
-
-      let user = await User.findById(service.user)
-      user.inService = false
-      await user.save()
-
       let user_socket = await client.hget('sockets', service.user.toString())
 
       if (user_socket) {
@@ -399,14 +400,22 @@ module.exports = (io, client) => {
       }
 
       sendJSONresponse(res, 200, service)
+
+      driver.inService = false
+      await driver.save()
+
+      let user = await User.findById(service.user)
+      user.inService = false
+      await user.save()
+
     } catch(e) {
       return next(e)
     }
   }
 
-  async function emit_new_service (service, driver_reject) {
+  /* async function emit_new_service (service, driver_reject) {
 
-    if (service.state === 'canceled' || service.state === 'negated') return false
+    if (service.state === 'canceled' || service.state === 'negated' || service.driver) return false
 
     let base = await service_utils.get_base(service)
 
@@ -465,10 +474,33 @@ module.exports = (io, client) => {
     } else {
       return false
     }
+  } */
+
+  async function emit_new_service(service) {
+    let base = await service_utils.get_base(service)
+
+    if (base) {
+      let count_online = 0
+      let promises = base.stack.map(async driver => {
+        let driver_socket = await client.hget('sockets', driver.toString())
+        if (driver_socket) {
+          console.log('servicio a base', driver, driver_socket)
+          io.to(driver_socket).emit('new_service', service)
+          count_online += 1
+        }
+      })
+
+      Promise.all(promises).then(async () => {
+        if (count_online == 0) {
+          await assign_to_close_driver(service)
+        }
+      })
+    }
   }
 
-  async function assign_to_close_driver (service, user_id) {
+  /* async function assign_to_close_driver (service, user_id) {
     let drivers = await service_utils.get_close_drivers(service)
+
     if (user_id) {
       drivers = drivers.filter(d => d._id.toString() != user_id.toString())
     }
@@ -502,6 +534,38 @@ module.exports = (io, client) => {
         io.to(user_socket).emit('service_rejected', service)
       }
     }
+  } */
+
+  async function assign_to_close_driver (service) {
+    let close_drivers = await service_utils.get_close_drivers(service)
+
+    let total_drivers = 0
+    let promises = close_drivers.map(async driver => {
+      const driver_socket = await client.hget('sockets', driver.id)
+      if (driver_socket) {
+        console.log('Servicio a cercano', driver, driver_socket)
+        io.to(driver_socket).emit('new_service', service)
+        total_drivers += 1
+      }
+    })
+
+    Promise.all(promises).then(async () => {
+        //No se envio a nadie, no hay conductores cerca
+      if (total_drivers == 0) {
+        const user_socket = await client.hget('sockets', service.user.toString())
+
+        service.state = 'negated'
+        service = await service.save()
+
+        let user = await User.findById(service.user)
+        user.inService = false;
+        await user.save()
+
+        if (user_socket) {
+          io.to(user_socket).emit('service_rejected', service)
+        }
+      }
+    })
   }
 
   async function service_by_driver (req, res, next) {

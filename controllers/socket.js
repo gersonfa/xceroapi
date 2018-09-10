@@ -7,20 +7,23 @@ module.exports = (io, client) => {
   io.on('connect',  async (socket) => {
     const socket_id = socket.id
     let user_id = socket.handshake.query.user_id
+    console.log(io.engine.clientsCount)
     
     await client.hset('sockets', user_id, socket_id)
 
     let user = await User.findById(user_id)
     if (!user) { return }
+    if (user.role == 'Driver') { socket.join('drivers') }
 
     let check = setInterval(async () => {
       if (!socket.connected && user.role == 'Driver') {
-        console.log('se desconecto', user.full_name, user_id)
+        console.log('se desconecto', user.full_name)
         
         client.hdel('sockets', user_id)
         client.hdel('coords', user_id)
+        socket.leave('drivers')
 
-        let keys = await client.hkeys('sockets')
+        //let keys = await client.hkeys('sockets')
         //console.log(keys)
         /* let bases = await Base.find({stack: user_id})
 
@@ -31,10 +34,6 @@ module.exports = (io, client) => {
         clearInterval(check)
       }
     }, 10000)
-
-    //console.log(users_online.entries())
-    let keys = await client.keys('*')
-    //console.log(keys)
 
     socket.on('update_location', async (socket) => {
 

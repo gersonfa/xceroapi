@@ -5,7 +5,7 @@ module.exports = (app, io) => {
   let users_online = new Map()
   const redis = require('async-redis')
   const client = redis.createClient()
-
+  client.flushall()
   const require_auth = require('../middlewares/auth').require_auth
   const require_login = require('../middlewares/auth').require_login
 

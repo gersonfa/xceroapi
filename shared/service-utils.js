@@ -169,6 +169,8 @@ async function get_close_drivers(service, distance) {
     inService: false,
     enable: true
   })
+
+  
   return drivers
 }
 
