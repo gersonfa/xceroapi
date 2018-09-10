@@ -430,6 +430,7 @@ module.exports = (io, client) => {
             const driver_online = drivers_in_base.find(async d => await client.get(d.toString()))
             
             if (driver_online) {
+              console.log('vino de base', driver_online.full_name)
               let socket_driver = await client.hget('sockets', driver_online.toString())
               io.to(socket_driver).emit('new_service', service)
               return true
@@ -447,7 +448,7 @@ module.exports = (io, client) => {
           const driver_online = base.stack.find(async d => await client.hget('sockets', d.toString()))
 
           if (driver_online) {
-            console.log(driver_online.full_name)
+            console.log('servicio nuevo', driver_online.full_name)
             let socket_driver = await client.hget('sockets', driver_online.toString())
             //console.log('driver_socket', socket_driver)
             io.to(socket_driver).emit('new_service', service)
@@ -477,7 +478,7 @@ module.exports = (io, client) => {
       const driver_online = drivers.find(async d => await client.hget('sockets', d.id))
 
       if (driver_online) {
-        console.log('servicio', driver_online.full_name)
+        console.log('servicio a cercano', driver_online.full_name)
         const driver_socket = await client.hget('sockets', driver_online.id)
         service = await User.populate(service, {path: 'user', select: 'full_name image'})
         //console.log('driver_socket', driver_socket)

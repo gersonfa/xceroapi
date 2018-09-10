@@ -21,7 +21,7 @@ module.exports = (io, client) => {
         client.hdel('coords', user_id)
 
         let keys = await client.hkeys('sockets')
-        console.log(keys)
+        //console.log(keys)
         /* let bases = await Base.find({stack: user_id})
 
         bases.map(async (base) => {
@@ -34,7 +34,7 @@ module.exports = (io, client) => {
 
     //console.log(users_online.entries())
     let keys = await client.keys('*')
-    console.log(keys)
+    //console.log(keys)
 
     socket.on('update_location', async (socket) => {
 
