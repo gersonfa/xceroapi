@@ -156,7 +156,7 @@ async function get_places(lat, lng) {
 }
 
 async function get_close_drivers(service, distance) {
-  const drivers = await client.hkeys('coords')
+  let drivers = await client.hkeys('coords')
   console.log(drivers)
   drivers = await Promise.all(drivers.filter(async driver => {
     let coords = await client.hget('coords', driver)
