@@ -100,7 +100,7 @@ module.exports = (io, client) => {
           
         setTimeout(async () => {
           let check_service = await Service.findById(service._id)
-          if (!check_service.driver && check_service.state != 'canceled' || check_service.state != 'negated') {
+          if (!check_service.driver && (check_service.state != 'canceled' || check_service.state != 'negated')) {
             check_service.state = 'negated'
             check_service = await check_service.save()
 
@@ -112,7 +112,8 @@ module.exports = (io, client) => {
 
         setTimeout(async () => {
           let check_service = await Service.findById(service._id)
-          if (!check_service.driver && check_service.state != 'canceled' || check_service.state != 'negated') {
+          if (!check_service.driver && (check_service.state != 'canceled' || check_service.state != 'negated')) {
+            console.log('holi')
             await assign_to_close_driver(service)
           }
         }, 15000)
