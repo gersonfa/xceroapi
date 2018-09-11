@@ -474,20 +474,18 @@ module.exports = (io, client) => {
 
     if (base) {
       let count_online = 0
-      let promises = base.stack.map(async driver => {
+      await Promise.all(base.stack.map(async driver => {
         let driver_socket = await client.hget('sockets', driver.toString())
         if (driver_socket) {
           console.log('servicio a base', driver, driver_socket)
           io.to(driver_socket).emit('new_service', service)
           count_online += 1
         }
-      })
+      }))
 
-      Promise.all(promises).then(async () => {
-        if (count_online == 0) {
-          await assign_to_close_driver(service)
-        }
-      })
+      if (count_online == 0) {
+        await assign_to_close_driver(service)
+      }
     }
   }
 
@@ -533,33 +531,30 @@ module.exports = (io, client) => {
     let close_drivers = await service_utils.get_close_drivers(service)
 
     let total_drivers = 0
-    let promises = close_drivers.map(async driver => {
+    await Promise.all(close_drivers.map(async driver => {
       const driver_socket = await client.hget('sockets', driver.id)
       if (driver_socket) {
         console.log('Servicio a cercano', driver, driver_socket)
         io.to(driver_socket).emit('new_service', service)
         total_drivers += 1
       }
-    })
+    }))
 
-    Promise.all(promises).then(async () => {
-        //No se envio a nadie, no hay conductores cerca
-      if (total_drivers == 0) {
-        console.log('no hubo conductores')
-        const user_socket = await client.hget('sockets', service.user.toString())
+    if (total_drivers == 0) {
+      console.log('no hubo conductores cercanos')
+      const user_socket = await client.hget('sockets', service.user.toString())
 
-        service.state = 'negated'
-        service = await service.save()
+      service.state = 'negated'
+      service = await service.save()
 
-        let user = await User.findById(service.user)
-        user.inService = false;
-        await user.save()
+      let user = await User.findById(service.user)
+      user.inService = false;
+      await user.save()
 
-        if (user_socket) {
-          io.to(user_socket).emit('service_rejected', service)
-        }
+      if (user_socket) {
+        io.to(user_socket).emit('service_rejected', service)
       }
-    })
+    }
   }
 
   async function service_by_driver (req, res, next) {
