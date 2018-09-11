@@ -97,7 +97,6 @@ module.exports = (io, client) => {
 
         if (result) {
           sendJSONresponse(res, 200, service)
-          io.to('drivers').emit('new_request')
             
           setTimeout(async () => {
             let check_service = await Service.findById(service._id)
@@ -313,6 +312,7 @@ module.exports = (io, client) => {
         io.to(user_socket).emit('service_end', service)
       }
 
+      io.to('drivers').emit('new_request')
       sendJSONresponse(res, 200, service)
 
       user.inService = false
