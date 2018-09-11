@@ -484,8 +484,8 @@ module.exports = (io, client) => {
         }
       }))
       
-      console.log('count', count_online)
-      if (count_online == 0) {
+      console.log('count', count_online === 0, count_online)
+      if (count_online === 0) {
         await assign_to_close_driver(service)
       }
     }
@@ -530,6 +530,7 @@ module.exports = (io, client) => {
   } */
 
   async function assign_to_close_driver (service) {
+    console.log('buscando cercanos')
     let close_drivers = await service_utils.get_close_drivers(service)
     let total_drivers = 0
 
@@ -542,7 +543,7 @@ module.exports = (io, client) => {
       }
     }))
 
-    if (total_drivers == 0) {
+    if (total_drivers === 0) {
       console.log('no hubo conductores cercanos')
       const user_socket = await client.hget('sockets', service.user.toString())
 
