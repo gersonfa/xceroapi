@@ -158,18 +158,11 @@ module.exports = (io, client) => {
         throw boom.badRequest('El servicio ya ha sido asignado.')
       }
 
-      service.driver = req.user._id
+      service.driver = user._id
       service.state = 'on_the_way'
 
       service = await service.save()
-      service.driver = {
-        _id: user._id,
-        full_name: user.full_name,
-        image: user.image,
-        rating: user.rating,
-        unit_number: user.unit_number
-      }
-      //await User.populate(service, {path: 'driver', select: 'full_name image rating unit_number'})
+      await User.populate(service, {path: 'driver', select: 'full_name image rating unit_number'})
 
       let passenger = service.user.toString()
       let passenger_socket = await client.hget('sockets', passenger)
@@ -552,6 +545,7 @@ module.exports = (io, client) => {
     Promise.all(promises).then(async () => {
         //No se envio a nadie, no hay conductores cerca
       if (total_drivers == 0) {
+        console.log('no hubo conductores')
         const user_socket = await client.hget('sockets', service.user.toString())
 
         service.state = 'negated'
