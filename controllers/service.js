@@ -96,6 +96,7 @@ module.exports = (io, client) => {
         sendJSONresponse(res, 200, service)
         io.to('drivers').emit('new_request')
 
+        service = await User.populate(service, {path: 'user', select: 'full_name'})
         await emit_new_service(service)
           
         setTimeout(async () => {
@@ -163,7 +164,7 @@ module.exports = (io, client) => {
       service.state = 'on_the_way'
 
       service = await service.save()
-      await User.populate(service, {path: 'driver', select: 'full_name image rating unit_number'})
+      service = await User.populate(service, {path: 'driver', select: 'full_name image rating unit_number'})
 
       let passenger = service.user.toString()
       let passenger_socket = await client.hget('sockets', passenger)
