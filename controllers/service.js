@@ -97,7 +97,7 @@ module.exports = (io, client) => {
         io.to('drivers').emit('new_request')
 
         service = await User.populate(service, {path: 'user', select: 'full_name'})
-        await emit_new_service(service)
+        emit_new_service(service)
           
         setTimeout(async () => {
           let check_service = await Service.findById(service._id)
