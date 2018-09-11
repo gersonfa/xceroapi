@@ -161,6 +161,7 @@ async function get_close_drivers(service, distance) {
   drivers = await Promise.all(drivers.filter(async driver => {
     let coords = await client.hget('coords', driver)
     coords = JSON.parse(coords)
+    console.log(coords)
     if (geolib.isPointInCircle(
       {latitude: coords[1], longitude: coords[0]},
       {latitude: service.origin_coords[1], longitude: service.origin_coords[0]},
@@ -170,7 +171,7 @@ async function get_close_drivers(service, distance) {
     }
   }))
 
-  console.log(drivers)
+  console.log('resultado', drivers)
   return drivers
 }
 
