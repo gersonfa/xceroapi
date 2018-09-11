@@ -492,7 +492,7 @@ module.exports = (io, client) => {
       
       console.log('count', count_online === 0, count_online)
       if (count_online === 0) {
-        await assign_to_close_driver(service)
+        return await assign_to_close_driver(service)
       } else {
         return true
       }
