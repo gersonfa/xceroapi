@@ -1,5 +1,4 @@
 const Tariff = require('../models/tariff')
-const Colony = require('../models/colony')
 const Place = require('../models/place')
 const User = require('../models/user')
 const Group = require('../models/group')
@@ -7,6 +6,9 @@ const Base = require('../models/base')
 const Area = require('../models/area')
 const fetch = require('node-fetch')
 const inside = require('point-in-polygon')
+const geolib = require('geolib')
+const redis = require('async-redis')
+const client = redis.createClient()
 
 function withinRadius(point, interest, kms) {
   let R = 6371;
@@ -154,23 +156,21 @@ async function get_places(lat, lng) {
 }
 
 async function get_close_drivers(service, distance) {
-  const drivers = await User.find({
-    coords: {
-      $nearSphere: {
-        $geometry: {
-          type: 'Point',
-          coordinates: service.origin_coords
-        },
-        // Distancia en metros 3km por defecto
-        $maxDistance: distance || 2000
-      }
-    },
-    role: 'Driver',
-    inService: false,
-    enable: true
+  const drivers = await client.hkeys('coords')
+  console.log(drivers)
+  drivers = drivers.filter(async driver => {
+    let coords = await client.hget('coords', driver)
+    coords = JSON.parse(coords)
+    if (geolib.isPointInCircle(
+      {latitude: coords[1], longitude: coords[0]},
+      {latitude: service.origin_coords[1], longitude: service.origin_coords[0]},
+      distance || 2000
+    )) {
+      return driver
+    }
   })
 
-  
+  console.log(drivers)
   return drivers
 }
 

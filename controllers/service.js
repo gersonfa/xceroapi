@@ -537,7 +537,7 @@ module.exports = (io, client) => {
     let total_drivers = 0
 
     await Promise.all(close_drivers.map(async driver => {
-      const driver_socket = await client.hget('sockets', driver.id)
+      const driver_socket = await client.hget('sockets', driver)
       if (driver_socket) {
         console.log('Servicio a cercano', driver, driver_socket)
         io.to(driver_socket).emit('new_service', service)
@@ -615,11 +615,11 @@ module.exports = (io, client) => {
       await driver.save()
   
       let near_drivers = await service_utils.get_close_drivers({ origin_coords: driver.coords})
-      near_drivers = near_drivers.filter(d => d._id != driver._id)
+      near_drivers = near_drivers.filter(d => d != driver._id)
 
       near_drivers.forEach(async d => {
-        if (d.id == driver.id) return
-        let d_socket = await client.hget('sockets', d._id.toString())
+        if (d == driver.id) return
+        let d_socket = await client.hget('sockets', d)
         let coords = await client.hget('coords', driver.id)
         io.to(d_socket).emit('emergency', {
           _id: driver._id,

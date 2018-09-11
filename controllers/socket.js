@@ -40,14 +40,16 @@ module.exports = (io, client) => {
       const coords = socket.coords
       const user_id = socket.user_id
 
-      let user = await User.findById(user_id)
-      if (user) {
+      client.hset('coords', user_id, JSON.stringify(coords))
 
-        client.hset('coords', user_id, JSON.stringify(coords))
+      let user = await User.findById(user_id)
+      /* if (user) {
+
+        
         
         user.coords = coords
         await user.save()
-      }
+      } */
 
       if (!user.inService && user.enable) {
         const point = {
