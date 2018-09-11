@@ -92,31 +92,34 @@ module.exports = (io, client) => {
       if (service.origin_colony || service.origin_place || service.origin_group) {
 
         service = await service.save()
-
-        sendJSONresponse(res, 200, service)
-        io.to('drivers').emit('new_request')
-
         service = await User.populate(service, {path: 'user', select: 'full_name'})
-        emit_new_service(service)
-          
-        setTimeout(async () => {
-          let check_service = await Service.findById(service._id)
-          if (!check_service.driver && (check_service.state != 'canceled' || check_service.state != 'negated')) {
-            check_service.state = 'negated'
-            check_service = await check_service.save()
+        let result = await emit_new_service(service)
 
-            let passenger = check_service.user.toString()
-            let passenger_socket = await client.hget('sockets', passenger)
-            io.to(passenger_socket).emit('service_rejected', check_service)
-          }
-        }, 40000)
+        if (result) {
+          sendJSONresponse(res, 200, service)
+          io.to('drivers').emit('new_request')
+            
+          setTimeout(async () => {
+            let check_service = await Service.findById(service._id)
+            if (!check_service.driver && (check_service.state != 'canceled' || check_service.state != 'negated')) {
+              check_service.state = 'negated'
+              check_service = await check_service.save()
 
-        setTimeout(async () => {
-          let check_service = await Service.findById(service._id)
-          if (!check_service.driver && (check_service.state != 'canceled' || check_service.state != 'negated')) {
-            await assign_to_close_driver(service)
-          }
-        }, 15000)
+              let passenger = check_service.user.toString()
+              let passenger_socket = await client.hget('sockets', passenger)
+              io.to(passenger_socket).emit('service_rejected', check_service)
+            }
+          }, 40000)
+
+          setTimeout(async () => {
+            let check_service = await Service.findById(service._id)
+            if (!check_service.driver && (check_service.state != 'canceled' || check_service.state != 'negated')) {
+              assign_to_close_driver(service)
+            }
+          }, 15000)
+        } else {
+          sendJSONresponse(res, 402, {error: 'No hay conductores cercanos'})
+        }
 
       } else {
         sendJSONresponse(res, 402, {eror: 'No hay servicios disponibles desde la ubicación establecida.'})
@@ -490,6 +493,8 @@ module.exports = (io, client) => {
       console.log('count', count_online === 0, count_online)
       if (count_online === 0) {
         await assign_to_close_driver(service)
+      } else {
+        return true
       }
     }
   }
@@ -560,6 +565,10 @@ module.exports = (io, client) => {
       if (user_socket) {
         io.to(user_socket).emit('service_rejected', service)
       }
+
+      return false
+    } else {
+      return true
     }
   }
 
