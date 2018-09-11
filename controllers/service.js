@@ -330,8 +330,10 @@ module.exports = (io, client) => {
       const service_id = req.params.service_id
 
       let service = await Service.findById(service_id).populate('origin_colony')
-
-      if (service.state == 'completed' || service.state == 'negated') throw boom.badRequest('No se puede cancelar un servicio que ya fue completado o negado.')
+      console.log(service)
+      if (service.state === 'completed' || service.state === 'negated') {
+        throw boom.badRequest('No se puede cancelar un servicio que ya fue completado o negado.')
+      }
 
       user.inService = false
       await user.save()
