@@ -471,18 +471,20 @@ module.exports = (io, client) => {
 
   async function emit_new_service(service) {
     let base = await service_utils.get_base(service)
+    let count_online = 0
 
     if (base) {
-      let count_online = 0
       await Promise.all(base.stack.map(async driver => {
         let driver_socket = await client.hget('sockets', driver.toString())
         if (driver_socket) {
           console.log('servicio a base', driver, driver_socket)
           io.to(driver_socket).emit('new_service', service)
+          console.log('count_online', count_online)
           count_online += 1
         }
       }))
-
+      
+      console.log('count', count_online)
       if (count_online == 0) {
         await assign_to_close_driver(service)
       }
@@ -529,8 +531,8 @@ module.exports = (io, client) => {
 
   async function assign_to_close_driver (service) {
     let close_drivers = await service_utils.get_close_drivers(service)
-
     let total_drivers = 0
+
     await Promise.all(close_drivers.map(async driver => {
       const driver_socket = await client.hget('sockets', driver.id)
       if (driver_socket) {
