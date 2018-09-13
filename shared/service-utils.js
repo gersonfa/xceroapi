@@ -165,7 +165,6 @@ async function get_close_drivers(service, distance) {
       {latitude: service.origin_coords[1], longitude: service.origin_coords[0]},
       2000
     )
-    console.log(inside)
     if (inside) {
       close_drivers.push(driver)
     }
