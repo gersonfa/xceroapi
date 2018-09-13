@@ -546,6 +546,7 @@ module.exports = (io, client) => {
     let close_drivers = await service_utils.get_close_drivers(service)
     console.log(close_drivers)
     close_drivers = await User.find({_id: {$in: close_drivers}, enable: true, inService: false}).distinct('_id')
+    close_drivers = close_drivers.map(d => d.toString())
     console.log(close_drivers)
     let total_drivers = 0
 
@@ -633,7 +634,8 @@ module.exports = (io, client) => {
   
       let near_drivers = await service_utils.get_close_drivers({ origin_coords: driver.coords}, 40000)
       near_drivers = await User.find({_id: {$in: near_drivers}, enable: true, inService: false}).distinct('_id')
-      near_drivers = near_drivers.filter(d => d != driver._id)
+      near_drivers = near_drivers.map(d => d.toString())
+      near_drivers = near_drivers.filter(d => d != driver.id)
 
       near_drivers.forEach(async d => {
         if (d == driver.id) return

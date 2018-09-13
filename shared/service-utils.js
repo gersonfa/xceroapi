@@ -174,7 +174,6 @@ async function get_close_drivers(service, distance = 2000) {
   }))
 
   console.log('termino')
-  close_drivers = close_drivers.map(d => d.toString())
   return close_drivers
   
 }
