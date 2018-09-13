@@ -118,7 +118,7 @@ async function user_status (req, res, next) {
       user = await user.save()
     }
 
-    sendJSONresponse(res, 200, {inService: user.inService, service, base, emergency: user.emergency, enable: user.enable})
+    sendJSONresponse(res, 200, {inService: user.inService, service, base, emergency: user.emergency})
   } catch(e) {
     return next(e)
   }
