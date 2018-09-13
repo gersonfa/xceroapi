@@ -6,6 +6,7 @@ const Place = require('../models/place')
 const Group = require('../models/group')
 const Colony = require('../models/colony')
 const Tariff = require('../models/tariff')
+const Area = require('../models/area')
 const boom = require('boom')
 
 async function base_create(req, res, next) {
@@ -50,6 +51,7 @@ async function base_delete(req, res, next) {
 		let places_ids = await Place.find({base: base_id}).distinct('_id')
 		let groups_ids = await Group.find({base: base_id}).distinct('_id')
 		let colonies_ids = await Colony.deleteMany({group: {$in: groups_ids}}).distinct('_id')
+		let areas_ids = await Area.deleteMany({group: {$in: groups_ids}})
 
 		let tariffs = await Tariff.deleteMany({$or: [
 			{origin_place: {$in: places_ids}}, 
