@@ -43,7 +43,6 @@ const jwtOptions = {
 const jwtLogin = new JwtStrategy(jwtOptions, async (payload, done) => {
   try {
     let user = await User.findById(payload._id)
-    console.log(payload._id, user.id)
     if (!user) throw boom.notFound('user unauthorized')
     done(null, user)
 
