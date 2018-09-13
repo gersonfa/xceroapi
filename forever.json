@@ -1,0 +1,18 @@
+[
+    {
+      "uid": "app1",
+      "append": true,
+      "watch": true,
+      "script": "app.js",
+      "sourceDir": "/home/xcero-api",
+      "args": ["--port", "3019"]
+    },
+    {
+      "uid": "app2",
+      "append": true,
+      "watch": true,
+      "script": "app.js",
+      "sourceDir": "/home/xcero-api",
+      "args": ["--port", "3018"]
+    }
+  ]

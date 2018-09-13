@@ -4,7 +4,9 @@ const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
 const logger = require('morgan')
 const helmet = require('helmet')
-const port = process.env.PORT || 3019
+
+const parseArgs = require('minimist') (process.argv.slice(2))
+const port = parseArgs.port || 3019
 
 const passport = require('passport')
 const chalk = require('chalk')
