@@ -14,6 +14,8 @@ const cors = require('cors')
 
 const server = http.createServer(app)
 const io = require('socket.io')(server)
+const redis = require('socket.io-redis');
+io.adapter(redis({ host: 'localhost', port: 6379 }));
 
 app.use(bodyParser.json({ limit: '4mb' }))
 app.use(bodyParser.urlencoded({ extended: false, limit: '4mb' }))

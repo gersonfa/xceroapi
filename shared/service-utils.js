@@ -37,12 +37,12 @@ async function inside_polygon (point) {
   let area = areas_map.find(a => {
     return inside(point, a.polygon)
   })
+  
 
   return area || null
 }
 
 async function set_tariff (service) {
-  console.log(service)
   let op_group = service.origin_place ? service.origin_place.group : null
   let oc_group = service.origin_colony ? service.origin_colony.group : null
 
@@ -60,7 +60,6 @@ async function set_tariff (service) {
   })
 
   service.tariff = tariff
-  console.log(service)
   return service
 
     /* if (service.origin_colony) {

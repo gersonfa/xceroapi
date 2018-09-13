@@ -247,7 +247,11 @@ module.exports = (io, client) => {
         if (colony) {
            sendJSONresponse(res, 200, {colony: colony, group: group_id})
         } else {
-          sendJSONresponse(res, 200, 'colony or place not found')
+          if (group_id) {
+            sendJSONresponse(res, 200, {group: group_id})
+          } else {
+            sendJSONresponse(res, 200, 'colony or place not found')
+          }
         }
              
       }
