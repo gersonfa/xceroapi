@@ -15,10 +15,13 @@ const localOptions = {
 // Setting up local login Strategy
 const localLogin = new LocalStrategy(
   localOptions, async (account, password, done) => {
+    console.log(account)
       let user = await User.findOne({ account })
+      console.log(user)
       if (user) {
         user.comparePassword(password, (err, isMatch) => {
           if (err || !isMatch || !user.enable) {
+            console.log('err', err)
             done(null, false)
           } else {
             return done(null, user);
