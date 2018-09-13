@@ -544,7 +544,7 @@ module.exports = (io, client) => {
   async function assign_to_close_driver (service) {
     console.log('buscando cercanos')
     let close_drivers = await service_utils.get_close_drivers(service)
-    let close_drivers = await User.find({_id: {$in: close_drivers}, enable: true, inService: false}).distinct('_id')
+    close_drivers = await User.find({_id: {$in: close_drivers}, enable: true, inService: false}).distinct('_id')
     let total_drivers = 0
 
     await Promise.all(close_drivers.map(async driver => {
