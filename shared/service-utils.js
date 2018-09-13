@@ -156,6 +156,7 @@ async function get_places(lat, lng) {
 
 async function get_close_drivers(service, distance = 2000) {
   let drivers = await client.hkeys('coords')
+  console.log('distance', distance)
   let close_drivers = []
   await Promise.all(drivers.filter(async driver => {
     let coords = await client.hget('coords', driver)
@@ -165,6 +166,7 @@ async function get_close_drivers(service, distance = 2000) {
       {latitude: service.origin_coords[1], longitude: service.origin_coords[0]},
       distance
     )
+    console.log(inside)
     if (inside) {
       close_drivers.push(driver)
     }
