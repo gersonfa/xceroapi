@@ -204,6 +204,7 @@ module.exports = (io, client) => {
       }
 
       let coords = await client.hget('coords', driver.id)
+      coords = JSON.parse(coords)
 
       if (service_utils.withinRadius({longitude: service.origin_coords[0], latitude: service.origin_coords[1]}, {longitude: coords[0], latitude: coords[1]}, 0.2)) {
         service.state = 'in_process'
