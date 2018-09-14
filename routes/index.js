@@ -232,6 +232,7 @@ module.exports = (app, io) => {
    */
   api_routes.post('/service', require_auth, service_controller.service_create)
   api_routes.post('/get_area', service_controller.get_area)
+  api_routes.get('/global_service', require_auth, service_controller.service_global)
   /**
    * @api {get} /api/service Service list
    * @apiName Service list

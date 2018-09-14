@@ -738,6 +738,49 @@ module.exports = (io, client) => {
     }
   }
 
+  async function service_global (req, res, next) {
+    try {
+      const init_date = req.query.init_date
+      const end_date = req.query.end_date
+      const unit_numbers = JSON.parse(req.query.unit_numbers)
+      let response = []
+      console.log(unit_numbers)
+    
+      let services = await Service.find({state: 'completed', end_time: {$gt: init_date, $lt: end_date}})
+        .populate({path: 'user', select: 'full_name'})
+        .populate({path: 'driver', select: 'unit_number'})
+        .populate({path: 'tariff', select: 'cost'})
+
+      services = services.filter(s => s.driver && s.driver.unit_number)
+
+      if (unit_numbers.length > 0) {
+        unit_numbers.map(unit => {
+          let r = {
+            unit_number: unit,
+            services: services.filter(s => s.driver.unit_number == unit)
+          }
+          response.push(r)
+        })
+      } else {
+        services.map(s => {
+          let index = response.findIndex(r => r.unit_number = s.driver.unit_number)
+          console.log(index)
+          if (index >= 0) {
+            response[index].services.push(s)
+          } else {
+            response.push({unit_number: s.driver.unit_number, services: [s]})
+          }
+        })
+      }
+     
+
+      sendJSONresponse(res, 200, response)
+
+    } catch(e) {
+      return next(e)
+    }
+  }
+
 
   return {
     service_create,
@@ -755,6 +798,7 @@ module.exports = (io, client) => {
     add_fee,
     remove_fee,
     add_price,
-    get_area
+    get_area,
+    service_global
   }
 }
