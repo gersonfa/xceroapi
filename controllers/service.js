@@ -763,8 +763,7 @@ module.exports = (io, client) => {
         })
       } else {
         services.map(s => {
-          let index = response.findIndex(r => r.unit_number = s.driver.unit_number)
-          console.log(index)
+          let index = response.findIndex(r => r.unit_number == s.driver.unit_number)
           if (index >= 0) {
             response[index].services.push(s)
           } else {
