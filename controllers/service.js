@@ -305,9 +305,6 @@ module.exports = (io, client) => {
               // No se encontro ni place ni colony
             }
         }
-
-        service = await Colony.populate(service, 'origin_colony destiny_colony')
-        service = await Place.populate(service, 'origin_place destiny_place')
       }
       
       service = await service_utils.set_tariff(service)

@@ -1,5 +1,6 @@
 const Tariff = require('../models/tariff')
 const Place = require('../models/place')
+const Colony = require('../models/colony')
 const User = require('../models/user')
 const Group = require('../models/group')
 const Base = require('../models/base')
@@ -43,6 +44,12 @@ async function inside_polygon (point) {
 }
 
 async function set_tariff (service) {
+
+  if (service.origin_colony || service.origin_place || service.destiny_colony || service.destiny_place) {
+    service = await Colony.populate(service, 'origin_colony destiny_colony')
+    service = await Place.populate(service, 'origin_place destiny_place')
+  }
+
   let op_group = service.origin_place ? service.origin_place.group : null
   let oc_group = service.origin_colony ? service.origin_colony.group : null
 
