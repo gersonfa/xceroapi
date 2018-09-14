@@ -740,11 +740,10 @@ module.exports = (io, client) => {
 
   async function service_global (req, res, next) {
     try {
-      const init_date = req.query.init_date
-      const end_date = req.query.end_date
+      const init_date = Number(req.query.init_date)
+      const end_date = Number(req.query.end_date)
       const unit_numbers = JSON.parse(req.query.unit_numbers)
       let response = []
-      console.log(unit_numbers)
     
       let services = await Service.find({state: 'completed', end_time: {$gt: init_date, $lt: end_date}})
         .populate({path: 'user', select: 'full_name'})
