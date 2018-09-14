@@ -203,7 +203,9 @@ module.exports = (io, client) => {
         throw boom.badRequest('service is canceled')
       }
 
-      if (service_utils.withinRadius({longitude: service.origin_coords[0], latitude: service.origin_coords[1]}, {longitude: driver.coords[0], latitude: driver.coords[1]}, 0.2)) {
+      let coords = await client.hget('coords', driver.id)
+
+      if (service_utils.withinRadius({longitude: service.origin_coords[0], latitude: service.origin_coords[1]}, {longitude: coords[0], latitude: coords[1]}, 0.2)) {
         service.state = 'in_process'
         service.start_time = start_time
         await service.save()
