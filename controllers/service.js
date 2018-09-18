@@ -337,7 +337,6 @@ module.exports = (io, client) => {
       const service_id = req.params.service_id
 
       let service = await Service.findById(service_id).populate('origin_colony')
-      console.log(service)
       if (service.state === 'completed' || service.state === 'negated') {
         throw boom.badRequest('No se puede cancelar un servicio que ya fue completado o negado.')
       }
@@ -487,14 +486,11 @@ module.exports = (io, client) => {
       await Promise.all(base.stack.map(async driver => {
         let driver_socket = await client.hget('sockets', driver.toString())
         if (driver_socket) {
-          console.log('servicio a base', driver, driver_socket)
           io.to(driver_socket).emit('new_service', service)
-          console.log('count_online', count_online)
           count_online += 1
         }
       }))
       
-      console.log('count', count_online === 0, count_online)
       if (count_online === 0) {
         return await assign_to_close_driver(service)
       } else {
@@ -542,25 +538,20 @@ module.exports = (io, client) => {
   } */
 
   async function assign_to_close_driver (service) {
-    console.log('buscando cercanos')
     let close_drivers = await service_utils.get_close_drivers(service)
-    console.log(close_drivers)
     close_drivers = await User.find({_id: {$in: close_drivers}, enable: true, inService: false}).distinct('_id')
     close_drivers = close_drivers.map(d => d.toString())
-    console.log(close_drivers)
     let total_drivers = 0
 
     await Promise.all(close_drivers.map(async driver => {
       const driver_socket = await client.hget('sockets', driver)
       if (driver_socket) {
-        console.log('Servicio a cercano', driver, driver_socket)
         io.to(driver_socket).emit('new_service', service)
         total_drivers += 1
       }
     }))
 
     if (total_drivers === 0) {
-      console.log('no hubo conductores cercanos')
       const user_socket = await client.hget('sockets', service.user.toString())
 
       service.state = 'negated'
@@ -743,9 +734,10 @@ module.exports = (io, client) => {
       const init_date = Number(req.query.init_date)
       const end_date = Number(req.query.end_date)
       const unit_numbers = JSON.parse(req.query.unit_numbers)
+      const state = req.query.state || 'completed'
       let response = []
     
-      let services = await Service.find({state: 'completed', end_time: {$gt: init_date, $lt: end_date}})
+      let services = await Service.find({state: state, end_time: {$gt: init_date, $lt: end_date}})
         .populate({path: 'user', select: 'full_name'})
         .populate({path: 'driver', select: 'unit_number'})
         .populate({path: 'tariff', select: 'cost'})
