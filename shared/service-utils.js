@@ -129,12 +129,12 @@ async function set_tariff (service) {
 async function get_colonies(lat, lng) {
   try {
     let place_ids = []
-    while (place_ids.length == 0) {
-      const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=AIzaSyAogodmHuA-P4Ais69knDP1HBlLOWCrCdg`)
-      const json = await response.json()
-      place_ids = json.results.map(p => p.place_id)
-    }
+    
+    const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=AIzaSyAogodmHuA-P4Ais69knDP1HBlLOWCrCdg`)
 
+    const json = await response.json()
+    place_ids = json.results.map(p => p.place_id)
+    
     return place_ids
   } catch (e) {
     return e

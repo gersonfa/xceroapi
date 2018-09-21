@@ -736,6 +736,8 @@ module.exports = (io, client) => {
       const unit_numbers = JSON.parse(req.query.unit_numbers)
       const state = req.query.state || 'completed'
       let response = []
+
+      console.log(state)
     
       let services = await Service.find({state: state, end_time: {$gt: init_date, $lt: end_date}})
         .populate({path: 'user', select: 'full_name'})
