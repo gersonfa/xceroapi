@@ -130,10 +130,10 @@ async function get_colonies(lat, lng) {
   try {
     let place_ids = []
     
-    const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=AIzaSyAogodmHuA-P4Ais69knDP1HBlLOWCrCdg`)
+    /* const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=AIzaSyAogodmHuA-P4Ais69knDP1HBlLOWCrCdg`)
 
     const json = await response.json()
-    place_ids = json.results.map(p => p.place_id)
+    place_ids = json.results.map(p => p.place_id) */
     
     return place_ids
   } catch (e) {
@@ -163,7 +163,6 @@ async function get_places(lat, lng) {
 
 async function get_close_drivers(service, distance = 2000) {
   let drivers = await client.hkeys('coords')
-  console.log('distance', distance)
   let close_drivers = []
   
   await Promise.all(drivers.map(async driver => {
@@ -174,13 +173,11 @@ async function get_close_drivers(service, distance = 2000) {
       {latitude: service.origin_coords[1], longitude: service.origin_coords[0]},
       distance
     )
-    console.log(inside)
     if (inside) {
       close_drivers.push(driver)
     }
   }))
 
-  console.log('termino')
   return close_drivers
   
 }
