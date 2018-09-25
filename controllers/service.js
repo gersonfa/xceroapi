@@ -206,7 +206,7 @@ module.exports = (io, client) => {
       let coords = await client.hget('coords', driver.id)
       coords = JSON.parse(coords)
 
-      if (service_utils.withinRadius({longitude: service.origin_coords[0], latitude: service.origin_coords[1]}, {longitude: coords[0], latitude: coords[1]}, 0.2)) {
+      if (service_utils.withinRadius({longitude: service.origin_coords[0], latitude: service.origin_coords[1]}, {longitude: coords[0], latitude: coords[1]}, 0.3)) {
         service.state = 'in_process'
         service.start_time = start_time
         await service.save()
@@ -415,69 +415,6 @@ module.exports = (io, client) => {
     }
   }
 
-  /* async function emit_new_service (service, driver_reject) {
-
-    if (service.state === 'canceled' || service.state === 'negated' || service.driver) return false
-
-    let base = await service_utils.get_base(service)
-
-    if (base) {
-      service = await User.populate(service, {path: 'user', select: 'full_name image'})
-      
-      // Servicio cancelado por conductor
-      if (service.driver) {
-        const result = await assign_to_close_driver(service, service.driver)
-        return result
-      //  Servicio rechazado en cola o en algun otro lugar
-      } else if (driver_reject) {
-        //  Verificar si el rechazo vino de base
-        if (base.stack.map(d => d.toString).includes(driver_reject.toString)) {
-
-          const reject_position = base.stack.indexOf(driver_reject) + 1
-          let drivers_in_base = base.stack.slice(reject_position)
-
-          if (base.stack.length != 0 && drivers_in_base.length > 0) {
-
-            const driver_online = drivers_in_base.find(async d => await client.get(d.toString()))
-            
-            if (driver_online) {
-              console.log('vino de base', driver_online.full_name)
-              let socket_driver = await client.hget('sockets', driver_online.toString())
-              io.to(socket_driver).emit('new_service', service)
-              return true
-            }
-          } else {
-            await assign_to_close_driver(service, driver_reject)
-          }
-        } else {
-          await assign_to_close_driver(service, driver_reject)
-        }
-
-      //  Servicio nuevo
-      } else {
-        if (base.stack.length > 0) {
-          const driver_online = base.stack.find(async d => await client.hget('sockets', d.toString()))
-
-          if (driver_online) {
-            console.log('servicio nuevo', driver_online.full_name)
-            let socket_driver = await client.hget('sockets', driver_online.toString())
-            //console.log('driver_socket', socket_driver)
-            io.to(socket_driver).emit('new_service', service)
-            return true
-          } else {
-            const result = await assign_to_close_driver(service)
-            return result
-          }
-        } else {
-          const result = await assign_to_close_driver(service)
-          return result
-        }
-      }
-    } else {
-      return false
-    }
-  } */
-
   async function emit_new_service(service) {
     let base = await service_utils.get_base(service)
     let count_online = 0
@@ -498,44 +435,6 @@ module.exports = (io, client) => {
       }
     }
   }
-
-  /* async function assign_to_close_driver (service, user_id) {
-    let drivers = await service_utils.get_close_drivers(service)
-
-    if (user_id) {
-      drivers = drivers.filter(d => d._id.toString() != user_id.toString())
-    }
-
-    if (drivers.length > 0) {
-
-      const driver_online = drivers.find(async d => await client.hget('sockets', d.id))
-
-      if (driver_online) {
-        console.log('servicio a cercano', driver_online.full_name)
-        const driver_socket = await client.hget('sockets', driver_online.id)
-        service = await User.populate(service, {path: 'user', select: 'full_name image'})
-        //console.log('driver_socket', driver_socket)
-        io.to(driver_socket).emit('new_service', service)
-        return true
-      } else {
-        return false
-      }
-    } else {
-      // Avisar que no hay conductores
-      const user_socket = await client.hget('sockets', service.user.toString())
-
-      service.state = 'negated'
-      service = await service.save()
-
-      let user = await User.findById(service.user)
-      user.inService = false;
-      await user.save()
-
-      if (user_socket) {
-        io.to(user_socket).emit('service_rejected', service)
-      }
-    }
-  } */
 
   async function assign_to_close_driver (service) {
     let close_drivers = await service_utils.get_close_drivers(service)
@@ -749,11 +648,8 @@ module.exports = (io, client) => {
         .populate({path: 'driver', select: 'unit_number'})
         .populate({path: 'tariff', select: 'cost'})
       }
-    
-      
 
       services = services.filter(s => s.driver && s.driver.unit_number)
-      console.log(services)
 
       if (unit_numbers.length > 0) {
         unit_numbers.map(unit => {
@@ -768,10 +664,8 @@ module.exports = (io, client) => {
           let index = response.findIndex(r => r.unit_number == s.driver.unit_number)
           if (index >= 0) {
             response[index].services.push(s)
-            console.log(response)
           } else {
             response.push({unit_number: s.driver.unit_number, services: [s]})
-            console.log(response)
           }
         })
       }

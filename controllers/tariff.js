@@ -18,10 +18,6 @@ async function tariff_create(req, res, next) {
 			{path: 'origin_group', populate: {path: 'base', select: 'name'}},
 			{path: 'destiny_group', populate: {path: 'base', select: 'name'}}
 		])
-		tariff = await Place.populate(tariff, [
-			{path: 'origin_place', populate: {path: 'base', select: 'name'}},
-			{path: 'destiny_place', populate: {path: 'base', select: 'name'}}
-		])
 
 		sendJSONresponse(res, 200, tariff)
 	} catch(e) {
@@ -40,15 +36,6 @@ async function tariff_list(req, res, next) {
 		let tariffs = []
 
 		if (base_id && (group_id || place_id)) {
-			/* let groups_ids = await Group.find({base: base_id}).distinct('_id')
-			let places_ids = await Place.find({base: base_id}).distinct('_id') */
-
-			/* query.$or = [
-				{origin_place: {$in: places_ids}}, 
-				{destiny_place: {$in: places_ids}},
-				{origin_group: {$in: groups_ids}},
-				{destiny_group: {$in: groups_ids}}
-			] */
 
 			if (group_id) {
 				query.$or = [
@@ -187,10 +174,6 @@ async function tariff_update (req, res, next) {
 			{path: 'origin_group', populate: {path: 'base', select: 'name'}},
 			{path: 'destiny_group', populate: {path: 'base', select: 'name'}}
 		])
-		tariff = await Place.populate(tariff, [
-			{path: 'origin_place', populate: {path: 'base', select: 'name'}},
-			{path: 'destiny_place', populate: {path: 'base', select: 'name'}}
-		])
 
 		sendJSONresponse(res, 200, tariff)
 	} catch (e) {
@@ -221,8 +204,6 @@ async function tariff_update_all (req, res, next) {
 		tariffs = await Tariff.find().populate([
 			{path: 'origin_group', populate: {path: 'base', select: 'name'}},
 			{path: 'destiny_group', populate: {path: 'base', select: 'name'}},
-			{path: 'origin_place', populate: {path: 'base', select: 'name'}},
-			{path: 'destiny_place', populate: {path: 'base', select: 'name'}}
 		])
 
 		sendJSONresponse(res, 200, tariffs)
@@ -238,11 +219,7 @@ async function tariff_by_groups (req, res, next) {
 
 		let tariff = await Tariff.findOne({$or: [
 			{origin_group: group1_id, destiny_group: group2_id},
-			{origin_group:group2_id, destiny_group: group1_id},
-			{origin_group: group1_id, destiny_place: group2_id},
-			{origin_group: group2_id, destiny_place: group1_id},
-			{origin_place: group1_id, destiny_place: group2_id},
-			{origin_place: group2_id, destiny_place: group1_id}
+			{origin_group:group2_id, destiny_group: group1_id}
 		]})
 
 		sendJSONresponse(res, 200, tariff)
@@ -258,9 +235,7 @@ async function tariff_details (req, res, next) {
 		let tariff = await Tariff.findById(tariff_id)
 		.populate([
 			{path: 'origin_group', populate: {path: 'base', select: 'name'}},
-			{path: 'destiny_group', populate: {path: 'base', select: 'name'}},
-			{path: 'origin_place', populate: {path: 'base', select: 'name'}},
-			{path: 'destiny_place', populate: {path: 'base', select: 'name'}}
+			{path: 'destiny_group', populate: {path: 'base', select: 'name'}}
 		])
 
 		sendJSONresponse(res, 200, tariff)

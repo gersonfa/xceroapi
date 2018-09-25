@@ -3,7 +3,6 @@
 const sendJSONresponse = require('../shared/common').sendJSONresponse
 const Group = require('../models/group')
 const Tariff = require('../models/tariff')
-const Place = require('../models/place')
 const Colony = require('../models/colony')
 const mongoose = require('mongoose')
 
@@ -47,7 +46,6 @@ async function group_by_base(req, res, next) {
 async function gp_list() {
 	
 		let groups = await Group.find().populate('base')
-		let places = await Place.find().populate('base')
 
 		let group_places = []
 
@@ -62,19 +60,6 @@ async function gp_list() {
 			}
 
 			group_places.push(group)
-		})
-
-		places.forEach(p => {
-			if (!p.base) return
-			
-			let place = {
-				_id: p._id,
-				name: p.name,
-				base: p.base.name,
-				type: 'place'
-			}
-
-			group_places.push(place)
 		})
 
 		return group_places
@@ -95,7 +80,6 @@ async function group_place_list(req, res, next) {
 async function group_place_available(req, res, next) {
 	try {
 		const group_id = req.query.group_id
-		const place_id = req.query.place_id
 
 		let groups_places = await gp_list()
 		let tariffs = await Tariff.find()
@@ -128,18 +112,7 @@ async function group_place_available(req, res, next) {
 					return gp
 				}
 			})
-		} else if (place_id) {
-			groups_places = groups_places.filter( gp => gp._id.toString() != place_id)
-			groups_places = groups_places.filter(gp => {
-				let tariff = tariffs.find(t => (
-					((t.origin_place && t.origin_place.toString() == place_id) && ((t.destiny_group && t.destiny_group.toString() == gp._id.toString()) || (t.destiny_place && t.destiny_place.toString() == gp._id.toString()))) ||
-					((t.destiny_place && t.destiny_place.toString() == place_id) && ((t.origin_group && t.origin_group.toString() == gp._id.toString()) || (t.origin_place && t.origin_place.toString() == gp._id.toString()))))
-				)
-				if (!tariff) {
-					return gp
-				}
-			})
-		}
+		} 
 
 		sendJSONresponse(res, 200, groups_places)
 	} catch(e) {
