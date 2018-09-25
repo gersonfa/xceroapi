@@ -739,12 +739,10 @@ module.exports = (io, client) => {
 
       console.log(state)
     
-      let services = await Service.find({state: state, end_time: {$gt: init_date, $lt: end_date}})
+      let services = await Service.find({state: state, driver: { $ne: null }, end_time: {$gt: init_date, $lt: end_date}})
         .populate({path: 'user', select: 'full_name'})
         .populate({path: 'driver', select: 'unit_number'})
         .populate({path: 'tariff', select: 'cost'})
-
-      services = services.filter(s => s.driver && s.driver.unit_number)
 
       if (unit_numbers.length > 0) {
         unit_numbers.map(unit => {
