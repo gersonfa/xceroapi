@@ -736,13 +736,24 @@ module.exports = (io, client) => {
       const unit_numbers = JSON.parse(req.query.unit_numbers)
       const state = req.query.state || 'completed'
       let response = []
+      let services = []
 
-      console.log(state)
-    
-      let services = await Service.find({state: state, driver: { $ne: null }, end_time: {$gt: init_date, $lt: end_date}})
+      if (state === 'completed') {
+        services = await Service.find({state: state, driver: { $ne: null }, end_time: {$gt: init_date, $lt: end_date}})
         .populate({path: 'user', select: 'full_name'})
         .populate({path: 'driver', select: 'unit_number'})
         .populate({path: 'tariff', select: 'cost'})
+      } else {
+        services = await Service.find({state: state, driver: { $ne: null }})
+        .populate({path: 'user', select: 'full_name'})
+        .populate({path: 'driver', select: 'unit_number'})
+        .populate({path: 'tariff', select: 'cost'})
+      }
+    
+      
+
+      services = services.filter(s => s.driver && s.driver.unit_number)
+      console.log(services)
 
       if (unit_numbers.length > 0) {
         unit_numbers.map(unit => {
@@ -757,8 +768,10 @@ module.exports = (io, client) => {
           let index = response.findIndex(r => r.unit_number == s.driver.unit_number)
           if (index >= 0) {
             response[index].services.push(s)
+            console.log(response)
           } else {
             response.push({unit_number: s.driver.unit_number, services: [s]})
+            console.log(response)
           }
         })
       }
