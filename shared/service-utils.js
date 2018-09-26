@@ -161,7 +161,7 @@ async function get_places(lat, lng) {
   }
 }
 
-async function get_close_drivers(service, distance = 2000) {
+async function get_close_drivers(service, distance = 1400) {
   let drivers = await client.hkeys('coords')
   let close_drivers = []
   
