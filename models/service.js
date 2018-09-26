@@ -31,6 +31,10 @@ const serviceSchema = new Schema({
   start_time: { type: Number },
   end_time: { type: Number },
 
+  request_time: { type: Number },
+  negated_time: { type: Number },
+  canceled_time: { type: Number },
+
   fees: [feeSchema],
   price: { type: Number }, // Precio que asigna el conductor si no se encuentra tarifa
   details: { type: String }, // Dirección origen

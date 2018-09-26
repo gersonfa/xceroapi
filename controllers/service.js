@@ -89,8 +89,11 @@ module.exports = (io, client) => {
           service = await Place.populate(service, 'origin_place destiny_place')
       }
 
-      if (service.origin_colony || service.origin_place || service.origin_group) {
+      if (service.origin_colony || service.origin_group) {
 
+        let date = new Date()
+        let date_fix = new Date(date.setHours(date.getHours() - 5))
+        service.request_time = date_fix.getTime()
         service = await service.save()
         service = await User.populate(service, {path: 'user', select: 'full_name'})
         let result = await emit_new_service(service)
@@ -345,6 +348,9 @@ module.exports = (io, client) => {
       await user.save()
 
       service.state = 'canceled'
+      let date = new Date()
+      let date_fix = new Date(date.setHours(date.getHours() - 5))
+      service.canceled_time = date_fix.getTime()
       service = await service.save()
 
       sendJSONresponse(res, 200, service)
@@ -393,6 +399,9 @@ module.exports = (io, client) => {
       let service = await Service.findById(service_id)
       service.state = 'negated'
       service.reason_negated = reason_negated
+      let date = new Date()
+      let date_fix = new Date(date.setHours(date.getHours() - 5))
+      service.negated_time = date_fix.getTime()
       service = await service.save()
 
       let user_socket = await client.hget('sockets', service.user.toString())
