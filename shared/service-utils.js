@@ -1,11 +1,8 @@
 const Tariff = require('../models/tariff')
-const Place = require('../models/place')
-const Colony = require('../models/colony')
 const User = require('../models/user')
 const Group = require('../models/group')
 const Base = require('../models/base')
 const Area = require('../models/area')
-const fetch = require('node-fetch')
 const inside = require('point-in-polygon')
 const geolib = require('geolib')
 const redis = require('async-redis')
@@ -45,19 +42,8 @@ async function inside_polygon (point) {
 
 async function set_tariff (service) {
 
-  if (service.origin_colony || service.origin_place || service.destiny_colony || service.destiny_place) {
-    service = await Colony.populate(service, 'origin_colony destiny_colony')
-    service = await Place.populate(service, 'origin_place destiny_place')
-  }
-
-  let op_group = service.origin_place ? service.origin_place.group : null
-  let oc_group = service.origin_colony ? service.origin_colony.group : null
-
-  let dp_group = service.destiny_place ? service.destiny_place.group : null
-  let dc_group = service.destiny_colony ? service.destiny_colony.group: null
-
-  let origin_group = service.origin_group || op_group || oc_group
-  let destiny_group = service.destiny_group || dp_group || dc_group
+  let origin_group = service.origin_group 
+  let destiny_group = service.destiny_group 
 
   let tariff = await Tariff.findOne({
     $or: [
@@ -65,65 +51,8 @@ async function set_tariff (service) {
       {origin_group: destiny_group, destiny_group: origin_group}
     ]
   })
-
   service.tariff = tariff
   return service
-
-    /* if (service.origin_colony) {
-      if (service.destiny_colony) {
-        let tariff = await Tariff.findOne({
-          $or: [
-            {origin_group: service.origin_colony.group, destiny_group: service.destiny_colony.group},
-            {origin_group: service.destiny_colony.group, destiny_group: service.origin_colony.group}
-          ]
-        })
-        service.tariff = tariff
-        return service
-      } else {
-        let tariff = await Tariff.findOne({origin_group: service.origin_colony.group, destiny_place: service.destiny_place._id})
-        service.tariff = tariff
-        return service
-      }
-    } else if (service.origin_place) {
-      if (service.destiny_colony) {
-        let tariff = await Tariff.findOne({origin_place: service.origin_place._id, destiny_colony: service.destiny_colony._id})
-        if (!tariff) {
-          let colonies = await get_colonies(service.destiny_coords[1], service.destiny_coords[0])
-          let colony = await Colony.findOne({place_id: {$in: colonies}})
-          if (colony) {
-            tariff = await Tariff.findOne({
-              $or: [
-                {origin_group: colony.group, destiny_group: service.destiny_colony.group},
-                {origin_group: service.destiny_colony.group, destiny_group: colony.group}
-              ]
-            })
-          }
-        }
-        
-        service.tariff = tariff
-        return service
-      } else {
-        let tariff = await Tariff.findOne({origin_place: service.origin_place._id, destiny_place: service.destiny_place._id})
-        if (!tariff) {
-          let colonies = await get_colonies(service.destiny_coords[1], service.destiny_coords[0])
-          let colony_destiny = await Colony.findOne({place_id: {$in: colonies}})
-          colonies = await get_colonies(service.origin_coords[1], service.origin_coords[0])
-          let colony_origin = await Colony.findOne({place_id: {$in: colonies}})
-          if (colony_destiny && colony_origin) {
-            tariff = await Tariff.findOne({
-              $or: [
-                {origin_group: colony_origin.group, destiny_group: colony_destiny.group},
-                {origin_group: colony_destiny.group, destiny_group: colony_origin.group}
-              ]
-            })
-          }
-        }
-        
-        service.tariff = tariff
-        return service
-      }
-    } else return service */
-
 }
 
 
@@ -153,11 +82,6 @@ async function get_base(service) {
   if (service.origin_group) {
     const group = await Group.findById(service.origin_group)
     base = await Base.findById(group.base)
-  } else if (service.origin_colony) {
-    const group = await Group.findById(service.origin_colony.group)
-    base = await Base.findById(group.base)
-  } else if (service.origin_place) {
-    base = await Base.findById(service.origin_place.base)
   }
   return base
 }
@@ -165,8 +89,6 @@ async function get_base(service) {
 module.exports = {
   withinRadius,
   set_tariff,
-  get_colonies,
-  get_places,
   get_close_drivers,
   get_base,
   inside_polygon
