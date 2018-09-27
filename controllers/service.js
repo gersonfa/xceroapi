@@ -134,7 +134,7 @@ module.exports = (io, client) => {
       if (passenger_socket) {
         io.to(passenger_socket).emit('service_on_the_way', service)
       } else {
-        setTimeout(() => {
+        setTimeout(async () => {
           passenger_socket = await client.hget('sockets', passenger)
           io.to(passenger_socket).emit('service_on_the_way', service)
         }, 3000)
