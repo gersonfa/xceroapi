@@ -126,40 +126,6 @@ async function set_tariff (service) {
 
 }
 
-async function get_colonies(lat, lng) {
-  try {
-    let place_ids = []
-    
-    /* const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=AIzaSyAogodmHuA-P4Ais69knDP1HBlLOWCrCdg`)
-
-    const json = await response.json()
-    place_ids = json.results.map(p => p.place_id) */
-    
-    return place_ids
-  } catch (e) {
-    return e
-  }
-}
-
-async function get_places(lat, lng) {
-  try {
-    const places = await Place.find({
-      coords: {
-          $nearSphere: {
-            $geometry: {
-              type: 'Point',
-              coordinates: [parseFloat(lng), parseFloat(lat)]
-            },
-            $maxDistance: 100
-          }
-        }
-    })
-
-    return places
-  } catch(e) {
-    return e
-  }
-}
 
 async function get_close_drivers(service, distance = 1400) {
   let drivers = await client.hkeys('coords')

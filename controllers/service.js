@@ -2,8 +2,6 @@
 
 const Service = require('../models/service')
 const User = require('../models/user')
-const Place = require('../models/place')
-const Colony = require('../models/colony')
 const sendJSONresponse = require('../shared/common').sendJSONresponse
 const boom = require('boom')
 const service_utils = require('../shared/service-utils')
@@ -19,13 +17,7 @@ module.exports = (io, client) => {
       const origin_lat = req.body.origin_lat
       const origin_lng = req.body.origin_lng
 
-      let origin_colony = req.body.origin_colony
-      let origin_place = req.body.origin_place
-
       const details = req.body.details
-
-      const destiny_colony = req.body.destiny_colony
-      const destiny_place = req.body.destiny_place
 
       if (!origin_lat || !origin_lng || !details) throw boom.badRequest('origin_lat origin_lng details are requireds')
 
@@ -58,38 +50,9 @@ module.exports = (io, client) => {
             // Asignar tarifa
           }
         }
-      } else {
-        if (!origin_colony && !origin_place) {
-
-          let place = await service_utils.get_places(origin_lat, origin_lng)
-  
-          if (place.length > 0) {
-            origin_place = place[0]
-  
-            service.origin_place = origin_place._id
-  
-          } else {
-            // Buscar colonia
-              const place_ids = await service_utils.get_colonies(origin_lat, origin_lng)
-              let colony = await Colony.findOne({place_id: { "$in": place_ids }})
-              if (colony) {
-                service.origin_colony = colony._id
-              }
-          }
-  
-        } else {
-          service.origin_colony = origin_colony
-          service.origin_place = origin_place
-        }
-  
-          service.destiny_colony = destiny_colony
-          service.destiny_place = destiny_place
-    
-          service = await Colony.populate(service, 'origin_colony destiny_colony')
-          service = await Place.populate(service, 'origin_place destiny_place')
       }
 
-      if (service.origin_colony || service.origin_group) {
+      if (service.origin_group) {
 
         let date = new Date()
         let date_fix = new Date(date.setHours(date.getHours() - 5))
@@ -103,7 +66,7 @@ module.exports = (io, client) => {
             
           setTimeout(async () => {
             let check_service = await Service.findById(service._id)
-            if (!check_service.driver && (check_service.state != 'canceled' || check_service.state != 'negated')) {
+            if (!check_service.driver && (check_service.state != 'canceled' && check_service.state != 'negated')) {
               check_service.state = 'negated'
               check_service = await check_service.save()
 
@@ -111,14 +74,14 @@ module.exports = (io, client) => {
               let passenger_socket = await client.hget('sockets', passenger)
               io.to(passenger_socket).emit('service_rejected', check_service)
             }
-          }, 40000)
+          }, 16000)
 
           setTimeout(async () => {
             let check_service = await Service.findById(service._id)
-            if (!check_service.driver && (check_service.state != 'canceled' || check_service.state != 'negated')) {
+            if (!check_service.driver && (check_service.state != 'canceled' && check_service.state != 'negated')) {
               assign_to_close_driver(service)
             }
-          }, 15000)
+          }, 8000)
         } else {
           sendJSONresponse(res, 402, {error: 'No hay conductores cercanos'})
         }
@@ -126,7 +89,6 @@ module.exports = (io, client) => {
       } else {
         sendJSONresponse(res, 402, {eror: 'No hay servicios disponibles desde la ubicación establecida.'})
       }
-
 
     } catch(e) {
       return next(e)
@@ -139,7 +101,7 @@ module.exports = (io, client) => {
       const state = req.query.state || 'completed'
 
       const services = await Service.find({$or: [{user: user._id, state: state}, {driver: user._id, state: state}]})
-      .populate('origin_colony destiny_colony origin_place destiny_place tariff')
+      .populate('tariff')
       .populate({path: 'user', select: 'full_name image'})
       .populate({path: 'driver', select: 'full_name unit_number image'})
 
@@ -154,14 +116,10 @@ module.exports = (io, client) => {
       const user = req.user
       const service_id = req.params.service_id
 
-      let service = await Service.findById(service_id).populate('origin_colony origin_place')
+      let service = await Service.findById(service_id)
 
-      if (service.state === 'canceled' || service.state === 'negated' || service.state === 'on_the_way') {
+      if (service.state === 'canceled' || service.state === 'negated' || service.state === 'on_the_way' || service.state === 'in_progress') {
         throw boom.badRequest('El servicio ah sido cancelado o iniciado.')
-      }
-
-      if (service.driver) {
-        throw boom.badRequest('El servicio ya ha sido asignado.')
       }
 
       service.driver = user._id
@@ -172,7 +130,15 @@ module.exports = (io, client) => {
 
       let passenger = service.user.toString()
       let passenger_socket = await client.hget('sockets', passenger)
-      io.to(passenger_socket).emit('service_on_the_way', service)
+
+      if (passenger_socket) {
+        io.to(passenger_socket).emit('service_on_the_way', service)
+      } else {
+        setTimeout(() => {
+          passenger_socket = await client.hget('sockets', passenger)
+          io.to(passenger_socket).emit('service_on_the_way', service)
+        }, 3000)
+      }
 
       sendJSONresponse(res, 200, service)
 
@@ -238,10 +204,11 @@ module.exports = (io, client) => {
       let inside_area = await service_utils.inside_polygon([parseFloat(origin_lat), parseFloat(origin_lng)])
       let group_id = inside_area ? inside_area.group : null
 
+      sendJSONresponse(res, 200, {group: group_id})
 
-      let place = await service_utils.get_places(origin_lat, origin_lng)
+      /*let place = await service_utils.get_places(origin_lat, origin_lng)
 
-      if (place.length > 0) {
+       if (place.length > 0) {
         let place_location = place[0]
 
         sendJSONresponse(res, 200, {place: place_location, group: group_id})
@@ -260,7 +227,7 @@ module.exports = (io, client) => {
           }
         }
              
-      }
+      } */
     } catch(e) {
       return next(e)
     }
@@ -292,22 +259,6 @@ module.exports = (io, client) => {
 
       if (inside_area) {
         service.destiny_group = inside_area.group
-      } else {
-        let place = await service_utils.get_places(destiny_lat, destiny_lng)
-
-        if (place.length > 0) {
-          let place_location = place[0]
-
-          service.destiny_place = place_location._id
-        } else {
-            const place_ids = await service_utils.get_colonies(destiny_lat, destiny_lng)
-            let colony = await Colony.findOne({place_id: { "$in": place_ids }})
-            if (colony) {
-              service.destiny_colony = colony._id
-            } else {
-              // No se encontro ni place ni colony
-            }
-        }
       }
       
       service = await service_utils.set_tariff(service)
@@ -339,7 +290,7 @@ module.exports = (io, client) => {
       const user = req.user
       const service_id = req.params.service_id
 
-      let service = await Service.findById(service_id).populate('origin_colony')
+      let service = await Service.findById(service_id)
       if (service.state === 'completed' || service.state === 'negated') {
         throw boom.badRequest('No se puede cancelar un servicio que ya fue completado o negado.')
       }
@@ -371,17 +322,18 @@ module.exports = (io, client) => {
     }
   }
 
+  //Esta ruta se dejo de usar
   async function service_reject (req, res, next) {
     try {
       const user = req.user
       const service_id = req.params.service_id
 
-      let service = await Service.findById(service_id).populate('origin_colony origin_place')
+      /* let service = await Service.findById(service_id)
 
       if (service.state == 'canceled' || service.state == 'negated' || service.driver) {
         sendJSONresponse(res, 200, {message: 'Servicio rechazado correctamente'})
         return
-      }
+      } */
 
       //await emit_new_service(service, user._id)
       sendJSONresponse(res, 200, {message: 'Servicio rechazado correctamente'})
@@ -502,7 +454,7 @@ module.exports = (io, client) => {
 
 
       let services = await Service.find(query)
-      .populate('origin_colony origin_place destiny_colony destiny_place tariff')
+      .populate('tariff')
       .populate({path: 'user', select: 'full_name'})
 
       sendJSONresponse(res, 200, services)
