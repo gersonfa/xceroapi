@@ -603,8 +603,13 @@ module.exports = (io, client) => {
         .populate({path: 'user', select: 'full_name'})
         .populate({path: 'driver', select: 'unit_number'})
         .populate({path: 'tariff', select: 'cost'})
+      } else if (state === 'canceled') {
+        services = await Service.find({state: state, driver: { $ne: null }, canceled_time: {$gt: init_date, $lt: end_date}})
+        .populate({path: 'user', select: 'full_name'})
+        .populate({path: 'driver', select: 'unit_number'})
+        .populate({path: 'tariff', select: 'cost'})
       } else {
-        services = await Service.find({state: state, driver: { $ne: null }})
+        services = await Service.find({state: state, driver: { $ne: null }, negated_time: {$gt: init_date, $lt: end_date}})
         .populate({path: 'user', select: 'full_name'})
         .populate({path: 'driver', select: 'unit_number'})
         .populate({path: 'tariff', select: 'cost'})
