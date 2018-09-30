@@ -117,24 +117,6 @@ module.exports = (app, io) => {
   api_routes.get('/user/drivers', require_auth, user_controller.user_drivers_list)
   api_routes.get('/user/location', require_auth, user_controller.drivers_location(client))
   /**
-   * @api {put} /api/user/driver_exit Exit from app
-   * @apiName Exit from app
-   * @apiGroup Drivers
-   * @apiPermission Token
-
-   * @apiSuccess (200 Success) message
-   */
-  api_routes.put('/user/driver_exit', require_auth, user_controller.driver_exit)
-  /**
-   * @api {put} /api/user/driver_in Enter to app
-   * @apiName Enter to app
-   * @apiGroup Drivers
-   * @apiPermission Token
-
-   * @apiSuccess (200 Success) message
-   */
-  api_routes.put('/user/driver_in', require_auth, user_controller.driver_in)
-  /**
    * @api {get} /api/user/user_status Check user status
    * @apiName User status
    * @apiGroup User

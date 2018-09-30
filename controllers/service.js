@@ -7,19 +7,22 @@ const boom = require('boom')
 const service_utils = require('../shared/service-utils')
 
 module.exports = (io, client) => {
-
-  async function service_create (req, res, next) {
+  async function service_create(req, res, next) {
     try {
       const user = req.user
 
-      if (user.inService) throw boom.badRequest('no puedes crear un servicio si estas activo en uno.')
+      if (user.inService)
+        throw boom.badRequest(
+          'no puedes crear un servicio si estas activo en uno.'
+        )
 
       const origin_lat = req.body.origin_lat
       const origin_lng = req.body.origin_lng
 
       const details = req.body.details
 
-      if (!origin_lat || !origin_lng || !details) throw boom.badRequest('origin_lat origin_lng details are requireds')
+      if (!origin_lat || !origin_lng || !details)
+        throw boom.badRequest('origin_lat origin_lng details are requireds')
 
       const destiny_lat = req.body.destiny_lat
       const destiny_lng = req.body.destiny_lng
@@ -37,13 +40,17 @@ module.exports = (io, client) => {
         service.destiny_coords = destiny_coords
       }
 
-      let inside_area = await service_utils.inside_polygon(service.origin_coords.slice().reverse())
+      let inside_area = await service_utils.inside_polygon(
+        service.origin_coords.slice().reverse()
+      )
 
       if (inside_area) {
         service.origin_group = inside_area.group
 
         if (service.destiny_coords) {
-          let destiny_inside = await service_utils.inside_polygon(service.destiny_coords.slice().reverse())
+          let destiny_inside = await service_utils.inside_polygon(
+            service.destiny_coords.slice().reverse()
+          )
 
           if (destiny_inside) {
             service.destiny_group = destiny_inside.group
@@ -53,20 +60,26 @@ module.exports = (io, client) => {
       }
 
       if (service.origin_group) {
-
         let date = new Date()
         let date_fix = new Date(date.setHours(date.getHours() - 5))
         service.request_time = date_fix.getTime()
         service = await service.save()
-        service = await User.populate(service, {path: 'user', select: 'full_name'})
+        service = await User.populate(service, {
+          path: 'user',
+          select: 'full_name'
+        })
         let result = await emit_new_service(service)
 
         if (result) {
           sendJSONresponse(res, 200, service)
-            
+
           setTimeout(async () => {
             let check_service = await Service.findById(service._id)
-            if (!check_service.driver && (check_service.state != 'canceled' && check_service.state != 'negated')) {
+            if (
+              !check_service.driver &&
+              (check_service.state != 'canceled' &&
+                check_service.state != 'negated')
+            ) {
               check_service.state = 'negated'
               check_service = await check_service.save()
 
@@ -78,19 +91,23 @@ module.exports = (io, client) => {
 
           setTimeout(async () => {
             let check_service = await Service.findById(service._id)
-            if (!check_service.driver && (check_service.state != 'canceled' && check_service.state != 'negated')) {
+            if (
+              !check_service.driver &&
+              (check_service.state != 'canceled' &&
+                check_service.state != 'negated')
+            ) {
               assign_to_close_driver(service)
             }
           }, 8000)
         } else {
-          sendJSONresponse(res, 402, {error: 'No hay conductores cercanos'})
+          sendJSONresponse(res, 402, { error: 'No hay conductores cercanos' })
         }
-
       } else {
-        sendJSONresponse(res, 402, {eror: 'No hay servicios disponibles desde la ubicación establecida.'})
+        sendJSONresponse(res, 402, {
+          eror: 'No hay servicios disponibles desde la ubicación establecida.'
+        })
       }
-
-    } catch(e) {
+    } catch (e) {
       return next(e)
     }
   }
@@ -100,25 +117,35 @@ module.exports = (io, client) => {
       const user = req.user
       const state = req.query.state || 'completed'
 
-      const services = await Service.find({$or: [{user: user._id, state: state}, {driver: user._id, state: state}]})
-      .populate('tariff')
-      .populate({path: 'user', select: 'full_name image'})
-      .populate({path: 'driver', select: 'full_name unit_number image'})
+      const services = await Service.find({
+        $or: [
+          { user: user._id, state: state },
+          { driver: user._id, state: state }
+        ]
+      })
+        .populate('tariff')
+        .populate({ path: 'user', select: 'full_name image' })
+        .populate({ path: 'driver', select: 'full_name unit_number image' })
 
       sendJSONresponse(res, 200, services)
-    } catch(e) {
+    } catch (e) {
       return next(e)
     }
   }
 
-  async function service_set_driver (req, res, next) {
+  async function service_set_driver(req, res, next) {
     try {
       const user = req.user
       const service_id = req.params.service_id
 
       let service = await Service.findById(service_id)
 
-      if (service.state === 'canceled' || service.state === 'negated' || service.state === 'on_the_way' || service.state === 'in_progress') {
+      if (
+        service.state === 'canceled' ||
+        service.state === 'negated' ||
+        service.state === 'on_the_way' ||
+        service.state === 'in_progress'
+      ) {
         throw boom.badRequest('El servicio ah sido cancelado o iniciado.')
       }
 
@@ -126,7 +153,10 @@ module.exports = (io, client) => {
       service.state = 'on_the_way'
 
       service = await service.save()
-      service = await User.populate(service, {path: 'driver', select: 'full_name image rating unit_number'})
+      service = await User.populate(service, {
+        path: 'driver',
+        select: 'full_name image rating unit_number'
+      })
 
       let passenger = service.user.toString()
       let passenger_socket = await client.hget('sockets', passenger)
@@ -146,13 +176,12 @@ module.exports = (io, client) => {
       client_user.inService = true
       await client_user.save()
 
-      user.inService = true;
+      user.inService = true
       await user.save()
 
       let base = await service_utils.get_base(service)
       base.stack = base.stack.filter(d => d != user.id)
       await base.save()
-
     } catch (e) {
       return next(e)
     }
@@ -163,7 +192,7 @@ module.exports = (io, client) => {
       const driver = req.user
       const service_id = req.params.service_id
       const start_time = req.body.start_time
-      
+
       if (!start_time) throw boom.badRequest('start_time is required')
 
       let service = await Service.findById(service_id)
@@ -175,7 +204,16 @@ module.exports = (io, client) => {
       let coords = await client.hget('coords', driver.id)
       coords = JSON.parse(coords)
 
-      if (service_utils.withinRadius({longitude: service.origin_coords[0], latitude: service.origin_coords[1]}, {longitude: coords[0], latitude: coords[1]}, 0.3)) {
+      if (
+        service_utils.withinRadius(
+          {
+            longitude: service.origin_coords[0],
+            latitude: service.origin_coords[1]
+          },
+          { longitude: coords[0], latitude: coords[1] },
+          0.3
+        )
+      ) {
         service.state = 'in_process'
         service.start_time = start_time
         await service.save()
@@ -185,13 +223,13 @@ module.exports = (io, client) => {
         io.to(passenger_socket).emit('service_started', service)
 
         sendJSONresponse(res, 200, service)
-
       } else {
-        sendJSONresponse(res, 402, { error: 'No puedes empezar el servicio si no estás cerca de la ubicación de origen.'})
+        sendJSONresponse(res, 402, {
+          error:
+            'No puedes empezar el servicio si no estás cerca de la ubicación de origen.'
+        })
       }
-
-
-    } catch(e) {
+    } catch (e) {
       return next(e)
     }
   }
@@ -201,39 +239,19 @@ module.exports = (io, client) => {
       const origin_lng = req.query.origin_lng
       const origin_lat = req.query.origin_lat
 
-      let inside_area = await service_utils.inside_polygon([parseFloat(origin_lat), parseFloat(origin_lng)])
+      let inside_area = await service_utils.inside_polygon([
+        parseFloat(origin_lat),
+        parseFloat(origin_lng)
+      ])
       let group_id = inside_area ? inside_area.group : null
 
-      sendJSONresponse(res, 200, {group: group_id})
-
-      /*let place = await service_utils.get_places(origin_lat, origin_lng)
-
-       if (place.length > 0) {
-        let place_location = place[0]
-
-        sendJSONresponse(res, 200, {place: place_location, group: group_id})
-      } else {
-        const place_ids = await service_utils.get_colonies(origin_lat, origin_lng)
-
-        let colony = await Colony.findOne({place_id: { "$in": place_ids }})
-
-        if (colony) {
-           sendJSONresponse(res, 200, {colony: colony, group: group_id})
-        } else {
-          if (group_id) {
-            sendJSONresponse(res, 200, {group: group_id})
-          } else {
-            sendJSONresponse(res, 200, 'colony or place not found')
-          }
-        }
-             
-      } */
-    } catch(e) {
+      sendJSONresponse(res, 200, { group: group_id })
+    } catch (e) {
       return next(e)
     }
   }
 
-  async function service_end (req, res, next) {
+  async function service_end(req, res, next) {
     try {
       const user = req.user
       const service_id = req.params.service_id
@@ -242,7 +260,10 @@ module.exports = (io, client) => {
       const end_time = req.body.end_time
       const destiny_details = req.body.destiny_details
 
-      if (!destiny_lat || !destiny_lng || !end_time) throw boom.badRequest('destiny_lat, destiny_lng and end_time are requireds')
+      if (!destiny_lat || !destiny_lng || !end_time)
+        throw boom.badRequest(
+          'destiny_lat, destiny_lng and end_time are requireds'
+        )
 
       let service = await Service.findById(service_id)
 
@@ -251,16 +272,21 @@ module.exports = (io, client) => {
       }
 
       service.state = 'completed'
-      service.destiny_coords = [parseFloat(destiny_lng), parseFloat(destiny_lat)]
+      service.destiny_coords = [
+        parseFloat(destiny_lng),
+        parseFloat(destiny_lat)
+      ]
       service.end_time = end_time
       service.destiny_details = destiny_details
 
-      let inside_area = await service_utils.inside_polygon(service.destiny_coords.slice().reverse())
+      let inside_area = await service_utils.inside_polygon(
+        service.destiny_coords.slice().reverse()
+      )
 
       if (inside_area) {
         service.destiny_group = inside_area.group
       }
-      
+
       service = await service_utils.set_tariff(service)
       service = await service.save()
 
@@ -279,20 +305,21 @@ module.exports = (io, client) => {
       let client_user = await User.findById(service.user)
       client_user.inService = false
       await client_user.save()
-
-    } catch(e) {
+    } catch (e) {
       next(e)
     }
   }
 
-  async function service_cancel (req, res, next) {
+  async function service_cancel(req, res, next) {
     try {
       const user = req.user
       const service_id = req.params.service_id
 
       let service = await Service.findById(service_id)
       if (service.state === 'completed' || service.state === 'negated') {
-        throw boom.badRequest('No se puede cancelar un servicio que ya fue completado o negado.')
+        throw boom.badRequest(
+          'No se puede cancelar un servicio que ya fue completado o negado.'
+        )
       }
 
       user.inService = false
@@ -311,38 +338,31 @@ module.exports = (io, client) => {
         driver.inService = false
         await driver.save()
 
-        let driver_socket = await client.hget('sockets', service.driver.toString())
+        let driver_socket = await client.hget(
+          'sockets',
+          service.driver.toString()
+        )
         if (driver_socket) {
           io.to(driver_socket).emit('service_canceled', service)
         }
       }
-
-    } catch(e) {
+    } catch (e) {
       return next(e)
     }
   }
 
-  //Esta ruta se dejo de usar
-  async function service_reject (req, res, next) {
+  //  Esta ruta se dejo de usar
+  async function service_reject(req, res, next) {
     try {
-      const user = req.user
-      const service_id = req.params.service_id
-
-      /* let service = await Service.findById(service_id)
-
-      if (service.state == 'canceled' || service.state == 'negated' || service.driver) {
-        sendJSONresponse(res, 200, {message: 'Servicio rechazado correctamente'})
-        return
-      } */
-
-      //await emit_new_service(service, user._id)
-      sendJSONresponse(res, 200, {message: 'Servicio rechazado correctamente'})
-    } catch(e) {
+      sendJSONresponse(res, 200, {
+        message: 'Servicio rechazado correctamente'
+      })
+    } catch (e) {
       return next(e)
     }
   }
 
-  async function service_negate (req, res, next) {
+  async function service_negate(req, res, next) {
     try {
       let driver = req.user
       const service_id = req.params.service_id
@@ -370,8 +390,7 @@ module.exports = (io, client) => {
       let user = await User.findById(service.user)
       user.inService = false
       await user.save()
-
-    } catch(e) {
+    } catch (e) {
       return next(e)
     }
   }
@@ -381,14 +400,16 @@ module.exports = (io, client) => {
     let count_online = 0
 
     if (base) {
-      await Promise.all(base.stack.map(async driver => {
-        let driver_socket = await client.hget('sockets', driver.toString())
-        if (driver_socket) {
-          io.to(driver_socket).emit('new_service', service)
-          count_online += 1
-        }
-      }))
-      
+      await Promise.all(
+        base.stack.map(async driver => {
+          let driver_socket = await client.hget('sockets', driver.toString())
+          if (driver_socket) {
+            io.to(driver_socket).emit('new_service', service)
+            count_online += 1
+          }
+        })
+      )
+
       if (count_online === 0) {
         return await assign_to_close_driver(service)
       } else {
@@ -397,19 +418,25 @@ module.exports = (io, client) => {
     }
   }
 
-  async function assign_to_close_driver (service) {
+  async function assign_to_close_driver(service) {
     let close_drivers = await service_utils.get_close_drivers(service)
-    close_drivers = await User.find({_id: {$in: close_drivers}, enable: true, inService: false}).distinct('_id')
+    close_drivers = await User.find({
+      _id: { $in: close_drivers },
+      enable: true,
+      inService: false
+    }).distinct('_id')
     close_drivers = close_drivers.map(d => d.toString())
     let total_drivers = 0
 
-    await Promise.all(close_drivers.map(async driver => {
-      const driver_socket = await client.hget('sockets', driver)
-      if (driver_socket) {
-        io.to(driver_socket).emit('new_service', service)
-        total_drivers += 1
-      }
-    }))
+    await Promise.all(
+      close_drivers.map(async driver => {
+        const driver_socket = await client.hget('sockets', driver)
+        if (driver_socket) {
+          io.to(driver_socket).emit('new_service', service)
+          total_drivers += 1
+        }
+      })
+    )
 
     if (total_drivers === 0) {
       const user_socket = await client.hget('sockets', service.user.toString())
@@ -418,7 +445,7 @@ module.exports = (io, client) => {
       service = await service.save()
 
       let user = await User.findById(service.user)
-      user.inService = false;
+      user.inService = false
       await user.save()
 
       if (user_socket) {
@@ -431,7 +458,7 @@ module.exports = (io, client) => {
     }
   }
 
-  async function service_by_driver (req, res, next) {
+  async function service_by_driver(req, res, next) {
     try {
       const driver_id = req.params.driver_id
       const time = req.query.time
@@ -452,10 +479,9 @@ module.exports = (io, client) => {
         query.start_time = { $gt: monday.getTime() }
       }
 
-
       let services = await Service.find(query)
-      .populate('tariff')
-      .populate({path: 'user', select: 'full_name'})
+        .populate('tariff')
+        .populate({ path: 'user', select: 'full_name' })
 
       sendJSONresponse(res, 200, services)
     } catch (e) {
@@ -465,26 +491,32 @@ module.exports = (io, client) => {
 
   function getMonday(d) {
     var day = d.getDay(),
-        diff = d.getDate() - day + (day == 0 ? -6 : 1);
-    return new Date(d.setDate(diff));
+      diff = d.getDate() - day + (day == 0 ? -6 : 1)
+    return new Date(d.setDate(diff))
   }
 
-
-  async function emergency_enable (req, res, next) {
+  async function emergency_enable(req, res, next) {
     try {
       let driver = req.user
       const service_id = req.query.service_id
-  
+
       if (service_id) {
         let service = await Service.findById(service_id)
         driver = await User.findById(service.driver)
       }
-  
+
       driver.emergency = true
       await driver.save()
-  
-      let near_drivers = await service_utils.get_close_drivers({ origin_coords: driver.coords}, 40000)
-      near_drivers = await User.find({_id: {$in: near_drivers}, enable: true, inService: false}).distinct('_id')
+
+      let near_drivers = await service_utils.get_close_drivers(
+        { origin_coords: driver.coords },
+        40000
+      )
+      near_drivers = await User.find({
+        _id: { $in: near_drivers },
+        enable: true,
+        inService: false
+      }).distinct('_id')
       near_drivers = near_drivers.map(d => d.toString())
       near_drivers = near_drivers.filter(d => d != driver.id)
 
@@ -500,14 +532,13 @@ module.exports = (io, client) => {
         })
       })
 
-      sendJSONresponse(res, 200, {emergency: driver.emergency})
-  
-    } catch(e) {
+      sendJSONresponse(res, 200, { emergency: driver.emergency })
+    } catch (e) {
       return next(e)
     }
   }
 
-  async function emergency_disable (req, res, next) {
+  async function emergency_disable(req, res, next) {
     try {
       let driver = req.user
       const driver_id = req.query.driver_id
@@ -519,13 +550,13 @@ module.exports = (io, client) => {
       driver.emergency = false
       await driver.save()
 
-      sendJSONresponse(res, 200, {emergency: driver.emergency})
-    } catch(e) {
+      sendJSONresponse(res, 200, { emergency: driver.emergency })
+    } catch (e) {
       return next(e)
     }
   }
 
-  async function add_fee (req, res, next) {
+  async function add_fee(req, res, next) {
     try {
       let service_id = req.params.service_id
       let fee = req.body
@@ -544,7 +575,7 @@ module.exports = (io, client) => {
     }
   }
 
-  async function remove_fee (req, res, next) {
+  async function remove_fee(req, res, next) {
     try {
       let service_id = req.params.service_id
       let fee_id = req.params.fee_id
@@ -555,12 +586,12 @@ module.exports = (io, client) => {
       await service.save()
 
       sendJSONresponse(res, 200, fee)
-    } catch(e) {
+    } catch (e) {
       return next(e)
     }
   }
 
-  async function add_price (req, res, next) {
+  async function add_price(req, res, next) {
     try {
       let service_id = req.params.service_id
 
@@ -568,13 +599,13 @@ module.exports = (io, client) => {
       service.price = req.body.price
       await service.save()
 
-      sendJSONresponse(res, 200, {_id: service._id, price: req.body.price})
+      sendJSONresponse(res, 200, { _id: service._id, price: req.body.price })
     } catch (e) {
       return next(e)
     }
   }
 
-  async function get_area (req, res, next) {
+  async function get_area(req, res, next) {
     try {
       const lat = req.body.lat
       const lng = req.body.lng
@@ -589,7 +620,7 @@ module.exports = (io, client) => {
     }
   }
 
-  async function service_global (req, res, next) {
+  async function service_global(req, res, next) {
     try {
       const init_date = Number(req.query.init_date)
       const end_date = Number(req.query.end_date)
@@ -599,20 +630,32 @@ module.exports = (io, client) => {
       let services = []
 
       if (state === 'completed') {
-        services = await Service.find({state: state, driver: { $ne: null }, end_time: {$gt: init_date, $lt: end_date}})
-        .populate({path: 'user', select: 'full_name'})
-        .populate({path: 'driver', select: 'unit_number'})
-        .populate({path: 'tariff', select: 'cost'})
+        services = await Service.find({
+          state: state,
+          driver: { $ne: null },
+          end_time: { $gt: init_date, $lt: end_date }
+        })
+          .populate({ path: 'user', select: 'full_name' })
+          .populate({ path: 'driver', select: 'unit_number' })
+          .populate({ path: 'tariff', select: 'cost' })
       } else if (state === 'canceled') {
-        services = await Service.find({state: state, driver: { $ne: null }, canceled_time: {$gt: init_date, $lt: end_date}})
-        .populate({path: 'user', select: 'full_name'})
-        .populate({path: 'driver', select: 'unit_number'})
-        .populate({path: 'tariff', select: 'cost'})
+        services = await Service.find({
+          state: state,
+          driver: { $ne: null },
+          canceled_time: { $gt: init_date, $lt: end_date }
+        })
+          .populate({ path: 'user', select: 'full_name' })
+          .populate({ path: 'driver', select: 'unit_number' })
+          .populate({ path: 'tariff', select: 'cost' })
       } else {
-        services = await Service.find({state: state, driver: { $ne: null }, negated_time: {$gt: init_date, $lt: end_date}})
-        .populate({path: 'user', select: 'full_name'})
-        .populate({path: 'driver', select: 'unit_number'})
-        .populate({path: 'tariff', select: 'cost'})
+        services = await Service.find({
+          state: state,
+          driver: { $ne: null },
+          negated_time: { $gt: init_date, $lt: end_date }
+        })
+          .populate({ path: 'user', select: 'full_name' })
+          .populate({ path: 'driver', select: 'unit_number' })
+          .populate({ path: 'tariff', select: 'cost' })
       }
 
       services = services.filter(s => s.driver && s.driver.unit_number)
@@ -627,23 +670,22 @@ module.exports = (io, client) => {
         })
       } else {
         services.map(s => {
-          let index = response.findIndex(r => r.unit_number == s.driver.unit_number)
+          let index = response.findIndex(
+            r => r.unit_number == s.driver.unit_number
+          )
           if (index >= 0) {
             response[index].services.push(s)
           } else {
-            response.push({unit_number: s.driver.unit_number, services: [s]})
+            response.push({ unit_number: s.driver.unit_number, services: [s] })
           }
         })
       }
-     
 
       sendJSONresponse(res, 200, response)
-
-    } catch(e) {
+    } catch (e) {
       return next(e)
     }
   }
-
 
   return {
     service_create,

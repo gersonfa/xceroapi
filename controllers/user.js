@@ -12,8 +12,10 @@ const path = require('path')
 
 async function user_drivers_list(req, res, next) {
   try {
-
-    let drivers = await User.find({role: 'Driver'}, 'email full_name rating image unit_number inService')
+    let drivers = await User.find(
+      { role: 'Driver' },
+      'email full_name rating image unit_number inService'
+    )
 
     sendJSONresponse(res, 200, drivers)
   } catch (e) {
@@ -21,12 +23,15 @@ async function user_drivers_list(req, res, next) {
   }
 }
 
-function drivers_location (client) {
+function drivers_location(client) {
   return async (req, res, next) => {
     try {
       let user_ids = await client.hkeys('coords')
 
-      let drivers = await User.find({role: 'Driver', _id: { $in: user_ids }}, 'full_name unit_number emergency')
+      let drivers = await User.find(
+        { role: 'Driver', _id: { $in: user_ids } },
+        'full_name unit_number emergency'
+      )
       let promises = drivers.map(async d => {
         let coords = await client.hget('coords', d.id)
         return {
@@ -46,70 +51,44 @@ function drivers_location (client) {
   }
 }
 
-function driver_location (client) {
+function driver_location(client) {
   return async (req, res, next) => {
     try {
       const driver_id = req.params.driver_id
-  
+
       let driver = await User.findById(driver_id, 'unit_number emergency')
       let coords = await client.hget('coords', driver_id)
-  
-      sendJSONresponse(res, 200, {_id: driver._id, unit_number: driver.unit_number, emergency: driver.emergency, coords: JSON.parse(coords)})
-    } catch(e) {
+
+      sendJSONresponse(res, 200, {
+        _id: driver._id,
+        unit_number: driver.unit_number,
+        emergency: driver.emergency,
+        coords: JSON.parse(coords)
+      })
+    } catch (e) {
       return next(e)
     }
   }
 }
 
-//No se usa
-async function driver_exit (req, res, next) {
-  try {
-    const user = req.user
-
-    let bases = await Base.find({stack: user.id})
-
-    bases.map(async (base) => {
-      base.stack = base.stack.filter(d => d != user.id)
-      await base.save()
-    })
-    
-
-    user.inService = true
-    await user.save()
-
-    sendJSONresponse(res, 200, {message: 'Conductor fuera de servicio o trabajando por fuera.'})
-  } catch(e) {
-    return next(e)
-  }
-}
-
-//No se usa
-async function driver_in (req, res, next) {
-  try {
-    const user = req.user
-    user.inService = false
-
-    await user.save()
-    sendJSONresponse(res, 200, {message: 'Conductor habilitado para nuevos servicios.'})
-  } catch(e) {
-    return next(e)
-  }
-}
-
-async function user_status (req, res, next) {
+async function user_status(req, res, next) {
   try {
     let user = req.user
 
     let service = await Service.findOne({
-      $or: [{driver: user._id}, {user: user._id}],
-      state: {$in: ['on_the_way', 'in_process']}})
-      .populate({path: 'user', select: 'full_name image'})
-      .populate({path: 'driver', select: 'full_name image rating unit_number'})
+      $or: [{ driver: user._id }, { user: user._id }],
+      state: { $in: ['on_the_way', 'in_process'] }
+    })
+      .populate({ path: 'user', select: 'full_name image' })
+      .populate({
+        path: 'driver',
+        select: 'full_name image rating unit_number'
+      })
 
     let base
 
     if (user.role == 'Driver') {
-      base = await Base.findOne({stack: user._id})
+      base = await Base.findOne({ stack: user._id })
     }
 
     if (!service && user.inService) {
@@ -117,38 +96,49 @@ async function user_status (req, res, next) {
       user = await user.save()
     }
 
-    sendJSONresponse(res, 200, {inService: user.inService, service, base, emergency: user.emergency})
-  } catch(e) {
+    sendJSONresponse(res, 200, {
+      inService: user.inService,
+      service,
+      base,
+      emergency: user.emergency
+    })
+  } catch (e) {
     return next(e)
   }
 }
 
-async function driver_details (req, res, next) {
+async function driver_details(req, res, next) {
   try {
     const driver_id = req.params.driver_id
 
-    let driver = await User.findById(driver_id, 'full_name image rating email image enable unit_number account emergency')
+    let driver = await User.findById(
+      driver_id,
+      'full_name image rating email image enable unit_number account emergency'
+    )
 
     sendJSONresponse(res, 200, driver)
-  } catch(e) {
+  } catch (e) {
     return next(e)
   }
 }
 
-async function driver_reviews (req, res, next) {
+async function driver_reviews(req, res, next) {
   try {
     const driver_id = req.params.driver_id
 
-    let driver = await User.findById(driver_id).populate({path: 'reviews.author', select: 'full_name'})
+    let driver = await User.findById(driver_id).populate({
+      path: 'reviews.author',
+      select: 'full_name'
+    })
     let reviews = driver.reviews.filter(r => r.comment)
 
     sendJSONresponse(res, 200, reviews)
-  } catch(e) {
+  } catch (e) {
     return next(e)
   }
 }
 
-async function user_add_review (req, res, next) {
+async function user_add_review(req, res, next) {
   try {
     const user = req.user
     const driver_id = req.params.driver_id
@@ -166,18 +156,18 @@ async function user_add_review (req, res, next) {
     driver.reviews.push(review)
 
     let total = 0
-    driver.reviews.map(r => total += r.rating)
+    driver.reviews.map(r => (total += r.rating))
     driver.rating = total / driver.reviews.length
 
     await driver.save()
 
     sendJSONresponse(res, 201, review)
-  } catch(e) {
+  } catch (e) {
     return next(e)
   }
 }
 
-async function driver_update_image (req, res, next) {
+async function driver_update_image(req, res, next) {
   try {
     const user = req.user
 
@@ -185,40 +175,41 @@ async function driver_update_image (req, res, next) {
       let fileName = Date.now()
       let filepath = base64Img.imgSync(
         req.body.image,
-        path.join("/home/xcero/public", "drivers"),
-        //path.join("./uploads", "laboratory"),
+        path.join('/home/xcero/public', 'drivers'),
         fileName
       )
-      user.image = "http://xcero.com/images/drivers/" + fileName + path.extname(filepath)
+      user.image =
+        'http://xcero.com/images/drivers/' + fileName + path.extname(filepath)
 
       await user.save()
     } else {
       throw boom.badRequest('image is required')
     }
 
-    sendJSONresponse(res, 200, {image: user.image})
-
-  } catch(e) {
+    sendJSONresponse(res, 200, { image: user.image })
+  } catch (e) {
     return next(e)
   }
 }
 
-async function driver_update (req, res, next) {
+async function driver_update(req, res, next) {
   try {
     const driver_id = req.params.driver_id
     let driver = req.body
 
     let old_driver = await User.findById(driver_id)
 
-    if (driver.image && (driver.image != old_driver.image)) {
+    if (driver.image && driver.image != old_driver.image) {
       let fileName = Date.now()
       let filepath = base64Img.imgSync(
         driver.image,
-        path.join("/home/images", "profile"),
-        //path.join("./uploads", "laboratory"),
+        path.join('/home/images', 'profile'),
         fileName
       )
-      driver.image = "http://45.56.121.162/images/profile/" + fileName + path.extname(filepath)
+      driver.image =
+        'http://45.56.121.162/images/profile/' +
+        fileName +
+        path.extname(filepath)
     }
 
     old_driver = Object.assign(old_driver, driver)
@@ -231,30 +222,28 @@ async function driver_update (req, res, next) {
   }
 }
 
-async function driver_leave_base (req, res, next) {
+async function driver_leave_base(req, res, next) {
   try {
     const user = req.user
 
-    let bases = await Base.find({stack: user.id})
+    let bases = await Base.find({ stack: user.id })
 
     if (bases.length > 0) {
-      bases.map(async (base) => {
+      bases.map(async base => {
         base.stack = base.stack.filter(d => d != user.id)
         await base.save()
       })
-  
-      sendJSONresponse(res, 200, {base: bases[0]})
-    } else {
-      sendJSONresponse(res, 200, {message: 'Conductor fuera de base.'})
-    }
 
-    
+      sendJSONresponse(res, 200, { base: bases[0] })
+    } else {
+      sendJSONresponse(res, 200, { message: 'Conductor fuera de base.' })
+    }
   } catch (e) {
     return next(e)
   }
 }
 
-async function user_change_password (req, res, next) {
+async function user_change_password(req, res, next) {
   try {
     let user = req.user
     const old_password = req.body.old_password
@@ -269,23 +258,22 @@ async function user_change_password (req, res, next) {
     if (password_match) {
       user.password = req.body.new_password
       await user.save()
-      sendJSONresponse(res, 200, {message: 'Contraseña actualizada.'})
-
+      sendJSONresponse(res, 200, { message: 'Contraseña actualizada.' })
     } else {
-      sendJSONresponse(res, 402, {message: 'old_password don´t match'})
+      sendJSONresponse(res, 402, { message: 'old_password don´t match' })
     }
-  } catch(e) {
+  } catch (e) {
     return next(e)
   }
 }
 
-async function user_new_password (req, res, next) {
+async function user_new_password(req, res, next) {
   try {
     let email = req.body.email
 
     if (!email) throw boom.badRequest('email is required')
 
-    let user = await User.findOne({email: email})
+    let user = await User.findOne({ email: email })
 
     if (user) {
       let new_password = 'fvwefvwe'
@@ -293,33 +281,31 @@ async function user_new_password (req, res, next) {
       await user.save()
 
       email_sender.new_password(user.email, user.full_name, new_password)
-      sendJSONresponse(res, 200, {message: 'Se ha enviado una nueva contraseña a tu email.'})
+      sendJSONresponse(res, 200, {
+        message: 'Se ha enviado una nueva contraseña a tu email.'
+      })
     } else {
-      sendJSONresponse(res, 200, {meesage: 'email not found'})
+      sendJSONresponse(res, 200, { meesage: 'email not found' })
     }
-
   } catch (e) {
     return next(e)
   }
 }
 
-async function driver_delete (req, res, next) {
+async function driver_delete(req, res, next) {
   try {
     let driver = await User.findByIdAndRemove(req.params.driver_id)
 
     sendJSONresponse(res, 200, driver)
-  } catch(e) {
+  } catch (e) {
     return next(e)
   }
 }
-
 
 module.exports = {
   user_drivers_list,
   drivers_location,
   driver_location,
-  driver_exit,
-  driver_in,
   user_status,
   driver_details,
   user_add_review,

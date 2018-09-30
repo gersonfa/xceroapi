@@ -2,12 +2,9 @@ const sendJSONresponse = require('../shared/common').sendJSONresponse
 const Inbox = require('../models/inbox')
 const Notice = require('../models/notice')
 const User = require('../models/user')
-const redis = require('async-redis')
-const client = redis.createClient()
 
 module.exports = (io, client) => {
-
-  async function inbox_create (req, res, next) {
+  async function inbox_create(req, res, next) {
     try {
       const driver_id = req.params.driver_id
 
@@ -22,29 +19,29 @@ module.exports = (io, client) => {
       }
 
       sendJSONresponse(res, 201, inbox)
-    } catch(e) {
+    } catch (e) {
       return next(e)
     }
   }
 
-  async function inbox_list (req, res, next) {
+  async function inbox_list(req, res, next) {
     try {
       const driver_id = req.params.driver_id
 
-      let inboxs = await Inbox.find({driver: driver_id}).sort({date: -1})
+      let inboxs = await Inbox.find({ driver: driver_id }).sort({ date: -1 })
 
       sendJSONresponse(res, 200, inboxs)
-    } catch(e) {
+    } catch (e) {
       return next(e)
     }
   }
 
-  async function notice_create (req, res, next) {
+  async function notice_create(req, res, next) {
     try {
       let notice = new Notice(req.body)
       await notice.save()
 
-      let drivers = await User.find({role: 'Driver'})
+      let drivers = await User.find({ role: 'Driver' })
       drivers.map(async d => {
         let exist = await client.hexists('sockets', d.id)
         if (exist) {
@@ -54,29 +51,29 @@ module.exports = (io, client) => {
       })
 
       sendJSONresponse(res, 200, notice)
-    } catch(e) {
+    } catch (e) {
       return next(e)
     }
   }
 
-  async function notice_list (req, res, next) {
+  async function notice_list(req, res, next) {
     try {
-      let notices = await Notice.find().sort({date: -1})
+      let notices = await Notice.find().sort({ date: -1 })
 
       sendJSONresponse(res, 200, notices)
-    } catch(e) {
+    } catch (e) {
       return next(e)
     }
   }
 
-  async function notice_delete (req, res, next) {
+  async function notice_delete(req, res, next) {
     try {
       let notice_id = req.params.notice_id
 
       let notice = await Notice.findByIdAndRemove(notice_id)
 
       sendJSONresponse(res, 200, notice)
-    } catch(e) {
+    } catch (e) {
       return next(e)
     }
   }
@@ -88,5 +85,4 @@ module.exports = (io, client) => {
     notice_list,
     notice_create
   }
-
 }
