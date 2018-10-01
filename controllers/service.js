@@ -141,9 +141,9 @@ module.exports = (io, client) => {
       let service = await Service.findById(service_id)
 
       if (
+        service.state === 'on_the_way' ||        
         service.state === 'canceled' ||
         service.state === 'negated' ||
-        service.state === 'on_the_way' ||
         service.state === 'in_progress'
       ) {
         throw boom.badRequest('El servicio ah sido cancelado o iniciado.')
@@ -251,7 +251,7 @@ module.exports = (io, client) => {
     }
   }
 
-  async function service_end(req, res, next) {
+  async function service_end (req, res, next) {
     try {
       const user = req.user
       const service_id = req.params.service_id
@@ -296,8 +296,8 @@ module.exports = (io, client) => {
         io.to(user_socket).emit('service_end', service)
       }
 
-      io.to('drivers').emit('new_request', { _id: user.id })
       sendJSONresponse(res, 200, service)
+      io.to('drivers').emit('new_request', { _id: user.id })
 
       user.inService = false
       await user.save()

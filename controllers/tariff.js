@@ -77,11 +77,6 @@ async function tariff_list(req, res, next) {
 
 async function tariff_check(req, res, next) {
   try {
-    let colony_one = req.query.colony_one
-    let colony_two = req.query.colony_two
-    let place_one = req.query.place_one
-    let place_two = req.query.place_two
-
     let origin_lat = req.query.origin_lat
     let origin_lng = req.query.origin_lng
 
@@ -103,47 +98,9 @@ async function tariff_check(req, res, next) {
           ]
         })
         sendJSONresponse(res, 200, tariff)
-      } else {
-        if (colony_one) {
-          colony_one = await Colony.findById(colony_one)
-          let group_one = await Group.findById(colony_one.group)
-
-          if (colony_two) {
-            colony_two = await Colony.findById(colony_two)
-            let group_two = await Group.findById(colony_two.group)
-
-            let tariff = await Tariff.findOne({
-              $or: [
-                { origin_group: group_one._id, destiny_group: group_two._id },
-                { origin_group: group_two._id, destiny_group: group_one._id }
-              ]
-            })
-            sendJSONresponse(res, 200, tariff)
-          } else if (place_one) {
-            place_one = await Place.findById(place_one)
-
-            let tariff = await Tariff.findOne({
-              origin_group: group_one._id,
-              destiny_place: place_one._id
-            })
-            sendJSONresponse(res, 200, tariff)
-          }
-        } else if (place_one) {
-          // Buscar lugar
-          place_one = await Place.findById(place_one)
-          place_two = await Place.findById(place_two)
-
-          let tariff = await Tariff.findOne({
-            $or: [
-              { origin_place: place_one._id, destiny_place: place_two._id },
-              { origin_place: place_two._id, destiny_place: place_one._id }
-            ]
-          })
-          sendJSONresponse(res, 200, tariff)
-        } else {
-          throw boom.badRequest('colony_one or place_one are requireds')
-        }
-      }
+      } 
+    } else {
+      throw boom.badRequest('origin and destiny coords are required')
     }
   } catch (e) {
     return next(e)
