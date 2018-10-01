@@ -41,14 +41,7 @@ module.exports = (io, client) => {
       let notice = new Notice(req.body)
       await notice.save()
 
-      let drivers = await User.find({ role: 'Driver' })
-      drivers.map(async d => {
-        let exist = await client.hexists('sockets', d.id)
-        if (exist) {
-          let socket_driver = await client.hget('sockets', d.id)
-          io.to(socket_driver).emit('notice', notice)
-        }
-      })
+      io.to('drivers').emit('notice', notice)
 
       sendJSONresponse(res, 200, notice)
     } catch (e) {

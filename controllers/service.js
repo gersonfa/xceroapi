@@ -296,7 +296,7 @@ module.exports = (io, client) => {
         io.to(user_socket).emit('service_end', service)
       }
 
-      io.to('drivers').emit('new_request')
+      io.to('drivers').emit('new_request', { _id: user.id })
       sendJSONresponse(res, 200, service)
 
       user.inService = false
