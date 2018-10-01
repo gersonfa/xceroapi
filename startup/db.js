@@ -4,7 +4,7 @@ const config = require('../config/db')
 module.exports = () => {
   mongoose.Promise = require('bluebird')
   mongoose.connect(
-    config.test,
+    config.database,
     {
       useMongoClient: true
     }
