@@ -1,6 +1,6 @@
 define({
   "title": "API XCERO",
-  "url": "http://34.213.221.198:4510",
+  "url": "http://http://45.33.55.120",
   "name": "api_xcero",
   "version": "0.0.1",
   "description": "API REST for XCERO Application",
@@ -9,7 +9,7 @@ define({
   "apidoc": "0.3.0",
   "generator": {
     "name": "apidoc",
-    "time": "2018-08-17T16:16:52.513Z",
+    "time": "2018-10-01T00:18:06.870Z",
     "url": "http://apidocjs.com",
     "version": "0.17.6"
   }

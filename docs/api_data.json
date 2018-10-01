@@ -295,60 +295,6 @@
   },
   {
     "type": "put",
-    "url": "/api/user/driver_in",
-    "title": "Enter to app",
-    "name": "Enter_to_app",
-    "group": "Drivers",
-    "permission": [
-      {
-        "name": "Token"
-      }
-    ],
-    "success": {
-      "fields": {
-        "200 Success": [
-          {
-            "group": "200 Success",
-            "optional": false,
-            "field": "message",
-            "description": ""
-          }
-        ]
-      }
-    },
-    "version": "0.0.0",
-    "filename": "routes/index.js",
-    "groupTitle": "Drivers"
-  },
-  {
-    "type": "put",
-    "url": "/api/user/driver_exit",
-    "title": "Exit from app",
-    "name": "Exit_from_app",
-    "group": "Drivers",
-    "permission": [
-      {
-        "name": "Token"
-      }
-    ],
-    "success": {
-      "fields": {
-        "200 Success": [
-          {
-            "group": "200 Success",
-            "optional": false,
-            "field": "message",
-            "description": ""
-          }
-        ]
-      }
-    },
-    "version": "0.0.0",
-    "filename": "routes/index.js",
-    "groupTitle": "Drivers"
-  },
-  {
-    "type": "put",
     "url": "/api/user/driver_leave_base",
     "title": "Leave base",
     "name": "Leave_base",
@@ -1410,7 +1356,7 @@
   },
   {
     "type": "post",
-    "url": "/api/user/:user_id/add_review",
+    "url": "/api/emergency_disable",
     "title": "Emergency disable",
     "name": "Emergency_disable",
     "group": "User",
@@ -1438,7 +1384,7 @@
   },
   {
     "type": "post",
-    "url": "/api/user/:user_id/add_review",
+    "url": "/api/emergency_enable",
     "title": "Emergency enable",
     "name": "Emergency_enable",
     "group": "User",
