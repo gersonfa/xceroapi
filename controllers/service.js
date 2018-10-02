@@ -69,7 +69,6 @@ module.exports = (io, client) => {
           select: 'full_name'
         })
         let result = await emit_new_service(service)
-        console.log('servicio enviado a: ', result)
         if (result) {
           sendJSONresponse(res, 200, service)
 
@@ -137,51 +136,54 @@ module.exports = (io, client) => {
     try {
       const user = req.user
       const service_id = req.params.service_id
+      const time = Math.floor(Math.random() * (1500 - 1 + 1)) + 1
 
-      let service = await Service.findById(service_id)
+      setTimeout(async () => {
+        let service = await Service.findById(service_id)
 
-      if (
-        service.state === 'on_the_way' ||        
-        service.state === 'canceled' ||
-        service.state === 'negated' ||
-        service.state === 'in_progress'
-      ) {
-        throw boom.badRequest('El servicio ah sido cancelado o iniciado.')
-      }
+        if (
+          service.state === 'on_the_way' ||
+          service.state === 'canceled' ||
+          service.state === 'negated' ||
+          service.state === 'in_progress'
+        ) {
+          throw boom.badRequest('El servicio ah sido cancelado o iniciado.')
+        }
 
-      service.driver = user._id
-      service.state = 'on_the_way'
+        service.driver = user._id
+        service.state = 'on_the_way'
 
-      service = await service.save()
-      service = await User.populate(service, {
-        path: 'driver',
-        select: 'full_name image rating unit_number'
-      })
+        service = await service.save()
+        service = await User.populate(service, {
+          path: 'driver',
+          select: 'full_name image rating unit_number'
+        })
 
-      let passenger = service.user.toString()
-      let passenger_socket = await client.hget('sockets', passenger)
+        let passenger = service.user.toString()
+        let passenger_socket = await client.hget('sockets', passenger)
 
-      if (passenger_socket) {
-        io.to(passenger_socket).emit('service_on_the_way', service)
-      } else {
-        setTimeout(async () => {
-          passenger_socket = await client.hget('sockets', passenger)
+        if (passenger_socket) {
           io.to(passenger_socket).emit('service_on_the_way', service)
-        }, 3000)
-      }
+        } else {
+          setTimeout(async () => {
+            passenger_socket = await client.hget('sockets', passenger)
+            io.to(passenger_socket).emit('service_on_the_way', service)
+          }, 3000)
+        }
 
-      sendJSONresponse(res, 200, service)
+        sendJSONresponse(res, 200, service)
 
-      let client_user = await User.findById(service.user)
-      client_user.inService = true
-      await client_user.save()
+        let client_user = await User.findById(service.user)
+        client_user.inService = true
+        await client_user.save()
 
-      user.inService = true
-      await user.save()
+        user.inService = true
+        await user.save()
 
-      let base = await service_utils.get_base(service)
-      base.stack = base.stack.filter(d => d != user.id)
-      await base.save()
+        let base = await service_utils.get_base(service)
+        base.stack = base.stack.filter(d => d != user.id)
+        await base.save()
+      }, time)
     } catch (e) {
       return next(e)
     }
@@ -251,7 +253,7 @@ module.exports = (io, client) => {
     }
   }
 
-  async function service_end (req, res, next) {
+  async function service_end(req, res, next) {
     try {
       const user = req.user
       const service_id = req.params.service_id
@@ -322,9 +324,6 @@ module.exports = (io, client) => {
         )
       }
 
-      user.inService = false
-      await user.save()
-
       service.state = 'canceled'
       let date = new Date()
       let date_fix = new Date(date.setHours(date.getHours() - 5))
@@ -332,6 +331,9 @@ module.exports = (io, client) => {
       service = await service.save()
 
       sendJSONresponse(res, 200, service)
+
+      user.inService = false
+      await user.save()
 
       if (service.driver) {
         let driver = await User.findById(service.driver)
@@ -432,7 +434,6 @@ module.exports = (io, client) => {
       close_drivers.map(async driver => {
         const driver_socket = await client.hget('sockets', driver)
         if (driver_socket) {
-          console.log(driver, driver_socket)
           io.to(driver_socket).emit('new_service', service)
           total_drivers += 1
         }
