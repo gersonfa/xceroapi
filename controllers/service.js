@@ -69,7 +69,7 @@ module.exports = (io, client) => {
           select: 'full_name'
         })
         let result = await emit_new_service(service)
-
+        console.log('servicio enviado a: ', result)
         if (result) {
           sendJSONresponse(res, 200, service)
 
@@ -432,6 +432,7 @@ module.exports = (io, client) => {
       close_drivers.map(async driver => {
         const driver_socket = await client.hget('sockets', driver)
         if (driver_socket) {
+          console.log(driver, driver_socket)
           io.to(driver_socket).emit('new_service', service)
           total_drivers += 1
         }
