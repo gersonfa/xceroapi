@@ -23,7 +23,7 @@ module.exports = (io, client) => {
       if (!socket.connected && user.role == 'Driver') {
         if (times_disconnected > 1) {
           console.log('se desconecto', user.full_name)
-          client.hdel('sockets', user_id)
+          //client.hdel('sockets', user_id)
           client.hdel('coords', user_id)
           socket.leave('drivers')
           clearInterval(check)
