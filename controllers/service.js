@@ -136,9 +136,7 @@ module.exports = (io, client) => {
     try {
       const user = req.user
       const service_id = req.params.service_id
-      const time = Math.floor(Math.random() * (1500 - 1 + 1)) + 1
 
-      setTimeout(async () => {
         let service = await Service.findById(service_id)
 
         if (
@@ -183,7 +181,6 @@ module.exports = (io, client) => {
         let base = await service_utils.get_base(service)
         base.stack = base.stack.filter(d => d != user.id)
         await base.save()
-      }, time)
     } catch (e) {
       return next(e)
     }
