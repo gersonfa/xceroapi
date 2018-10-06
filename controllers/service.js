@@ -140,7 +140,8 @@ module.exports = (io, client) => {
       const minimum = 1
       const randomnumber = Math.floor(Math.random() * (maximum - minimum + 1)) + minimum;
 
-        await new Promise( () => setTimeout(() => {}, randomnumber))
+      let sleep = ms => new Promise( r => setTimeout(r, ms));
+      await sleep(randomnumber)
 
         let service = await Service.findById(service_id)
 
