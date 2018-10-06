@@ -149,7 +149,8 @@ module.exports = (io, client) => {
           service.state === 'on_the_way' ||
           service.state === 'canceled' ||
           service.state === 'negated' ||
-          service.state === 'in_progress'
+          service.state === 'in_process' ||
+          service.state === 'completed'
         ) {
           throw boom.badRequest('El servicio ah sido cancelado o iniciado.')
         }
