@@ -136,6 +136,11 @@ module.exports = (io, client) => {
     try {
       const user = req.user
       const service_id = req.params.service_id
+      const maximum = 1500
+      const minimum = 1
+      const randomnumber = Math.floor(Math.random() * (maximum - minimum + 1)) + minimum;
+
+        await new Promise( () => setTimeout(() => {}, randomnumber))
 
         let service = await Service.findById(service_id)
 
