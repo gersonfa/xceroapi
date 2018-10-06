@@ -86,7 +86,7 @@ module.exports = (io, client) => {
               let passenger_socket = await client.hget('sockets', passenger)
               io.to(passenger_socket).emit('service_rejected', check_service)
             }
-          }, 16000)
+          }, 30000)
 
           setTimeout(async () => {
             let check_service = await Service.findById(service._id)
@@ -97,7 +97,7 @@ module.exports = (io, client) => {
             ) {
               assign_to_close_driver(service)
             }
-          }, 8000)
+          }, 15000)
         } else {
           sendJSONresponse(res, 402, { error: 'No hay conductores cercanos' })
         }
