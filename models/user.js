@@ -23,7 +23,10 @@ const userSchema = new Schema(
     inService: { type: Boolean, default: false },
     reviews: [reviewSchema],
     enable: { type: Boolean, default: true },
-    emergency: { type: Boolean, default: false }
+    emergency: { type: Boolean, default: false },
+    license_plate: { type: String },
+    brand_car: { type: String },
+    model_car: { type: String }
   },
   {
     versionKey: false,
