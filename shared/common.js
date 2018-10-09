@@ -19,7 +19,10 @@ function setUserInfo(user) {
     name: user.full_name,
     role: user.role,
     unit_number: user.unit_number,
-    image: user.image
+    image: user.image,
+    brand_car: user.brand_car,
+    model_car: user.model_car,
+    license_plate: user.license_plate
   }
 
   return userInfo
