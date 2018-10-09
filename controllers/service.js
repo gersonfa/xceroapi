@@ -705,7 +705,7 @@ module.exports = (io, client) => {
       let date_fix = new Date(date.setHours(date.getHours() - 5))
       let today = new Date(date_fix.setHours(0, 0, 0, 0))
 
-      let count = await Counter.findOne({date: today})
+      let count = await Counter.findOne({date: today.getTime()})
 
       sendJSONresponse(res, 200, count)
     } catch(e) {
