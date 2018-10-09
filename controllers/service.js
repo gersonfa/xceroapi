@@ -5,6 +5,7 @@ const User = require('../models/user')
 const sendJSONresponse = require('../shared/common').sendJSONresponse
 const boom = require('boom')
 const service_utils = require('../shared/service-utils')
+const Counter = require('../models/counter')
 
 module.exports = (io, client) => {
   async function service_create(req, res, next) {
@@ -15,6 +16,11 @@ module.exports = (io, client) => {
         throw boom.badRequest(
           'no puedes crear un servicio si estas activo en uno.'
         )
+
+      let date = new Date()
+      let date_fix = new Date(date.setHours(date.getHours() - 5))
+      let today = new Date(date_fix.setHours(0, 0, 0, 0))
+      await Counter.findOneAndUpdate({date: today}, { $inc: { count: 1 }},{ upsert: true })
 
       const origin_lat = req.body.origin_lat
       const origin_lng = req.body.origin_lng
@@ -693,6 +699,20 @@ module.exports = (io, client) => {
     }
   }
 
+  async function service_count(req, res, next) {
+    try {
+      let date = new Date()
+      let date_fix = new Date(date.setHours(date.getHours() - 5))
+      let today = new Date(date_fix.setHours(0, 0, 0, 0))
+
+      let count = await Counter.findOne({date: today})
+
+      sendJSONresponse(res, 200, count)
+    } catch(e) {
+      return next(e)
+    }
+  }
+
   return {
     service_create,
     service_list,
@@ -710,6 +730,7 @@ module.exports = (io, client) => {
     remove_fee,
     add_price,
     get_area,
-    service_global
+    service_global,
+    service_count
   }
 }

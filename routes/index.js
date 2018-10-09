@@ -314,6 +314,7 @@ module.exports = (app, io) => {
    * @apiSuccess (200 Success) price 
    */
   api_routes.put('/service/:service_id/price', require_auth, service_controller.add_price)
+  api_routes.get('/service/counter', require_auth, service_controller.service_count)
   /**
    * @api {get} /api/get_location Get location
    * @apiName Get location
