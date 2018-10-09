@@ -20,7 +20,7 @@ module.exports = (io, client) => {
       let date = new Date()
       let date_fix = new Date(date.setHours(date.getHours() - 5))
       let today = new Date(date_fix.setHours(0, 0, 0, 0))
-      await Counter.findOneAndUpdate({date: today}, { $inc: { count: 1 }},{ upsert: true })
+      await Counter.findOneAndUpdate({date: today.getTime()}, { $inc: { count: 1 }},{ upsert: true })
 
       const origin_lat = req.body.origin_lat
       const origin_lng = req.body.origin_lng
