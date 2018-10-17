@@ -701,11 +701,10 @@ module.exports = (io, client) => {
 
   async function service_count(req, res, next) {
     try {
-      let date = new Date()
-      let date_fix = new Date(date.setHours(date.getHours() - 5))
-      let today = new Date(date_fix.setHours(0, 0, 0, 0))
+      const init_date = Number(req.query.init_date)
+      const end_date = Number(req.query.end_date)
 
-      let count = await Counter.findOne({date: today.getTime()})
+      let count = await Counter.find({date: { $gt: init_date, $lt: end_date }})
 
       sendJSONresponse(res, 200, count)
     } catch(e) {
