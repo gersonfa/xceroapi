@@ -701,7 +701,7 @@ module.exports = (io, client) => {
 
   async function service_count(req, res, next) {
     try {
-      const init_date = Number(req.query.init_date)
+      const init_date = Number(req.query.init_date) - 1
       const end_date = Number(req.query.end_date)
 
       let count = await Counter.find({date: { $gt: init_date, $lt: end_date }})

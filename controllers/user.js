@@ -113,7 +113,7 @@ async function driver_details(req, res, next) {
 
     let driver = await User.findById(
       driver_id,
-      'full_name image rating email image enable unit_number account emergency'
+      'full_name image rating email image enable unit_number account emergency license_plate brand_car model_car'
     )
 
     sendJSONresponse(res, 200, driver)
