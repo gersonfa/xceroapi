@@ -20,6 +20,7 @@ module.exports = (app, io) => {
   const frequent_controller = require('../controllers/frequent')
   const service_controller = require('../controllers/service')(io, client)
   const version_controller = require('../controllers/version')
+  const analysis_controller = require('../controllers/analysis')
 
   require('../controllers/socket')(io, client)
 
@@ -339,6 +340,7 @@ module.exports = (app, io) => {
    */
   api_routes.get('/driver_location/:driver_id', require_auth, user_controller.driver_location(client))
   api_routes.get('/service/driver/:driver_id', require_auth, service_controller.service_by_driver)
+  api_routes.get('/analysis', require_auth, analysis_controller.analysis_list)
   /**
    * @api {post} /api/report Report create
    * @apiName Report create

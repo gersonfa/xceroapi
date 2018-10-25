@@ -6,6 +6,7 @@ const sendJSONresponse = require('../shared/common').sendJSONresponse
 const boom = require('boom')
 const service_utils = require('../shared/service-utils')
 const Counter = require('../models/counter')
+const Analysis = require('../models/analysis')
 
 module.exports = (io, client) => {
   async function service_create(req, res, next) {
@@ -16,11 +17,6 @@ module.exports = (io, client) => {
         throw boom.badRequest(
           'no puedes crear un servicio si estas activo en uno.'
         )
-
-      let date = new Date()
-      let date_fix = new Date(date.setHours(date.getHours() - 5))
-      let today = new Date(date_fix.setHours(0, 0, 0, 0))
-      await Counter.findOneAndUpdate({date: today.getTime()}, { $inc: { count: 1 }},{ upsert: true })
 
       const origin_lat = req.body.origin_lat
       const origin_lng = req.body.origin_lng
@@ -74,6 +70,14 @@ module.exports = (io, client) => {
           path: 'user',
           select: 'full_name'
         })
+
+        let today = new Date(date_fix.setHours(0, 0, 0, 0))
+        await Counter.findOneAndUpdate(
+          { date: today.getTime() },
+          { $inc: { count: 1 } },
+          { upsert: true }
+        )
+
         let result = await emit_new_service(service)
         if (result) {
           sendJSONresponse(res, 200, service)
@@ -144,56 +148,57 @@ module.exports = (io, client) => {
       const service_id = req.params.service_id
       const maximum = 1500
       const minimum = 1
-      const randomnumber = Math.floor(Math.random() * (maximum - minimum + 1)) + minimum;
+      const randomnumber =
+        Math.floor(Math.random() * (maximum - minimum + 1)) + minimum
 
-      let sleep = ms => new Promise( r => setTimeout(r, ms));
+      let sleep = ms => new Promise(r => setTimeout(r, ms))
       await sleep(randomnumber)
 
-        let service = await Service.findById(service_id)
+      let service = await Service.findById(service_id)
 
-        if (
-          service.state === 'on_the_way' ||
-          service.state === 'canceled' ||
-          service.state === 'negated' ||
-          service.state === 'in_process' ||
-          service.state === 'completed'
-        ) {
-          throw boom.badRequest('El servicio ah sido cancelado o iniciado.')
-        }
+      if (
+        service.state === 'on_the_way' ||
+        service.state === 'canceled' ||
+        service.state === 'negated' ||
+        service.state === 'in_process' ||
+        service.state === 'completed'
+      ) {
+        throw boom.badRequest('El servicio ah sido cancelado o iniciado.')
+      }
 
-        service.driver = user._id
-        service.state = 'on_the_way'
+      service.driver = user._id
+      service.state = 'on_the_way'
 
-        service = await service.save()
-        service = await User.populate(service, {
-          path: 'driver',
-          select: 'full_name image rating unit_number'
-        })
+      service = await service.save()
+      service = await User.populate(service, {
+        path: 'driver',
+        select: 'full_name image rating unit_number'
+      })
 
-        let passenger = service.user.toString()
-        let passenger_socket = await client.hget('sockets', passenger)
+      let passenger = service.user.toString()
+      let passenger_socket = await client.hget('sockets', passenger)
 
-        if (passenger_socket) {
+      if (passenger_socket) {
+        io.to(passenger_socket).emit('service_on_the_way', service)
+      } else {
+        setTimeout(async () => {
+          passenger_socket = await client.hget('sockets', passenger)
           io.to(passenger_socket).emit('service_on_the_way', service)
-        } else {
-          setTimeout(async () => {
-            passenger_socket = await client.hget('sockets', passenger)
-            io.to(passenger_socket).emit('service_on_the_way', service)
-          }, 3000)
-        }
+        }, 3000)
+      }
 
-        sendJSONresponse(res, 200, service)
+      sendJSONresponse(res, 200, service)
 
-        let client_user = await User.findById(service.user)
-        client_user.inService = true
-        await client_user.save()
+      let client_user = await User.findById(service.user)
+      client_user.inService = true
+      await client_user.save()
 
-        user.inService = true
-        await user.save()
+      user.inService = true
+      await user.save()
 
-        let base = await service_utils.get_base(service)
-        base.stack = base.stack.filter(d => d != user.id)
-        await base.save()
+      let base = await service_utils.get_base(service)
+      base.stack = base.stack.filter(d => d != user.id)
+      await base.save()
     } catch (e) {
       return next(e)
     }
@@ -425,6 +430,15 @@ module.exports = (io, client) => {
       if (count_online === 0) {
         return await assign_to_close_driver(service)
       } else {
+        let analysis = new Analysis({
+          type: 'base',
+          drivers: base.stack.map(d => {
+            return { driver: d }
+          }),
+          service: service._id
+        })
+
+        await analysis.save()
         return true
       }
     }
@@ -432,12 +446,6 @@ module.exports = (io, client) => {
 
   async function assign_to_close_driver(service) {
     let close_drivers = await service_utils.get_close_drivers(service)
-    close_drivers = await User.find({
-      _id: { $in: close_drivers },
-      enable: true,
-      inService: false
-    }).distinct('_id')
-    close_drivers = close_drivers.map(d => d.toString())
     let total_drivers = 0
 
     await Promise.all(
@@ -704,10 +712,12 @@ module.exports = (io, client) => {
       const init_date = Number(req.query.init_date)
       const end_date = Number(req.query.end_date)
 
-      let count = await Counter.find({date: { $gt: init_date, $lt: end_date }})
+      let count = await Counter.find({
+        date: { $gt: init_date, $lt: end_date }
+      })
 
       sendJSONresponse(res, 200, count)
-    } catch(e) {
+    } catch (e) {
       return next(e)
     }
   }

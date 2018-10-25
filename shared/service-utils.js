@@ -2,6 +2,8 @@ const Tariff = require('../models/tariff')
 const Group = require('../models/group')
 const Base = require('../models/base')
 const Area = require('../models/area')
+const Analysis = require('../models/analysis')
+const User = require('../models/user')
 const inside = require('point-in-polygon')
 const geolib = require('geolib')
 const redis = require('async-redis')
@@ -81,7 +83,28 @@ async function get_close_drivers(service, distance = 1400) {
     })
   )
 
-  console.log('cercanos', close_drivers)
+  close_drivers = await User.find({
+    _id: { $in: close_drivers },
+    enable: true,
+    inService: false
+  }).distinct('_id')
+
+  let analysis = new Analysis({
+    type: 'closest',
+    drivers: close_drivers.map(async d => {
+      const driver = {
+        driver: d,
+        coords: await client.hget('coords', d.toString())
+      }
+
+      return driver
+    }),
+    service: service._id
+  })
+
+  close_drivers = close_drivers.map(d => d.toString())
+
+  await analysis.save()
   return close_drivers
 }
 
