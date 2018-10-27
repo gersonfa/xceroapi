@@ -32,6 +32,6 @@ require('./startup/logging')()
 require('./startup/routes')(app, io)
 require('./startup/db')()
 
-module.exports = server.listen(port, () => {
+server.listen(port, () => {
   console.log(`${chalk.green('[xcero-api]')} server listening on port ${port}`)
 })
