@@ -63,11 +63,18 @@ async function set_tariff(service) {
 
 async function get_close_drivers(service, distance = 1400) {
   let drivers = await client.hkeys('coords')
+  let drivers_available = await User.find({
+    _id: { $in: drivers },
+    enable: true,
+    inService: false
+  }).distinct('_id')
+
   let close_drivers = []
+  let drivers_analysis = []
 
   await Promise.all(
-    drivers.map(async driver => {
-      let coords = await client.hget('coords', driver)
+    drivers_available.map(async driver => {
+      let coords = await client.hget('coords', driver.toString())
       coords = JSON.parse(coords)
       let inside = await geolib.isPointInCircle(
         { latitude: coords[1], longitude: coords[0] },
@@ -78,32 +85,27 @@ async function get_close_drivers(service, distance = 1400) {
         distance
       )
       if (inside) {
-        close_drivers.push(driver)
+        close_drivers.push(driver.toString())
+        drivers_analysis.push({driver, coords})
       }
     })
   )
 
-  close_drivers = await User.find({
+  /* close_drivers = await User.find({
     _id: { $in: close_drivers },
     enable: true,
     inService: false
-  }).distinct('_id')
+  }).distinct('_id') */
+
+
 
   let analysis = new Analysis({
     type: 'closest',
-    drivers: close_drivers.map(async d => {
-      const driver = {
-        driver: d,
-        coords: await client.hget('coords', d.toString())
-      }
-
-      return driver
-    }),
+    drivers: drivers_analysis,
     service: service._id
   })
 
-  close_drivers = close_drivers.map(d => d.toString())
-
+  console.log(analysis)
   await analysis.save()
   return close_drivers
 }

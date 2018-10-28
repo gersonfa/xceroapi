@@ -98,16 +98,6 @@ module.exports = (io, client) => {
             }
           }, 30000)
 
-          setTimeout(async () => {
-            let check_service = await Service.findById(service._id)
-            if (
-              !check_service.driver &&
-              (check_service.state != 'canceled' &&
-                check_service.state != 'negated')
-            ) {
-              assign_to_close_driver(service)
-            }
-          }, 15000)
         } else {
           sendJSONresponse(res, 402, { error: 'No hay conductores cercanos' })
         }
@@ -439,6 +429,18 @@ module.exports = (io, client) => {
         })
 
         await analysis.save()
+
+        setTimeout(async () => {
+          let check_service = await Service.findById(service._id)
+          if (
+            !check_service.driver &&
+            (check_service.state != 'canceled' &&
+              check_service.state != 'negated')
+          ) {
+            assign_to_close_driver(service)
+          }
+        }, 15000)
+        
         return true
       }
     }
