@@ -18,10 +18,13 @@ async function analysis_list(req, res, next) {
         }
       })
 
-    list = list.filter(
-      a =>
-        a.service.request_time > init_date && a.service.request_time < end_date
-    )
+    list = list
+      .filter(a => a.service)
+      .filter(
+        a =>
+          a.service.request_time > init_date &&
+          a.service.request_time < end_date
+      )
 
     sendJSONresponse(res, 200, list)
   } catch (e) {
