@@ -6,7 +6,6 @@ async function analysis_list(req, res, next) {
     const init_date = Number(req.query.init_date)
     const end_date = Number(req.query.end_date)
 
-    console.log(init_date, end_date)
     let list = await Analysis.find()
       .populate('service')
       .populate({
@@ -22,8 +21,7 @@ async function analysis_list(req, res, next) {
       .filter(a => a.service)
       .filter(
         a =>
-          a.service.request_time > init_date &&
-          a.service.request_time < end_date
+          a.service.request_time > init_date && a.service.request_time < end_date
       )
 
     sendJSONresponse(res, 200, list)
