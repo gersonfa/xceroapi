@@ -5,6 +5,7 @@ const theEarth = require('../shared/common').theEarth
 
 module.exports = (io, client) => {
   io.on('connect', async socket => {
+    console.log(io.engine.clientsCount);
     const socket_id = socket.id
     let user_id = socket.handshake.query.user_id
     let times_disconnected = 0
