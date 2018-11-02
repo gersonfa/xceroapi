@@ -6,7 +6,10 @@ module.exports = () => {
   mongoose.connect(
     config.database,
     {
-      useMongoClient: true
+      useMongoClient: true,
+      reconnectTries: Number.MAX_VALUE,
+        // sets the delay between every retry (milliseconds)
+      reconnectInterval: 1000 
     }
   )
 }
