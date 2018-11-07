@@ -13,7 +13,9 @@ const http = require('http')
 const cors = require('cors')
 
 const server = http.createServer(app)
-const io = require('socket.io')(server)
+const io = require('socket.io')(server, {
+  upgradeTimeout: 30000
+})
 const redis = require('socket.io-redis')
 io.adapter(redis({ host: 'localhost', port: 6379 }))
 
