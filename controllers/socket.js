@@ -40,6 +40,8 @@ module.exports = (io, client) => {
       const coords = socket.coords
       const user_id = socket.user_id
 
+      if (!user_id) return
+
       client.hset('coords', user_id, JSON.stringify(coords))
 
       let user = await User.findById(user_id)
