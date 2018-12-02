@@ -5,7 +5,7 @@ const theEarth = require('../shared/common').theEarth
 
 module.exports = (io, client) => {
   io.on('connect', async socket => {
-    console.log(io.engine.clientsCount);
+    //console.log(io.engine.clientsCount);
     const socket_id = socket.id
     let user_id = socket.handshake.query.user_id
     let times_disconnected = 0
@@ -23,7 +23,7 @@ module.exports = (io, client) => {
     let check = setInterval(async () => {
       if (!socket.connected && user.role == 'Driver') {
         if (times_disconnected > 1) {
-          console.log('se desconecto', user.full_name)
+          //console.log('se desconecto', user.full_name)
           //client.hdel('sockets', user_id)
           client.hdel('coords', user_id)
           socket.leave('drivers')
