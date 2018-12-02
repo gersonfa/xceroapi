@@ -71,6 +71,8 @@ module.exports = (io, client) => {
           select: 'full_name'
         })
 
+        console.log(service)
+
         let today = new Date(date_fix.setHours(0, 0, 0, 0))
         await Counter.findOneAndUpdate(
           { date: today.getTime() },
@@ -449,6 +451,8 @@ module.exports = (io, client) => {
   async function assign_to_close_driver(service) {
     let close_drivers = await service_utils.get_close_drivers(service)
     let total_drivers = 0
+
+    console.log('close', service)
 
     await Promise.all(
       close_drivers.map(async driver => {

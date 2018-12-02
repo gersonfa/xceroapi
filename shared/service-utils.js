@@ -91,21 +91,12 @@ async function get_close_drivers(service, distance = 1400) {
     })
   )
 
-  /* close_drivers = await User.find({
-    _id: { $in: close_drivers },
-    enable: true,
-    inService: false
-  }).distinct('_id') */
-
-
-
   let analysis = new Analysis({
     type: 'closest',
     drivers: drivers_analysis,
     service: service._id
   })
 
-  console.log(analysis)
   await analysis.save()
   return close_drivers
 }
