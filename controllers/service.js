@@ -413,6 +413,7 @@ module.exports = (io, client) => {
         base.stack.map(async driver => {
           let driver_socket = await client.hget('sockets', driver.toString())
           if (driver_socket) {
+            console.log('base', service)
             io.to(driver_socket).emit('new_service', service)
             count_online += 1
           }
@@ -452,12 +453,13 @@ module.exports = (io, client) => {
     let close_drivers = await service_utils.get_close_drivers(service)
     let total_drivers = 0
 
-    console.log('close', service)
+    
 
     await Promise.all(
       close_drivers.map(async driver => {
         const driver_socket = await client.hget('sockets', driver)
         if (driver_socket) {
+          console.log('close', service)
           io.to(driver_socket).emit('new_service', service)
           total_drivers += 1
         }
