@@ -66,10 +66,6 @@ module.exports = (io, client) => {
         let date_fix = new Date(date.setHours(date.getHours() - 5))
         service.request_time = date_fix.getTime()
         service = await service.save()
-        service = await User.populate(service, {
-          path: 'user',
-          select: 'full_name'
-        })
 
         console.log(service)
 
@@ -408,6 +404,13 @@ module.exports = (io, client) => {
     let base = await service_utils.get_base(service)
     let count_online = 0
 
+    service = await User.populate(service, {
+      path: 'user',
+      select: 'full_name'
+    })
+
+    console.log('emit', service)
+
     if (base) {
       await Promise.all(
         base.stack.map(async driver => {
@@ -453,13 +456,10 @@ module.exports = (io, client) => {
     let close_drivers = await service_utils.get_close_drivers(service)
     let total_drivers = 0
 
-    
-
     await Promise.all(
       close_drivers.map(async driver => {
         const driver_socket = await client.hget('sockets', driver)
         if (driver_socket) {
-          console.log('close', service)
           io.to(driver_socket).emit('new_service', service)
           total_drivers += 1
         }
